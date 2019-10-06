@@ -1,0 +1,45 @@
+package SintacticoDosLang;
+import java.util.ArrayList;
+import java_cup.runtime.*;
+import doslang.DosLang;
+import Excepciones.Excepcion;
+import Excepciones.Excepcion.TIPOERROR;
+
+parser code 
+{:
+    //ArrayList<Traduccion> tree;
+    static int fila;
+    static int columna;
+    //public ArrayList<Traduccion> DevolverArbol() {
+    //        return tree;
+    //}
+    public void syntax_error(Symbol s){ 
+            System.err.println("Error Sintáctico en la Línea " + s.left +" Columna "+s.right+ ". No se esperaba este componente: " +s.value); 
+            DosLang.errores.add(new Excepcion(TIPOERROR.SINTACTICO, "No se esperaba el token: "+s.value, s.left, s.right));
+    } 
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+            System.err.println("Error síntactico en la Línea " + s.left+ "__Columna "+s.right+ ". No se esperaba este componente: " +s.value); 
+            DosLang.errores.add(new Excepcion(TIPOERROR.SINTACTICO, "No se esperaba el token: "+s.value, s.left, s.right));
+    }  
+
+    public static int getFila(){
+        return fila;
+    }
+    
+    public static int getColumna(){
+        return columna;
+    }
+:}
+
+/* Terminals (tokens returned by the scanner). */
+terminal numero, decimal, tipo, igual, cadena, identificador;
+
+/* Non terminals */
+non terminal String INICIO;
+
+start with INICIO;
+
+INICIO ::= numero:e {: System.out.println("Termino Correctamente"); :}
+        | cadena:e {: System.out.println("Termino Correctamente"); :}
+        ;
