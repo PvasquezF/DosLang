@@ -33,13 +33,169 @@ parser code
 :}
 
 /* Terminals (tokens returned by the scanner). */
-terminal numero, decimal, tipo, igual, cadena, identificador;
+terminal numero, decimal, tipo, igual, pComa, cadena, identificador;
+terminal integer, real, character, bool, word, string, record, nil;
+terminal type, coma, parenI, parenD, tresP, array, corI, corD, dosP;
+terminal of, sizeof, malloc, free, and, begin, caso, constante, div, hacer;
+terminal downto, sino, end, file, para, function, ir, si, in, label;
+terminal mod, not, or, packed, procedure, program, repeat, set, then;
+terminal to, until, var, punto, mientras, con, caracter, uses, dosPuntos;
+terminal potencia, modulo, menorque, menorigual, mayorque, mayorigual;
+terminal igualacion, diferente, nand, nor, falso, verdadero;
+terminal mas, menos, por, division, UMENOS;
 
 /* Non terminals */
-non terminal String INICIO;
+non terminal INICIO, SECCION_TIPO, LISTA_DECLARACION_TIPOS, DECLARACION_TIPOS;
+non terminal TIPO_DECLARACION, LISTA_IDENTIFICADORES, TIPO_PRIMITIVO;
+non terminal ENUM_TYPE, SUBRANGE_TYPE, LOWER_LIMIT, UPPER_LIMIT, ARRAY_TYPE;
+non terminal RANGO_ARRAY, EXPRESION, ARRAY_DECLARATION, MEMORIA_VIRTUAL;
+non terminal VARIABLE, LISTA_EXPRESION, PROGRAM, USES, SECCION_CONST;
+non terminal DECLARACION_CONST, CONST, SECCION_VAR, TIPO, ARITMETICA ;
+non terminal RELACIONAL, LOGICA, PRIMITIVO;
+
+precedence left or;
+precedence left nand, nor;
+precedence left and;
+precedence left igualacion, diferente;
+precedence left mayorigual, menorigual, menorque, mayorque;
+precedence left mas, menos;
+precedence left por, division, potencia, modulo;
+precedence right potencia;
+precedence right not;
+precedence right UMENOS;
 
 start with INICIO;
 
-INICIO ::= numero:e {: System.out.println("Termino Correctamente"); :}
-        | cadena:e {: System.out.println("Termino Correctamente"); :}
+INICIO ::= PROGRAM:e {: System.out.println("Termino Correctamente"); :}
+         ;
+
+PROGRAM ::= program identificador pComa USES
+          ;
+
+USES ::= uses LISTA_IDENTIFICADORES pComa SECCION_TIPO
+       | SECCION_TIPO 
+       ;
+
+SECCION_TIPO ::= type LISTA_DECLARACION_TIPOS SECCION_CONST
+               | SECCION_CONST
+               ;
+
+LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS DECLARACION_TIPOS
+                          | DECLARACION_TIPOS
+                          ;
+
+DECLARACION_TIPOS ::= TIPO_DECLARACION pComa
+                    | ENUM_TYPE pComa
+                    | SUBRANGE_TYPE pComa
+                    | ARRAY_TYPE pComa
+                    ;
+
+TIPO_DECLARACION ::= LISTA_IDENTIFICADORES igual TIPO
+                   ;
+
+ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_IDENTIFICADORES parenD
+            ;
+
+SUBRANGE_TYPE ::= LISTA_IDENTIFICADORES igual LOWER_LIMIT tresP UPPER_LIMIT
+                ;
+
+LOWER_LIMIT ::= EXPRESION
+            ; 
+
+UPPER_LIMIT ::= EXPRESION
+            ; 
+
+ARRAY_TYPE ::= LISTA_IDENTIFICADORES igual ARRAY_DECLARATION
+             ;
+
+ARRAY_DECLARATION ::= array corI RANGO_ARRAY corD of ARRAY_DECLARATION
+                    | array corI RANGO_ARRAY corD of TIPO_PRIMITIVO
+                    ;
+
+RANGO_ARRAY ::= EXPRESION dosP EXPRESION
+              ;
+
+LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES coma identificador
+                        | identificador
+                        ;
+
+VARIABLE ::= identificador
+           | VARIABLE punto identificador
+           | VARIABLE corI LISTA_EXPRESION corD
+           ;
+
+LISTA_EXPRESION ::= LISTA_EXPRESION coma EXPRESION
+                  | EXPRESION
+                  ;
+
+MEMORIA_VIRTUAL ::= sizeof parenI VARIABLE parenD pComa
+                  | malloc parenI EXPRESION parenD pComa
+                  | free parenI VARIABLE parenD pComa
+                  ;
+
+TIPO_PRIMITIVO ::= integer  
+                 | real
+                 | character
+                 | bool
+                 | word
+                 | string
+                 | record
+                 ;
+
+TIPO ::= identificador
+       | TIPO_PRIMITIVO
+       ;
+
+SECCION_CONST ::= constante DECLARACION_CONST SECCION_VAR
+                | SECCION_VAR
+                ;
+
+
+DECLARACION_CONST ::= DECLARACION_CONST CONST
+                   | CONST 
+                   ;
+
+CONST ::= LISTA_IDENTIFICADORES dosPuntos TIPO igual EXPRESION pComa
         ;
+
+SECCION_VAR ::= var DECLARACION_CONST
+              ;
+
+EXPRESION ::=  ARITMETICA:e                 {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}    
+           |   LOGICA:e                     {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
+           |   RELACIONAL:e                 {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
+           |   PRIMITIVO:e                  {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
+           |   parenI EXPRESION:e parenD    {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
+           ;
+
+ARITMETICA ::= menos  EXPRESION:e                 {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, Operador.MENOS_UNARIO); :} %prec UMENOS 
+             | EXPRESION:e mas EXPRESION:e1       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.SUMA); :}
+             | EXPRESION:e menos EXPRESION:e1     {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.RESTA); :}
+             | EXPRESION:e por EXPRESION:e1       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.MULTIPLICACION); :}
+             | EXPRESION:e division EXPRESION:e1       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.DIVISION); :}
+             | EXPRESION:e potencia EXPRESION:e1  {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.POTENCIA); :}
+             | EXPRESION:e modulo EXPRESION:e1    {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.POTENCIA); :}
+             ;
+
+RELACIONAL ::= EXPRESION:e mayorque EXPRESION:e1   {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.MAYOR_QUE); :}
+             | EXPRESION:e mayorigual EXPRESION:e1 {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.MAYOR_IGUAL); :}
+             | EXPRESION:e menorigual EXPRESION:e1 {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.MENOR_IGUAL); :}
+             | EXPRESION:e menorque EXPRESION:e1   {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.MENOR_QUE); :}
+             | EXPRESION:e igualacion EXPRESION:e1 {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.IGUAL_IGUAL); :}
+             | EXPRESION:e diferente EXPRESION:e1  {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.DIFERENTE_QUE); :}
+             ;
+
+LOGICA ::= EXPRESION:e or EXPRESION:e1      {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.OR); :}
+        |  EXPRESION:e and EXPRESION:e1     {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.AND); :}
+        |  EXPRESION:e nand EXPRESION:e1    {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.AND); :}
+        |  EXPRESION:e nor EXPRESION:e1     {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.AND); :}
+        |  not EXPRESION:e                  {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, Operador.NOT); :}
+        ;
+
+PRIMITIVO ::= cadena:e       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(e.toString()); :}
+           | verdadero:e     {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(true); :}
+           | falso:e         {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(false); :}
+           | numero:e        {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(new Integer(e+"")); :}
+           | decimal:e       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(new Double(e+"")); :}
+           | nil:e           {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(new Nulo()); :}
+           ;
