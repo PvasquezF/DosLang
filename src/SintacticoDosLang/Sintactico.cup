@@ -33,16 +33,17 @@ parser code
 :}
 
 /* Terminals (tokens returned by the scanner). */
-terminal numero, decimal, tipo, igual, pComa, cadena, identificador;
+terminal numero, decimal, igual, pComa, cadena, identificador;
 terminal integer, real, character, bool, word, string, record, nil;
 terminal type, coma, parenI, parenD, tresP, array, corI, corD, dosP;
-terminal of, sizeof, malloc, free, and, begin, caso, constante, div, hacer;
-terminal downto, sino, end, file, para, function, ir, si, in, label;
-terminal mod, not, or, packed, procedure, program, repeat, set, then;
+terminal of, sizeof, malloc, free, and, begin, caso, constante, hacer;
+terminal downto, sino, end, para, function, si;
+terminal not, or, procedure, program, repeat, then;
 terminal to, until, var, punto, mientras, con, caracter, uses, dosPuntos;
 terminal potencia, modulo, menorque, menorigual, mayorque, mayorigual;
 terminal igualacion, diferente, nand, nor, falso, verdadero;
-terminal mas, menos, por, division, UMENOS;
+terminal mas, menos, por, division, UMENOS, leer;
+terminal detener, continuar, salir, escribir, escribirln;
 
 /* Non terminals */
 non terminal INICIO, SECCION_TIPO, LISTA_DECLARACION_TIPOS, DECLARACION_TIPOS;
@@ -51,7 +52,14 @@ non terminal ENUM_TYPE, SUBRANGE_TYPE, LOWER_LIMIT, UPPER_LIMIT, ARRAY_TYPE;
 non terminal RANGO_ARRAY, EXPRESION, ARRAY_DECLARATION, MEMORIA_VIRTUAL;
 non terminal VARIABLE, LISTA_EXPRESION, PROGRAM, USES, SECCION_CONST;
 non terminal DECLARACION_CONST, CONST, SECCION_VAR, TIPO, ARITMETICA ;
-non terminal RELACIONAL, LOGICA, PRIMITIVO;
+non terminal RELACIONAL, LOGICA, PRIMITIVO, SECCION_FUNCION, PARAMETROS;
+non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES, LISTA_INSTRUCCIONES;
+non terminal INSTRUCCION, VAR, FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
+non terminal METHOD_LIST, MAIN, ASIGNACION, SI, LISTAIF, INSTRUCCIONESIF;
+non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, WRITE, READ;
+non terminal ACCESO, DECLARACION_VAR, VARINIT, REGISTRO, LISTA_RECORDS, RECORDS;
+non terminal CASE, CASELIST, DEFECTO, SWITCH, ARRAY_DECLARATION_MULTI, LISTA_RANGO_ARRAY;
+non terminal LLAMADA;
 
 precedence left or;
 precedence left nand, nor;
@@ -60,9 +68,10 @@ precedence left igualacion, diferente;
 precedence left mayorigual, menorigual, menorque, mayorque;
 precedence left mas, menos;
 precedence left por, division, potencia, modulo;
-precedence right potencia;
-precedence right not;
-precedence right UMENOS;
+precedence left potencia;
+precedence left not;
+precedence left UMENOS;
+precedence left parenI, parenD;
 
 start with INICIO;
 
@@ -91,9 +100,10 @@ DECLARACION_TIPOS ::= TIPO_DECLARACION pComa
                     ;
 
 TIPO_DECLARACION ::= LISTA_IDENTIFICADORES igual TIPO
+                   | LISTA_IDENTIFICADORES igual REGISTRO
                    ;
 
-ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_IDENTIFICADORES parenD
+ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_EXPRESION parenD
             ;
 
 SUBRANGE_TYPE ::= LISTA_IDENTIFICADORES igual LOWER_LIMIT tresP UPPER_LIMIT
@@ -106,6 +116,7 @@ UPPER_LIMIT ::= EXPRESION
             ; 
 
 ARRAY_TYPE ::= LISTA_IDENTIFICADORES igual ARRAY_DECLARATION
+             | LISTA_IDENTIFICADORES igual ARRAY_DECLARATION_MULTI
              ;
 
 ARRAY_DECLARATION ::= array corI RANGO_ARRAY corD of ARRAY_DECLARATION
@@ -115,22 +126,33 @@ ARRAY_DECLARATION ::= array corI RANGO_ARRAY corD of ARRAY_DECLARATION
 RANGO_ARRAY ::= EXPRESION dosP EXPRESION
               ;
 
+ARRAY_DECLARATION_MULTI ::= array corI ARRAY_MULTI corD of TIPO_PRIMITIVO
+                          ;
+
+ARRAY_MULTI ::= RANGO_ARRAY coma LISTA_RANGO_ARRAY
+              ;
+
+LISTA_RANGO_ARRAY ::= LISTA_RANGO_ARRAY coma RANGO_ARRAY
+                    | RANGO_ARRAY
+                    ;
+
 LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES coma identificador
                         | identificador
                         ;
 
 VARIABLE ::= identificador
-           | VARIABLE punto identificador
            | VARIABLE corI LISTA_EXPRESION corD
+           | VARIABLE parenI LISTA_EXPRESION parenD
+           | VARIABLE punto identificador
            ;
 
 LISTA_EXPRESION ::= LISTA_EXPRESION coma EXPRESION
                   | EXPRESION
                   ;
 
-MEMORIA_VIRTUAL ::= sizeof parenI VARIABLE parenD pComa
-                  | malloc parenI EXPRESION parenD pComa
-                  | free parenI VARIABLE parenD pComa
+MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION parenD
+                  | malloc parenI EXPRESION parenD
+                  //| free parenI EXPRESION parenD
                   ;
 
 TIPO_PRIMITIVO ::= integer  
@@ -150,7 +172,6 @@ SECCION_CONST ::= constante DECLARACION_CONST SECCION_VAR
                 | SECCION_VAR
                 ;
 
-
 DECLARACION_CONST ::= DECLARACION_CONST CONST
                    | CONST 
                    ;
@@ -158,15 +179,184 @@ DECLARACION_CONST ::= DECLARACION_CONST CONST
 CONST ::= LISTA_IDENTIFICADORES dosPuntos TIPO igual EXPRESION pComa
         ;
 
-SECCION_VAR ::= var DECLARACION_CONST
+SECCION_VAR ::= VARINIT SECCION_FUNCION
+              | SECCION_FUNCION
               ;
+
+VARINIT ::= var DECLARACION_VAR
+          ;
+
+DECLARACION_VAR ::= DECLARACION_VAR VAR
+                  | VAR
+                  ;
+
+VAR ::= LISTA_IDENTIFICADORES dosPuntos TIPO igual EXPRESION pComa
+      | LISTA_IDENTIFICADORES dosPuntos TIPO pComa
+      | LISTA_IDENTIFICADORES dosPuntos REGISTRO pComa
+      ;
+
+SECCION_FUNCION ::= METHOD_LIST MAIN
+                  | MAIN
+                  ;
+
+METHOD_LIST ::= METHOD_LIST FUNCION
+              | METHOD_LIST PROCEDURE
+              | FUNCION
+              | PROCEDURE
+              ;
+
+FUNCION ::= function identificador PARAMETROS dosPuntos TIPO pComa CUERPO_FUNCION
+          ;
+
+PROCEDURE ::= procedure identificador PARAMETROS pComa CUERPO_FUNCION
+            ;
+
+PARAMETROS ::= parenI LISTA_PARAMETROS parenD
+             | parenI parenD
+             ;
+
+LISTA_PARAMETROS ::= LISTA_PARAMETROS pComa LISTA_IDENTIFICADORES dosPuntos TIPO
+                   | LISTA_PARAMETROS pComa var LISTA_IDENTIFICADORES dosPuntos TIPO
+                   | LISTA_IDENTIFICADORES dosPuntos TIPO
+                   | var LISTA_IDENTIFICADORES dosPuntos TIPO
+                   ;
+
+CUERPO_FUNCION ::= VARINIT BLOQUE_INSTRUCCIONES
+                 | BLOQUE_INSTRUCCIONES
+                 ;
+
+
+REGISTRO ::= record  LISTA_RECORDS end 
+           ;
+
+LISTA_RECORDS ::= LISTA_RECORDS RECORDS
+                | RECORDS
+                ;
+
+RECORDS ::= LISTA_IDENTIFICADORES dosPuntos TIPO pComa 
+          | LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION pComa
+          | LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION_MULTI pComa
+          ;
+
+MAIN ::= begin LISTA_INSTRUCCIONES end punto
+       | begin end punto
+       ;
+
+BLOQUE_INSTRUCCIONES ::= begin LISTA_INSTRUCCIONES end pComa
+                       | begin end pComa
+                       ;
+
+LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES INSTRUCCION
+                      | INSTRUCCION
+                      ;
+
+INSTRUCCION ::= WITH
+              | ASIGNACION pComa
+              | TRANSFERENCIA
+              //| SI
+              | WHILE
+              | REPEAT
+              | FOR
+              | WRITE
+              | READ
+              | SWITCH
+              | free parenI EXPRESION parenD pComa
+              | LLAMADA pComa
+              ;
+
+WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES 
+       | con identificador hacer INSTRUCCION
+       ;
+
+ASIGNACION ::= VARIABLE dosPuntos igual EXPRESION 
+             ;
+
+TRANSFERENCIA ::= detener pComa
+                | continuar pComa
+                | salir pComa
+                ;
+
+//SI ::= si EXPRESION then BLOQUE_INSTRUCCIONES pComa
+//     | si EXPRESION then INSTRUCCION
+//     | si EXPRESION then INSTRUCCION sino INSTRUCCION
+//     | si EXPRESION then INSTRUCCION sino BLOQUE_INSTRUCCIONES pComa
+//     | si EXPRESION then BLOQUE_INSTRUCCIONES sino INSTRUCCION
+//     | si EXPRESION then BLOQUE_INSTRUCCIONES sino BLOQUE_INSTRUCCIONES pComa
+//     | si EXPRESION then INSTRUCCION LISTAIF
+     //| si EXPRESION then INSTRUCCIONESIF LISTAIF sino INSTRUCCIONESIF 
+     //| si EXPRESION then INSTRUCCIONESIF sino INSTRUCCIONESIF 
+     //| si EXPRESION then INSTRUCCIONESIF sino BLOQUE_INSTRUCCIONES pComa
+     //| si EXPRESION then INSTRUCCIONESIF sino INSTRUCCION
+     //| si EXPRESION then INSTRUCCIONESIF LISTAIFFINAL 
+     //;
+
+LISTAIF ::= sino si EXPRESION then INSTRUCCIONESIF LISTAIF
+          | sino si EXPRESION then INSTRUCCIONESIF
+          ;
+
+//LISTAIFFINAL ::= LISTAIFFINAL sino si EXPRESION then begin LISTA_INSTRUCCIONES end 
+//               | LISTAIFFINAL sino si EXPRESION then INSTRUCCION  
+//               | sino si EXPRESION then begin LISTA_INSTRUCCIONES end pComa
+//               | sino si EXPRESION then INSTRUCCION
+//               ;
+//
+INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES end
+                  | INSTRUCCION
+                  ;
+
+SWITCH ::= caso EXPRESION of CASELIST end pComa
+       | caso EXPRESION of CASELIST DEFECTO end pComa
+       ;
+
+CASELIST ::= CASELIST CASE
+           | CASE
+           ;
+
+CASE ::= EXPRESION dosPuntos INSTRUCCION
+       | EXPRESION dosPuntos BLOQUE_INSTRUCCIONES
+       ;
+
+DEFECTO ::= sino INSTRUCCION
+          | sino BLOQUE_INSTRUCCIONES
+          ;
+
+WHILE ::= mientras EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
+        | mientras EXPRESION hacer INSTRUCCION
+        ;
+
+REPEAT ::= repeat LISTA_INSTRUCCIONES until EXPRESION pComa
+         ;
+
+FOR ::= para ASIGNACION to EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
+      | para ASIGNACION downto EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
+      | para ASIGNACION to EXPRESION hacer INSTRUCCION
+      | para ASIGNACION downto EXPRESION hacer INSTRUCCION
+      ;
+
+WRITE ::= escribir parenI LISTA_EXPRESION parenD pComa
+        | escribirln parenI LISTA_EXPRESION parenD pComa
+        ; 
+
+READ ::= leer parenI LISTA_IDENTIFICADORES parenD pComa
+       ;
 
 EXPRESION ::=  ARITMETICA:e                 {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}    
            |   LOGICA:e                     {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
            |   RELACIONAL:e                 {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
            |   PRIMITIVO:e                  {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
            |   parenI EXPRESION:e parenD    {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
+           |   ACCESO:e                  {: //parser.fila = eleft; parser.columna = eright; RESULT = e; :}
+           |   MEMORIA_VIRTUAL
            ;
+
+ACCESO   ::= identificador
+           | ACCESO corI LISTA_EXPRESION corD
+           | ACCESO parenI LISTA_EXPRESION parenD
+           | ACCESO punto identificador
+           ;
+
+LLAMADA ::= identificador parenI LISTA_EXPRESION parenD
+          ;
 
 ARITMETICA ::= menos  EXPRESION:e                 {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, Operador.MENOS_UNARIO); :} %prec UMENOS 
              | EXPRESION:e mas EXPRESION:e1       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, e1, Operador.SUMA); :}
@@ -192,7 +382,8 @@ LOGICA ::= EXPRESION:e or EXPRESION:e1      {: //parser.fila = eleft; parser.col
         |  not EXPRESION:e                  {: //parser.fila = eleft; parser.columna = eright; RESULT = new Operacion(e, Operador.NOT); :}
         ;
 
-PRIMITIVO ::= cadena:e       {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(e.toString()); :}
+PRIMITIVO ::= cadena:e       {: System.out.println("string: "+e);//parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(e.toString()); :}
+           | caracter:e     {: System.out.println("char: "+e);//parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(true); :}
            | verdadero:e     {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(true); :}
            | falso:e         {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(false); :}
            | numero:e        {: //parser.fila = eleft; parser.columna = eright; RESULT = new Primitivo(new Integer(e+"")); :}

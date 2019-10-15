@@ -1,2 +1,0 @@
-SintacticoDosLang.CUP$Syntax$actions
-SintacticoDosLang.Syntax

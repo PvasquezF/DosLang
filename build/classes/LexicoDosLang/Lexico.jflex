@@ -57,29 +57,21 @@ ComentarioMulti =   "{" ~"}"
     "begin"             { return symbol(sym.begin, yytext().toLowerCase()); }
     "case"              { return symbol(sym.caso, yytext().toLowerCase()); }
     "const"             { return symbol(sym.constante, yytext().toLowerCase()); }
-    "div"               { return symbol(sym.div, yytext().toLowerCase()); }
     "do"                { return symbol(sym.hacer, yytext().toLowerCase()); }
     "downto"            { return symbol(sym.downto, yytext().toLowerCase()); }
     "else"              { return symbol(sym.sino, yytext().toLowerCase()); }
     "end"               { return symbol(sym.end, yytext().toLowerCase()); }
-    "file"              { return symbol(sym.file, yytext().toLowerCase()); }
     "for"               { return symbol(sym.para, yytext().toLowerCase()); }
     "function"          { return symbol(sym.function, yytext().toLowerCase()); }
-    "goto"              { return symbol(sym.ir, yytext().toLowerCase()); }
     "if"                { return symbol(sym.si, yytext().toLowerCase()); }
-    "in"                { return symbol(sym.in, yytext().toLowerCase()); }
-    "label"             { return symbol(sym.label, yytext().toLowerCase()); }
-    "mod"               { return symbol(sym.mod, yytext().toLowerCase()); }
     "and"               { return symbol(sym.and, yytext().toLowerCase()); }
     "or"                { return symbol(sym.or, yytext().toLowerCase()); }
     "nand"              { return symbol(sym.nand, yytext().toLowerCase()); }
     "nor"               { return symbol(sym.nor, yytext().toLowerCase()); }
     "not"               { return symbol(sym.not, yytext().toLowerCase()); }
-    "packed"            { return symbol(sym.packed, yytext().toLowerCase()); }
     "procedure"         { return symbol(sym.procedure, yytext().toLowerCase()); }
     "program"           { return symbol(sym.program, yytext().toLowerCase()); }
     "repeat"            { return symbol(sym.repeat, yytext().toLowerCase()); }
-    "set"               { return symbol(sym.set, yytext().toLowerCase()); }
     "then"              { return symbol(sym.then, yytext().toLowerCase()); }
     "to"                { return symbol(sym.to, yytext().toLowerCase()); }
     "until"             { return symbol(sym.until, yytext().toLowerCase()); }
@@ -89,6 +81,12 @@ ComentarioMulti =   "{" ~"}"
     "uses"              { return symbol(sym.uses, yytext().toLowerCase()); }
     "true"              { return symbol(sym.verdadero, yytext().toLowerCase()); }
     "false"             { return symbol(sym.falso, yytext().toLowerCase()); }
+    "break"             { return symbol(sym.detener, yytext().toLowerCase()); }
+    "continue"          { return symbol(sym.continuar, yytext().toLowerCase()); }
+    "exit"              { return symbol(sym.salir, yytext().toLowerCase()); }
+    "write"             { return symbol(sym.escribir, yytext().toLowerCase()); }
+    "writeln"           { return symbol(sym.escribirln, yytext().toLowerCase()); }
+    "read"              { return symbol(sym.leer, yytext().toLowerCase()); }
     
     "="                 { return symbol(sym.igual, "="); }
     "+"                 { return symbol(sym.mas, "+"); }
@@ -170,5 +168,5 @@ ComentarioMulti =   "{" ~"}"
                                                                  "Char sin finalizar", 
                                                                  yyline, 
                                                                  yycolumn)); }
-    .                            { NuevoString.append( yytext() ); }
+    .                            { NuevoChar.append( yytext() ); }
 }
