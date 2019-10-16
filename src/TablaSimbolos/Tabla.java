@@ -30,6 +30,7 @@ public class Tabla {
                 return "La variable " + simbolo.getNombre() + " ya ha sido declarada.";
             }
         }
+        tabla.add(simbolo);
         return null;
     }
     

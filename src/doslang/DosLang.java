@@ -16,8 +16,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import Excepciones.Excepcion;
+import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
+import TablaSimbolos.Tabla;
+import TablaSimbolos.Tree;
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
@@ -40,6 +43,12 @@ public class DosLang extends Thread {
         Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang.txt")));
         Syntax s = new Syntax(lexer);
         s.parse();
+        Tree t = s.getArbol();
+        Tabla tabla = new Tabla();
+        for(int i = 0; i < t.getInstrucciones().size(); i++){
+            Instruccion ins = (Instruccion)t.getInstrucciones().get(i);
+            ins.ejecutar(tabla, t);
+        }
         errores.forEach(m->{System.err.println(m.ToString());});
         //Listener socket = new Listener();
         //socket.connect();

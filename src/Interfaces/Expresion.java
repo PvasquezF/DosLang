@@ -6,6 +6,7 @@
 package Interfaces;
 
 import TablaSimbolos.Tabla;
+import TablaSimbolos.Tipo;
 import TablaSimbolos.Tree;
 
 /**
@@ -13,6 +14,6 @@ import TablaSimbolos.Tree;
  * @author Pavel
  */
 public interface Expresion extends AST {
-    Object getTipo();
+    Tipo getTipo();
     Object getValor(Tabla tabla, Tree arbol);
 }

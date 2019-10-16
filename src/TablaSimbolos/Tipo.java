@@ -5,13 +5,15 @@
  */
 package TablaSimbolos;
 
+import com.sun.org.apache.xpath.internal.operations.Equals;
+
 /**
  *
  * @author Pavel
  */
 public class Tipo {
 
-    private tipo t;
+    private tipo type;
     private String tipoObjeto;
 
     public static enum tipo {
@@ -23,24 +25,35 @@ public class Tipo {
         RECORD,
         NIL,
         WORD,
-        CHAR
+        CHAR,
+        OBJETO
     }
 
-    public Tipo(tipo t) {
-        this.t = t;
+    public Tipo(tipo type) {
+        this.type = type;
     }
 
     public Tipo(tipo t, String tipoObjeto) {
-        this.t = t;
+        this.type = type;
         this.tipoObjeto = tipoObjeto;
     }
 
-    public tipo getT() {
-        return t;
+    public boolean equals(Tipo t1) {
+        if (this.type == tipo.OBJETO) {
+            return this.getTipoObjeto().equalsIgnoreCase(t1.getTipoObjeto());
+        } else if (this.type == tipo.RECORD) {
+            return this.getTipoObjeto().equalsIgnoreCase(t1.getTipoObjeto());
+        } else {
+            return this.getType() == t1.getType();
+        }
     }
 
-    public void setT(tipo t) {
-        this.t = t;
+    public tipo getType() {
+        return type;
+    }
+
+    public void setType(tipo type) {
+        this.type = type;
     }
 
     public String getTipoObjeto() {

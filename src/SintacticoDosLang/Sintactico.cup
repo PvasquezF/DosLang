@@ -4,15 +4,17 @@ import java_cup.runtime.*;
 import doslang.DosLang;
 import Excepciones.Excepcion;
 import Excepciones.Excepcion.TIPOERROR;
+import Instrucciones.DeclaracionType;
+import Interfaces.AST;
+import TablaSimbolos.Tipo;
+import TablaSimbolos.Tree;
 
 parser code 
 {:
-    //ArrayList<Traduccion> tree;
-    static int fila;
-    static int columna;
-    //public ArrayList<Traduccion> DevolverArbol() {
-    //        return tree;
-    //}
+    Tree tree;
+    public Tree getArbol() {
+            return tree;
+    }
     public void syntax_error(Symbol s){ 
             System.err.println("Error Sintáctico en la Línea " + s.left +" Columna "+s.right+ ". No se esperaba este componente: " +s.value); 
             DosLang.errores.add(new Excepcion(TIPOERROR.SINTACTICO, "No se esperaba el token: "+s.value, s.left, s.right));
@@ -22,36 +24,27 @@ parser code
             System.err.println("Error síntactico en la Línea " + s.left+ "__Columna "+s.right+ ". No se esperaba este componente: " +s.value); 
             DosLang.errores.add(new Excepcion(TIPOERROR.SINTACTICO, "No se esperaba el token: "+s.value, s.left, s.right));
     }  
-
-    public static int getFila(){
-        return fila;
-    }
-    
-    public static int getColumna(){
-        return columna;
-    }
 :}
 
 /* Terminals (tokens returned by the scanner). */
-terminal numero, decimal, igual, pComa, cadena, identificador;
-terminal integer, real, character, bool, word, string, record, nil;
-terminal type, coma, parenI, parenD, tresP, array, corI, corD, dosP;
-terminal of, sizeof, malloc, free, and, begin, caso, constante, hacer;
-terminal downto, sino, end, para, function, si;
-terminal not, or, procedure, program, repeat, then;
-terminal to, until, var, punto, mientras, con, caracter, uses, dosPuntos;
-terminal potencia, modulo, menorque, menorigual, mayorque, mayorigual;
-terminal igualacion, diferente, nand, nor, falso, verdadero;
-terminal mas, menos, por, division, UMENOS, leer;
-terminal detener, continuar, salir, escribir, escribirln;
+terminal String numero, decimal, igual, pComa, cadena, identificador;
+terminal String integer, real, character, bool, word, string, record, nil;
+terminal String type, coma, parenI, parenD, tresP, array, corI, corD, dosP;
+terminal String of, sizeof, malloc, free, and, begin, caso, constante, hacer;
+terminal String downto, sino, end, para, function, si;
+terminal String not, or, procedure, program, repeat, then;
+terminal String to, until, var, punto, mientras, con, caracter, uses, dosPuntos;
+terminal String potencia, modulo, menorque, menorigual, mayorque, mayorigual;
+terminal String igualacion, diferente, nand, nor, falso, verdadero;
+terminal String mas, menos, por, division, UMENOS, leer;
+terminal String detener, continuar, salir, escribir, escribirln;
 
 /* Non terminals */
-non terminal INICIO, SECCION_TIPO, LISTA_DECLARACION_TIPOS, DECLARACION_TIPOS;
-non terminal TIPO_DECLARACION, LISTA_IDENTIFICADORES, TIPO_PRIMITIVO;
+non terminal INICIO;
 non terminal ENUM_TYPE, SUBRANGE_TYPE, LOWER_LIMIT, UPPER_LIMIT, ARRAY_TYPE;
 non terminal RANGO_ARRAY, EXPRESION, ARRAY_DECLARATION, MEMORIA_VIRTUAL;
-non terminal VARIABLE, LISTA_EXPRESION, PROGRAM, USES, SECCION_CONST;
-non terminal DECLARACION_CONST, CONST, SECCION_VAR, TIPO, ARITMETICA ;
+non terminal VARIABLE, LISTA_EXPRESION, SECCION_CONST;
+non terminal DECLARACION_CONST, CONST, SECCION_VAR, ARITMETICA ;
 non terminal RELACIONAL, LOGICA, PRIMITIVO, SECCION_FUNCION, PARAMETROS;
 non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES, LISTA_INSTRUCCIONES;
 non terminal INSTRUCCION, VAR, FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
@@ -60,6 +53,12 @@ non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, WRITE, READ;
 non terminal ACCESO, DECLARACION_VAR, VARINIT, REGISTRO, LISTA_RECORDS, RECORDS;
 non terminal CASE, CASELIST, DEFECTO, SWITCH, ARRAY_DECLARATION_MULTI, LISTA_RANGO_ARRAY;
 non terminal LLAMADA, INSIF;
+
+
+non terminal ArrayList<AST> PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS;
+non terminal ArrayList<String> LISTA_IDENTIFICADORES;
+non terminal AST DECLARACION_TIPOS, TIPO_DECLARACION;
+non terminal Tipo TIPO, TIPO_PRIMITIVO;
 
 precedence left then;
 //precedence left sino;
@@ -77,31 +76,31 @@ precedence left parenI, parenD;
 
 start with INICIO;
 
-INICIO ::= PROGRAM:e {: System.out.println("Termino Correctamente"); :}
+INICIO ::= PROGRAM:e {: System.out.println("Termino Correctamente"); parser.tree = new Tree(e);:}
          ;
 
-PROGRAM ::= program identificador pComa USES
+PROGRAM ::= program identificador:e pComa USES:e1 {:RESULT = e1;:}
           ;
 
-USES ::= uses LISTA_IDENTIFICADORES pComa SECCION_TIPO
-       | SECCION_TIPO 
+USES ::= uses LISTA_IDENTIFICADORES:e pComa SECCION_TIPO:e1 {:RESULT = e1;:}
+       | SECCION_TIPO:e {:RESULT = e;:}
        ;
 
-SECCION_TIPO ::= type LISTA_DECLARACION_TIPOS SECCION_CONST
+SECCION_TIPO ::= type LISTA_DECLARACION_TIPOS:e SECCION_CONST {:RESULT = e;:}
                | SECCION_CONST
                ;
 
-LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS DECLARACION_TIPOS
-                          | DECLARACION_TIPOS
+LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS:e DECLARACION_TIPOS:e1 {:RESULT = e; RESULT.add(e1);:}
+                          | DECLARACION_TIPOS:e {:RESULT = new ArrayList<>(); RESULT.add(e);:}
                           ;
 
-DECLARACION_TIPOS ::= TIPO_DECLARACION pComa
+DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
                     | ENUM_TYPE pComa
                     | SUBRANGE_TYPE pComa
                     | ARRAY_TYPE pComa
                     ;
 
-TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igual TIPO:e1 {RESULT = new DeclaracionType(e, e1, eleft, eright);}
+TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igual TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
                    | LISTA_IDENTIFICADORES igual REGISTRO
                    ;
 
@@ -138,8 +137,8 @@ LISTA_RANGO_ARRAY ::= LISTA_RANGO_ARRAY coma RANGO_ARRAY
                     | RANGO_ARRAY
                     ;
 
-LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES coma identificador
-                        | identificador
+LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES:e coma identificador:e1 {:RESULT = e; RESULT.add(e1);:}
+                        | identificador:e {:RESULT = new ArrayList<String>(); RESULT.add(e);:}
                         ;
 
 VARIABLE ::= identificador
@@ -157,17 +156,17 @@ MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION parenD
                   //| free parenI EXPRESION parenD
                   ;
 
-TIPO_PRIMITIVO ::= integer  
-                 | real
-                 | character
-                 | bool
-                 | word
-                 | string
-                 | record
+TIPO_PRIMITIVO ::= integer   {:RESULT = new Tipo(Tipo.tipo.INTEGER);:} 
+                 | real      {:RESULT = new Tipo(Tipo.tipo.REAL);:}
+                 | character {:RESULT = new Tipo(Tipo.tipo.CHAR);:}
+                 | bool      {:RESULT = new Tipo(Tipo.tipo.BOOLEAN);:}
+                 | word      {:RESULT = new Tipo(Tipo.tipo.WORD);:}
+                 | string    {:RESULT = new Tipo(Tipo.tipo.STRING);:}
+                 | record    {:RESULT = new Tipo(Tipo.tipo.RECORD);:}
                  ;
 
-TIPO ::= identificador
-       | TIPO_PRIMITIVO
+TIPO ::= identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
+       | TIPO_PRIMITIVO:e {:RESULT = e;:}
        ;
 
 SECCION_CONST ::= constante DECLARACION_CONST SECCION_VAR
@@ -255,7 +254,7 @@ LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES INSTRUCCION
 INSTRUCCION ::= WITH
               | ASIGNACION pComa
               | TRANSFERENCIA
-              | SI
+              //| SI
               | WHILE
               | REPEAT
               | FOR

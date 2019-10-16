@@ -5,6 +5,8 @@
  */
 package TablaSimbolos;
 
+import Interfaces.Expresion;
+
 /**
  *
  * @author Pavel
@@ -16,6 +18,7 @@ public class Simbolo {
     private String ambito;
     private String rol;
     private int apuntador;
+    private Expresion valor;
 
     public Simbolo(String nombre, Tipo tipo, String ambito, String rol, int apuntador) {
         this.nombre = nombre;
@@ -23,6 +26,15 @@ public class Simbolo {
         this.ambito = ambito;
         this.rol = rol;
         this.apuntador = apuntador;
+    }
+    
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, Expresion valor, int apuntador) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ambito = ambito;
+        this.rol = rol;
+        this.apuntador = apuntador;
+        this.valor = valor;
     }
 
     public String getNombre() {
