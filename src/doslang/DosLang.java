@@ -26,6 +26,7 @@ public class DosLang extends Thread  {
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
+<<<<<<< Updated upstream
         Listener socket = new Listener();
         socket.connect();
         socket.start();
@@ -35,6 +36,17 @@ public class DosLang extends Thread  {
 //        PrintWriter pw = new PrintWriter(os);
 //        pw.println(msg);
 //        pw.flush();
+=======
+        errores = new ArrayList<>();
+        //Lexer lexer = new Lexer(new BufferedReader(new StringReader(entrada2)));
+        Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang.txt")));
+        Syntax s = new Syntax(lexer);
+        s.parse();
+        errores.forEach(m->{System.err.println(m.ToString());});
+//        Listener socket = new Listener();
+//        socket.connect();
+//        socket.start();
+>>>>>>> Stashed changes
     }
 //    public static void main(String[] args) {
 //        ServerSocket server;
