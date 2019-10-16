@@ -39,9 +39,7 @@ public class Tipo {
     }
 
     public boolean equals(Tipo t1) {
-        if (this.type == tipo.OBJETO) {
-            return this.getTipoObjeto().equalsIgnoreCase(t1.getTipoObjeto());
-        } else if (this.type == tipo.RECORD) {
+        if (this.type == tipo.OBJETO || this.type == tipo.RECORD) {
             return this.getTipoObjeto().equalsIgnoreCase(t1.getTipoObjeto());
         } else {
             return this.getType() == t1.getType();
