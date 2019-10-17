@@ -50,7 +50,7 @@ public class DosLang extends Thread {
             Instruccion ins = (Instruccion)t.getInstrucciones().get(i);
             ins.ejecutar(tabla, t);
         }
-        System.out.println("");
+        tabla.generarTablaHTML();
         errores.addAll(t.getErrores());
         errores.forEach(m->{System.err.println(m.ToString());});
         //Listener socket = new Listener();

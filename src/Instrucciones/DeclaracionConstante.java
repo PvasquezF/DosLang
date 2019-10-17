@@ -26,13 +26,6 @@ public class DeclaracionConstante implements Instruccion {
     private int fila;
     private int columna;
 
-    public DeclaracionConstante(Tipo tipo, ArrayList<String> identificadores, int fila, int columna) {
-        this.tipo = tipo;
-        this.identificadores = identificadores;
-        this.fila = fila;
-        this.columna = columna;
-    }
-
     public DeclaracionConstante(Tipo tipo, ArrayList<String> identificadores, Expresion valor, int fila, int columna) {
         this.tipo = tipo;
         this.identificadores = identificadores;
@@ -47,17 +40,18 @@ public class DeclaracionConstante implements Instruccion {
             String identificador = identificadores.get(i);
             Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", valor, true, tabla.getHeap());
             Object resultTipo = valor.getTipo(tabla, arbol);
+            if (resultTipo instanceof Excepcion) {
+                return resultTipo;
+            }
             if ((tipo.equals(new Tipo(Tipo.tipo.CHAR))
                     || tipo.equals(new Tipo(Tipo.tipo.INTEGER))
-                    || tipo.equals(new Tipo(Tipo.tipo.REAL))) && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
+                    || tipo.equals(new Tipo(Tipo.tipo.REAL))) 
+                    && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                         "No se puede asignar NIL al tipo " + tipo.toString() + ".",
                         fila, columna);
                 arbol.getErrores().add(exc);
                 return exc;
-            }
-            if (resultTipo instanceof Excepcion) {
-                return resultTipo;
             }
             Tipo tipoValor = (Tipo) resultTipo;
             if (tipo.equals(tipoValor)) {

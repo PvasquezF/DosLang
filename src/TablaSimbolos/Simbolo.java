@@ -79,4 +79,12 @@ public class Simbolo {
     public void setApuntador(int apuntador) {
         this.apuntador = apuntador;
     }
+
+    public boolean isConstante() {
+        return constante;
+    }
+
+    public void setConstante(boolean constante) {
+        this.constante = constante;
+    }
 }

@@ -10,6 +10,8 @@ import Expresiones.Operacion.Operador;
 import Expresiones.Primitivo;
 import Instrucciones.DeclaracionType;
 import Instrucciones.DeclaracionVar;
+import Instrucciones.DeclaracionConstante;
+import Instrucciones.Program;
 import Interfaces.AST;
 import TablaSimbolos.Tipo;
 import TablaSimbolos.Tree;
@@ -50,7 +52,6 @@ non terminal INICIO;
 non terminal ENUM_TYPE, SUBRANGE_TYPE, LOWER_LIMIT, UPPER_LIMIT, ARRAY_TYPE;
 non terminal RANGO_ARRAY, ARRAY_DECLARATION, MEMORIA_VIRTUAL;
 non terminal VARIABLE, LISTA_EXPRESION;
-non terminal DECLARACION_CONST, CONST ;
 non terminal SECCION_FUNCION, PARAMETROS;
 non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES, LISTA_INSTRUCCIONES;
 non terminal INSTRUCCION, FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
@@ -62,9 +63,9 @@ non terminal INSIF;
 
 
 non terminal ArrayList<AST> PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS;
-non terminal ArrayList<AST> VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST;
+non terminal ArrayList<AST> VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
-non terminal AST DECLARACION_TIPOS, TIPO_DECLARACION, VAR;
+non terminal AST DECLARACION_TIPOS, TIPO_DECLARACION, VAR, CONST;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, ACCESO, LLAMADA;
 non terminal Tipo TIPO, TIPO_PRIMITIVO;
 
@@ -87,7 +88,7 @@ start with INICIO;
 INICIO ::= PROGRAM:e {: System.out.println("Termino Correctamente"); parser.tree = new Tree(e);:}
          ;
 
-PROGRAM ::= program identificador:e pComa USES:e1 {:RESULT = e1;:}
+PROGRAM ::= program identificador:e pComa USES:e1 {: RESULT = new ArrayList<AST>(); RESULT.add(new Program(e)); RESULT.addAll(e1);:}
           ;
 
 USES ::= uses LISTA_IDENTIFICADORES:e pComa SECCION_TIPO:e1 {:RESULT = e1;:}
@@ -177,15 +178,15 @@ TIPO ::= identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
        | TIPO_PRIMITIVO:e {:RESULT = e;:}
        ;
 
-SECCION_CONST ::= constante DECLARACION_CONST:e SECCION_VAR:e1 {:RESULT = e1;:}
+SECCION_CONST ::= constante DECLARACION_CONST:e SECCION_VAR:e1 {:RESULT = e; RESULT.addAll(e1);:}
                 | SECCION_VAR:e {:RESULT = e;:}
                 ;
 
-DECLARACION_CONST ::= DECLARACION_CONST CONST
-                   | CONST 
+DECLARACION_CONST ::= DECLARACION_CONST:e CONST:e1 {:RESULT = e; RESULT.add(e1);:}
+                   | CONST:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                    ;
 
-CONST ::= LISTA_IDENTIFICADORES dosPuntos TIPO igual EXPRESION pComa
+CONST ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionConstante(e1, e, e2, eleft, eright); :}
         ;
 
 SECCION_VAR ::= VARINIT:e SECCION_FUNCION:e1 {:RESULT = e;:}
@@ -234,8 +235,7 @@ CUERPO_FUNCION ::= VARINIT BLOQUE_INSTRUCCIONES
                  | BLOQUE_INSTRUCCIONES
                  ;
 
-
-REGISTRO ::= record  LISTA_RECORDS end 
+REGISTRO ::= record LISTA_RECORDS end 
            ;
 
 LISTA_RECORDS ::= LISTA_RECORDS RECORDS
