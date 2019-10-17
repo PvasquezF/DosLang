@@ -40,7 +40,8 @@ public class DosLang extends Thread {
         // TODO code application logic here
         errores = new ArrayList<>();
         //Lexer lexer = new Lexer(new BufferedReader(new StringReader(entrada2)));
-        Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang.txt")));
+        //Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang.txt")));
+        Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang2.txt")));
         Syntax s = new Syntax(lexer);
         s.parse();
         Tree t = s.getArbol();
@@ -49,6 +50,8 @@ public class DosLang extends Thread {
             Instruccion ins = (Instruccion)t.getInstrucciones().get(i);
             ins.ejecutar(tabla, t);
         }
+        System.out.println("");
+        errores.addAll(t.getErrores());
         errores.forEach(m->{System.err.println(m.ToString());});
         //Listener socket = new Listener();
         //socket.connect();

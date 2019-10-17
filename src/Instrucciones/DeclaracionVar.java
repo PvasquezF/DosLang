@@ -18,7 +18,7 @@ import java.util.ArrayList;
  *
  * @author Pavel
  */
-public class Declaracion implements Instruccion {
+public class DeclaracionVar implements Instruccion {
 
     private ArrayList<String> identificadores;
     private Tipo tipo;
@@ -26,14 +26,14 @@ public class Declaracion implements Instruccion {
     private int fila;
     private int columna;
 
-    public Declaracion(Tipo tipo, ArrayList<String> identificadores, int fila, int columna) {
+    public DeclaracionVar(Tipo tipo, ArrayList<String> identificadores, int fila, int columna) {
         this.tipo = tipo;
         this.identificadores = identificadores;
         this.fila = fila;
         this.columna = columna;
     }
 
-    public Declaracion(Tipo tipo, ArrayList<String> identificadores, Expresion valor, int fila, int columna) {
+    public DeclaracionVar(Tipo tipo, ArrayList<String> identificadores, Expresion valor, int fila, int columna) {
         this.tipo = tipo;
         this.identificadores = identificadores;
         this.valor = valor;
@@ -43,10 +43,12 @@ public class Declaracion implements Instruccion {
 
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
-        if (valor != null) {
+        if (valor == null) {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
-                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", tabla.getHeap());
+                Expresion resultTipo = Tipo.valorPredeterminado(tipo);
+                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", resultTipo, false, tabla.getHeap());
+
                 Object result = tabla.InsertarVariable(simbolo);
                 if (result != null) {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -59,9 +61,22 @@ public class Declaracion implements Instruccion {
         } else {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
-                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", valor, tabla.getHeap());
-                Tipo tipoValor = valor.getTipo();
-                if (tipoValor.equals(tipo)) {
+                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", valor, false, tabla.getHeap());
+                Object resultTipo = valor.getTipo(tabla, arbol);
+                if ((tipo.equals(new Tipo(Tipo.tipo.CHAR))
+                        || tipo.equals(new Tipo(Tipo.tipo.INTEGER))
+                        || tipo.equals(new Tipo(Tipo.tipo.REAL))) && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
+                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                            "No se puede asignar NIL al tipo " + tipo.toString() + ".",
+                            fila, columna);
+                    arbol.getErrores().add(exc);
+                    return exc;
+                }
+                if (resultTipo instanceof Excepcion) {
+                    return resultTipo;
+                }
+                Tipo tipoValor = (Tipo) resultTipo;
+                if (tipo.equals(tipoValor)) {
                     Object result = tabla.InsertarVariable(simbolo);
                     if (result != null) {
                         Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

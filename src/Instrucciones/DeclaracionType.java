@@ -36,7 +36,7 @@ public class DeclaracionType implements Instruccion {
     public Object ejecutar(Tabla tabla, Tree arbol) {
         for(int i = 0; i < identificadores.size(); i++){
             String identificador = identificadores.get(i);
-            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", tabla.getHeap());
+            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", false, tabla.getHeap());
             Object result = tabla.InsertarVariable(simbolo);
             if (result != null) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

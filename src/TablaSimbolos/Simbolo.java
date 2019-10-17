@@ -18,23 +18,26 @@ public class Simbolo {
     private String ambito;
     private String rol;
     private int apuntador;
+    private boolean constante;
     private Expresion valor;
 
-    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, int apuntador) {
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, boolean constante, int apuntador) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ambito = ambito;
         this.rol = rol;
         this.apuntador = apuntador;
+        this.constante = constante;
     }
     
-    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, Expresion valor, int apuntador) {
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, Expresion valor, boolean constante, int apuntador) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ambito = ambito;
         this.rol = rol;
         this.apuntador = apuntador;
         this.valor = valor;
+        this.constante = constante;
     }
 
     public String getNombre() {
