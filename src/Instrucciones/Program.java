@@ -26,11 +26,12 @@ public class Program implements Instruccion{
         //Si se llama otro program, este pasara a ser el primero, y al terminar 
         //se hara pop y el anterior volvera a ser el ambito actual
         tabla.getListaAmbitos().add(nombreProgram.toLowerCase());
+        tabla.setAmbito(nombreProgram.toLowerCase());
         return null;
     }
 
     @Override
-    public String get4D() {
+    public String get4D(Tabla tabla, Tree arbol) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

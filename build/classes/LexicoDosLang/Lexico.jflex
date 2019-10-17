@@ -22,7 +22,7 @@ import doslang.DosLang;
         return new Symbol(type, yyline, yycolumn, value);
     }
     StringBuilder NuevoString = new StringBuilder();
-    StringBuilder NuevoChar = new StringBuilder();
+    char NuevoChar;
 %}
 
 FinLinea        =   \r|\n|\r\n
@@ -112,7 +112,7 @@ ComentarioMulti =   "{" ~"}"
     "=="                { return symbol(sym.igualacion, "=="); }
     "<>"                { return symbol(sym.diferente, "<>"); }
     \"                  { yybegin(STRING); NuevoString.setLength(0);}
-    \'                  { yybegin(CHARACTER); NuevoChar.setLength(0);}
+    \'                  { yybegin(CHARACTER); NuevoChar = ' ';}
     {Identificador}     { return symbol(sym.identificador, yytext().toLowerCase());  }
     {ComentarioLinea}   { /* ignore */}
     {ComentarioMulti}   { /* ignore */}
@@ -150,23 +150,17 @@ ComentarioMulti =   "{" ~"}"
 
 <CHARACTER> {
     \'                           { yybegin(YYINITIAL); 
-                                   if(NuevoChar.toString().length() > 2){
-                                        DosLang.errores.add(new Excepcion(TIPOERROR.LEXICO, 
-                                                            "El tipo de dato char solo debe tener un caracter", 
-                                                            yyline, 
-                                                            yycolumn));
-                                   }else{
-                                        return symbol(sym.caracter, NuevoChar.toString());}
-                                   }
-    \\t                          { NuevoString.append('\t'); }
-    \\n                          { NuevoString.append('\n'); }
-    \\r                          { NuevoString.append('\r'); }
-    \\\"                         { NuevoString.append('\"'); }
-    \\                           { NuevoString.append('\\'); }
+                                   return symbol(sym.caracter, NuevoChar);}
+                                   
+    \\t                          { NuevoChar = '\t'; }
+    \\n                          { NuevoChar = '\n'; }
+    \\r                          { NuevoChar = '\r'; }
+    \\\"                         { NuevoChar = '\"'; }
+    \\                           { NuevoChar = '\\'; }
     {FinLinea}                   { yybegin(YYINITIAL);
                                    DosLang.errores.add(new Excepcion(TIPOERROR.LEXICO, 
                                                                  "Char sin finalizar", 
                                                                  yyline, 
                                                                  yycolumn)); }
-    .                            { NuevoChar.append( yytext() ); }
+    .                            { NuevoChar = yytext().charAt(0); }
 }

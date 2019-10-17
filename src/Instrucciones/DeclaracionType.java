@@ -34,7 +34,7 @@ public class DeclaracionType implements Instruccion {
 
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
-        for(int i = 0; i < identificadores.size(); i++){
+        for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
             Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", false, tabla.getHeap());
             Object result = tabla.InsertarVariable(simbolo);
@@ -50,8 +50,23 @@ public class DeclaracionType implements Instruccion {
     }
 
     @Override
-    public String get4D() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object get4D(Tabla tabla, Tree arbol) {
+        String codigo = "";
+        /*for (int i = 0; i < identificadores.size(); i++) {
+            String identificador = identificadores.get(i);
+            Object result = tabla.getVariable(identificador);
+            if (result instanceof String) {
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        (String) result,
+                        fila, columna);
+                arbol.getErrores().add(exc);
+                return exc;
+            } else {
+                Simbolo sim = (Simbolo) result;
+                codigo += "=," + tabla.getTemporal() + "," + sim.getApuntador() + ",heap\n";
+            }
+        }*/
+        return codigo;
     }
 
 }

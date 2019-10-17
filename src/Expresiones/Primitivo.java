@@ -48,8 +48,28 @@ public class Primitivo implements Expresion {
     }
 
     @Override
-    public String get4D() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String get4D(Tabla tabla, Tree arbol) {
+        String codigo = "";
+        if (valor instanceof String) {
+            codigo += "=," + tabla.getHeap() + ",," + tabla.getTemporal() + "\n";
+        } else if (valor instanceof Integer) {
+            codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
+        } else if (valor instanceof Character) {
+            codigo += "=," + (int) ((Character)valor).charValue() + ",," + tabla.getTemporal() + "\n";
+        } else if (valor instanceof Double) {
+            codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
+        } else if (valor instanceof Boolean) {
+            if ((boolean) valor) {
+                codigo += "=,1,," + tabla.getTemporal() + "\n";
+            } else {
+                codigo += "=,0,," + tabla.getTemporal() + "\n";
+            }
+        } else if (valor instanceof Nil) {
+            codigo += new Nil().get4D(tabla, arbol);
+        } else {
+            codigo += new Nil().get4D(tabla, arbol);
+        }
+        return codigo;
     }
 
 }

@@ -15,7 +15,7 @@ import TablaSimbolos.Tree;
  *
  * @author Pavel
  */
-public class Nil implements Expresion{
+public class Nil implements Expresion {
 
     @Override
     public Object getTipo(Tabla tabla, Tree arbol) {
@@ -28,8 +28,10 @@ public class Nil implements Expresion{
     }
 
     @Override
-    public String get4D() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object get4D(Tabla tabla, Tree arbol) {
+        String codigo = "";
+        codigo += "=, -1,, " + tabla.getTemporal()+"\n";
+        return codigo;
     }
-    
+
 }

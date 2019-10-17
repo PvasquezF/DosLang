@@ -24,8 +24,9 @@ public class Tabla {
 
     private ArrayList<Simbolo> tabla;
     private String ambito;
-    private String temporal;
+    private int indiceTemporal;
     private String etiqueta;
+    private int indiceEtiqueta;
     private Stack listaAmbitos;
     private int heap;
     private int stack;
@@ -43,6 +44,17 @@ public class Tabla {
         }
         tabla.add(simbolo);
         return null;
+    }
+
+    public Object getVariable(String identificador) {
+        for (Simbolo i : tabla) {
+            for (Object env : listaAmbitos) {
+                if (i.getNombre().equalsIgnoreCase(identificador) && i.getAmbito().equalsIgnoreCase((String) env)) {
+                    return i;
+                }
+            }
+        }
+        return "No se ha encontrado la variable " + identificador + ".";
     }
 
     public void generarTablaHTML() {
@@ -78,7 +90,7 @@ public class Tabla {
             filas += "<td scope=\"row\">" + sim.getNombre() + "</td>";
             filas += "<td scope=\"row\">" + sim.getTipo() + "</td>";
             filas += "<td scope=\"row\">" + sim.getAmbito() + "</td>";
-            filas += "<td scope=\"row\">" + sim.isConstante()+ "</td>";
+            filas += "<td scope=\"row\">" + sim.isConstante() + "</td>";
             filas += "<td scope=\"row\"> - </td>";
             filas += "<td scope=\"row\">" + sim.getApuntador() + "</td>";
             filas += "</tr>";
@@ -105,16 +117,24 @@ public class Tabla {
     }
 
     public String getAmbito() {
-        ambito = this.listaAmbitos.firstElement().toString();
+        //ambito = this.listaAmbitos.firstElement().toString();
         return ambito;
     }
 
     public String getTemporal() {
-        return temporal;
+        return "t" + indiceTemporal++;
+    }
+
+    public String getTemporalActual() {
+        return "t" + (indiceTemporal - 1);
     }
 
     public String getEtiqueta() {
-        return etiqueta;
+        return "L" + indiceEtiqueta++;
+    }
+
+    public String getEtiquetaActual() {
+        return "L" + (indiceEtiqueta - 1);
     }
 
     public int getHeap() {
@@ -127,5 +147,9 @@ public class Tabla {
 
     public Stack getListaAmbitos() {
         return listaAmbitos;
+    }
+
+    public void setAmbito(String ambito) {
+        this.ambito = ambito;
     }
 }

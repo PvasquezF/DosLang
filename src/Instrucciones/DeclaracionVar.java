@@ -63,17 +63,19 @@ public class DeclaracionVar implements Instruccion {
                 String identificador = identificadores.get(i);
                 Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", valor, false, tabla.getHeap());
                 Object resultTipo = valor.getTipo(tabla, arbol);
+                if (resultTipo instanceof Excepcion) {
+                    return resultTipo;
+                }
+                char c;
                 if ((tipo.equals(new Tipo(Tipo.tipo.CHAR))
                         || tipo.equals(new Tipo(Tipo.tipo.INTEGER))
-                        || tipo.equals(new Tipo(Tipo.tipo.REAL))) && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
+                        || tipo.equals(new Tipo(Tipo.tipo.REAL)))
+                        && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                             "No se puede asignar NIL al tipo " + tipo.toString() + ".",
                             fila, columna);
                     arbol.getErrores().add(exc);
                     return exc;
-                }
-                if (resultTipo instanceof Excepcion) {
-                    return resultTipo;
                 }
                 Tipo tipoValor = (Tipo) resultTipo;
                 if (tipo.equals(tipoValor)) {
@@ -98,8 +100,24 @@ public class DeclaracionVar implements Instruccion {
     }
 
     @Override
-    public String get4D() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object get4D(Tabla tabla, Tree arbol) {
+        String codigo = "";
+        for (int i = 0; i < identificadores.size(); i++) {
+            String identificador = identificadores.get(i);
+            Object result = tabla.getVariable(identificador);
+            if (result instanceof String) {
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        (String) result,
+                        fila, columna);
+                arbol.getErrores().add(exc);
+                return exc;
+            } else {
+                Simbolo sim = (Simbolo) result;
+                codigo += sim.getValor().get4D(tabla, arbol);
+                codigo += "=, " + sim.getApuntador() + ", " + tabla.getTemporalActual() + ", heap\n";
+            }
+        }
+        return codigo;
     }
 
 }

@@ -41,12 +41,12 @@ terminal String type, coma, parenI, parenD, tresP, array, corI, corD, dosP;
 terminal String of, sizeof, malloc, free, and, begin, caso, constante, hacer;
 terminal String downto, sino, end, para, function, si;
 terminal String not, or, procedure, program, repeat, then;
-terminal String to, until, var, punto, mientras, con, caracter, uses, dosPuntos;
+terminal String to, until, var, punto, mientras, con, uses, dosPuntos;
 terminal String potencia, modulo, menorque, menorigual, mayorque, mayorigual;
 terminal String igualacion, diferente, nand, nor, falso, verdadero;
 terminal String mas, menos, por, division, UMENOS, leer;
 terminal String detener, continuar, salir, escribir, escribirln;
-
+terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
 non terminal ENUM_TYPE, SUBRANGE_TYPE, LOWER_LIMIT, UPPER_LIMIT, ARRAY_TYPE;

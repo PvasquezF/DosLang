@@ -107,8 +107,163 @@ public class Operacion implements Expresion {
     }
 
     @Override
-    public String get4D() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object get4D(Tabla tabla, Tree arbol) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        String opUActual = "";
+        Object tipoResultante = null;
+        Object op1 = null, op2 = null, opU = null;
+        if (operandoU == null) {
+            op1 = operando1.get4D(tabla, arbol);
+            if (op1 instanceof Excepcion) {
+                return op1;
+            } else if (!(op1 instanceof String)) {
+                tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, op1", fila, columna);
+                arbol.getErrores().add((Excepcion) tipoResultante);
+                return tipoResultante;
+            }
+            codigo += op1;
+            op1Actual = tabla.getTemporalActual();
+            op2 = operando2.get4D(tabla, arbol);
+            if (op2 instanceof Excepcion) {
+                return op2;
+            } else if (!(op2 instanceof String)) {
+                tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, op2", fila, columna);
+                arbol.getErrores().add((Excepcion) tipoResultante);
+                return tipoResultante;
+            }
+            codigo += op2;
+            op2Actual = tabla.getTemporalActual();
+        } else {
+            opU = operandoU.get4D(tabla, arbol);
+            if (opU instanceof Excepcion) {
+                return opU;
+            } else if (!(opU instanceof String)) {
+                tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, opU", fila, columna);
+                arbol.getErrores().add((Excepcion) tipoResultante);
+                return tipoResultante;
+            }
+            codigo += opU;
+            opUActual = tabla.getTemporalActual();
+        }
+        String etiquetaVerdadera1 = "";
+        String etiquetaFalsa1 = "";
+        String etiquetaVerdadera2 = "";
+        String etiquetaFalsa2 = "";
+        switch (operador) {
+            case SUMA:
+                codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                break;
+            case RESTA:
+                codigo += "-," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                break;
+            case MULTIPLICACION:
+                codigo += "*," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                break;
+            case DIVISION:
+                codigo += "/," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                break;
+            case MODULO:
+                codigo += "%," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                break;
+            case POTENCIA:
+                codigo += "*," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                break;
+            case MENOR_QUE:
+                codigo += "jl," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                break;
+            case MENOR_IGUAL:
+                codigo += "jle," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                break;
+            case MAYOR_QUE:
+                codigo += "jg," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                break;
+            case MAYOR_IGUAL:
+                codigo += "jge," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                break;
+            case IGUAL_IGUAL:
+                codigo += "je," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                break;
+            case DIFERENTE_QUE:
+                codigo += "jne," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                break;
+            case AND:
+                etiquetaVerdadera1 = tabla.getEtiqueta();
+                etiquetaFalsa1 = tabla.getEtiqueta();
+                etiquetaVerdadera2 = tabla.getEtiqueta();
+                etiquetaFalsa2 = tabla.getEtiqueta();
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+                codigo += etiquetaVerdadera1 + ":\n";
+                codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
+                codigo += "jmp,,," + etiquetaFalsa2 + "\n";
+                codigo += etiquetaVerdadera2 + ":\n";
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+                codigo += etiquetaFalsa1 + ":\n";
+                codigo += etiquetaFalsa2 + ":\n";
+                break;
+            case OR:
+                etiquetaVerdadera1 = tabla.getEtiqueta();
+                etiquetaVerdadera2 = tabla.getEtiqueta();
+                etiquetaFalsa1 = tabla.getEtiqueta();
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+
+                codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
+                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+
+                codigo += etiquetaVerdadera1 + ":\n";
+                codigo += etiquetaVerdadera2 + ":\n";
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+
+                codigo += etiquetaFalsa1 + ":\n";
+                break;
+            case NOR:
+                etiquetaVerdadera1 = tabla.getEtiqueta();
+                etiquetaFalsa1 = tabla.getEtiqueta();
+                etiquetaVerdadera2 = tabla.getEtiqueta();
+                etiquetaFalsa2 = tabla.getEtiqueta();
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
+                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+                codigo += etiquetaVerdadera1 + ":\n";
+                codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
+                codigo += "jmp,,," + etiquetaFalsa2 + "\n";
+                codigo += etiquetaVerdadera2 + ":\n";
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+                codigo += etiquetaFalsa1 + ":\n";
+                codigo += etiquetaFalsa2 + ":\n";
+                break;
+            case NAND:
+                etiquetaVerdadera1 = tabla.getEtiqueta();
+                etiquetaVerdadera2 = tabla.getEtiqueta();
+                etiquetaFalsa1 = tabla.getEtiqueta();
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
+
+                codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
+                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+
+                codigo += etiquetaVerdadera1 + ":\n";
+                codigo += etiquetaVerdadera2 + ":\n";
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+
+                codigo += etiquetaFalsa1 + ":\n";
+                break;
+            case NOT:
+                etiquetaVerdadera1 = tabla.getEtiqueta();
+                etiquetaFalsa1 = tabla.getEtiqueta();
+                codigo += "je," + opUActual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+                codigo += "=," + 1 + ",," + tabla.getTemporal() + "\n"; //Asignar true 
+                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+                codigo += etiquetaVerdadera1 + ":\n";
+                codigo += "=," + 0 + ",," + tabla.getTemporalActual() + "\n"; //Asignar false 
+                codigo += etiquetaFalsa1 + ":\n";
+                break;
+        }
+        return codigo;
     }
 
     @Override

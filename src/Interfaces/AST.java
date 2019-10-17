@@ -5,10 +5,13 @@
  */
 package Interfaces;
 
+import TablaSimbolos.Tabla;
+import TablaSimbolos.Tree;
+
 /**
  *
  * @author Pavel
  */
 public interface AST {
-    String get4D();
+    Object get4D(Tabla tabla, Tree arbol);
 }

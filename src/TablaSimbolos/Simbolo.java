@@ -87,4 +87,8 @@ public class Simbolo {
     public void setConstante(boolean constante) {
         this.constante = constante;
     }
+
+    public Expresion getValor() {
+        return valor;
+    }
 }
