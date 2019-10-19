@@ -108,44 +108,49 @@ public class Operacion implements Expresion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
-        String op1Actual = "";
-        String op2Actual = "";
-        String opUActual = "";
-        Object tipoResultante = null;
+        String codigo = "", op1Actual = "", op2Actual = "", opUActual = "";
+        Object tipoOP1 = null, tipoOP2 = null, tipoOPU = null, tipoResultante = null;
         Object op1 = null, op2 = null, opU = null;
+        Tipo tipo1 = null, tipo2 = null, tipoU = null;
         if (operandoU == null) {
             op1 = operando1.get4D(tabla, arbol);
-            if (op1 instanceof Excepcion) {
+            tipoOP1 = operando1.getTipo(tabla, arbol);
+            if (op1 instanceof Excepcion || tipoOP1 instanceof Excepcion) {
                 return op1;
-            } else if (!(op1 instanceof String)) {
+            } else if (!(op1 instanceof String) || !(tipoOP1 instanceof Tipo)) {
                 tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, op1", fila, columna);
                 arbol.getErrores().add((Excepcion) tipoResultante);
                 return tipoResultante;
             }
             codigo += op1;
             op1Actual = tabla.getTemporalActual();
+            tipo1 = (Tipo) tipoOP1;
+
             op2 = operando2.get4D(tabla, arbol);
-            if (op2 instanceof Excepcion) {
+            tipoOP2 = operando2.getTipo(tabla, arbol);
+            if (op2 instanceof Excepcion || tipoOP2 instanceof Excepcion) {
                 return op2;
-            } else if (!(op2 instanceof String)) {
+            } else if (!(op2 instanceof String) || !(tipoOP2 instanceof Tipo)) {
                 tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, op2", fila, columna);
                 arbol.getErrores().add((Excepcion) tipoResultante);
                 return tipoResultante;
             }
             codigo += op2;
             op2Actual = tabla.getTemporalActual();
+            tipo2 = (Tipo) tipoOP2;
         } else {
             opU = operandoU.get4D(tabla, arbol);
-            if (opU instanceof Excepcion) {
+            tipoOPU = operandoU.getTipo(tabla, arbol);
+            if (opU instanceof Excepcion || tipoOPU instanceof Excepcion) {
                 return opU;
-            } else if (!(opU instanceof String)) {
+            } else if (!(opU instanceof String) || !(tipoOPU instanceof Tipo)) {
                 tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, opU", fila, columna);
                 arbol.getErrores().add((Excepcion) tipoResultante);
                 return tipoResultante;
             }
             codigo += opU;
             opUActual = tabla.getTemporalActual();
+            tipoU = (Tipo) tipoOPU;
         }
         String etiquetaVerdadera1 = "";
         String etiquetaFalsa1 = "";
@@ -153,7 +158,27 @@ public class Operacion implements Expresion {
         String etiquetaFalsa2 = "";
         switch (operador) {
             case SUMA:
-                codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                if (tipo1.getType() == Tipo.tipo.STRING && tipo2.getType() == Tipo.tipo.STRING) {
+                    String temp1 = tabla.getTemporal();
+                    String temp2 = tabla.getTemporal();
+                    String temp3 = tabla.getTemporal();
+                    String temp4 = tabla.getTemporal();
+
+                    codigo += "+,p," + tabla.getFuncionSizeActual() + "," + temp1 + "\n";
+
+                    codigo += "+," + temp1 + ",0," + temp2 + "\n";
+                    codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
+
+                    codigo += "+," + temp1 + ",1," + temp3 + "\n";
+                    codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
+
+                    codigo += "+,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
+                    codigo += "call,,,concatenar_cadenas" + "\n";
+                    codigo += "+,p,2," + temp4 + "\n";
+                    codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+                    codigo += "-,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
+                }
+                //codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
                 break;
             case RESTA:
                 codigo += "-," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";

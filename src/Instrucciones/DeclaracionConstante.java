@@ -38,7 +38,7 @@ public class DeclaracionConstante implements Instruccion {
     public Object ejecutar(Tabla tabla, Tree arbol) {
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
-            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", valor, true, tabla.getHeap());
+            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, true, tabla.getStack());
             Object resultTipo = valor.getTipo(tabla, arbol);
             if (resultTipo instanceof Excepcion) {
                 return resultTipo;
@@ -87,9 +87,11 @@ public class DeclaracionConstante implements Instruccion {
                 arbol.getErrores().add(exc);
                 return exc;
             } else {
+                String temp1 = tabla.getTemporal();
                 Simbolo sim = (Simbolo) result;
+                codigo += "=," + sim.getApuntador() + ",," + temp1+"\n";
                 codigo += sim.getValor().get4D(tabla, arbol);
-                codigo += "=, " + sim.getApuntador() + ", " + tabla.getTemporalActual() + ", heap\n";
+                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
             }
         }
         return codigo;

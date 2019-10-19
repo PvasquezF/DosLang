@@ -30,10 +30,12 @@ public class Tabla {
     private Stack listaAmbitos;
     private int heap;
     private int stack;
+    private int funcionSizeActual;
 
     public Tabla() {
         tabla = new ArrayList<>();
         listaAmbitos = new Stack();
+        funcionSizeActual = 0;
     }
 
     public String InsertarVariable(Simbolo simbolo) {
@@ -142,7 +144,7 @@ public class Tabla {
     }
 
     public int getStack() {
-        return stack;
+        return stack++;
     }
 
     public Stack getListaAmbitos() {
@@ -152,4 +154,13 @@ public class Tabla {
     public void setAmbito(String ambito) {
         this.ambito = ambito;
     }
+
+    public int getFuncionSizeActual() {
+        return funcionSizeActual;
+    }
+
+    public void setFuncionSizeActual(int funcionSizeActual) {
+        this.funcionSizeActual = funcionSizeActual;
+    }
+
 }

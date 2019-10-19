@@ -17,24 +17,27 @@ public class Simbolo {
     private Tipo tipo;
     private String ambito;
     private String rol;
+    private String nivel;
     private int apuntador;
     private boolean constante;
     private Expresion valor;
 
-    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, boolean constante, int apuntador) {
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ambito = ambito;
         this.rol = rol;
+        this.nivel = nivel;
         this.apuntador = apuntador;
         this.constante = constante;
     }
     
-    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, Expresion valor, boolean constante, int apuntador) {
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, Expresion valor, boolean constante, int apuntador) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ambito = ambito;
         this.rol = rol;
+        this.nivel = nivel;
         this.apuntador = apuntador;
         this.valor = valor;
         this.constante = constante;
@@ -90,5 +93,13 @@ public class Simbolo {
 
     public Expresion getValor() {
         return valor;
+    }
+
+    public String getNivel() {
+        return nivel;
+    }
+
+    public void setNivel(String nivel) {
+        this.nivel = nivel;
     }
 }

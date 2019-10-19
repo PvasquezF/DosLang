@@ -51,11 +51,32 @@ public class Primitivo implements Expresion {
     public String get4D(Tabla tabla, Tree arbol) {
         String codigo = "";
         if (valor instanceof String) {
-            codigo += "=," + tabla.getHeap() + ",," + tabla.getTemporal() + "\n";
+            String temporalInicio = tabla.getTemporal();
+            //String heapTemp = "" + tabla.getHeap();
+            //String temporalSize = tabla.getTemporal();
+            codigo += "=,h,," + temporalInicio + "\n";
+            //codigo += "+,h,1,h\n";
+            //codigo += "=," + tabla.getHeap() + "," + temporalInicio + ",heap\n";
+            String str = (String) valor;
+            //codigo += "=," + tabla.getHeap() + "," + str.length() + ",heap\n"; //size
+            for (int i = 0; i <= str.length(); i++) {
+                if (i == 0) {
+                    codigo += "=,h," + ((int) str.charAt(i)) + ",heap\n";
+                    codigo += "+,h,1,h\n";
+                } else if (i == str.length()) {
+                    codigo += "=,h," + 0 + ",heap\n";
+                    codigo += "+,h,1,h\n";
+                } else {
+                    codigo += "=,h," + ((int) str.charAt(i)) + ",heap\n";
+                    codigo += "+,h,1,h\n";
+                }
+            }
+            codigo += "=," + temporalInicio + ",," + tabla.getTemporal() + "\n";
+
         } else if (valor instanceof Integer) {
             codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
         } else if (valor instanceof Character) {
-            codigo += "=," + (int) ((Character)valor).charValue() + ",," + tabla.getTemporal() + "\n";
+            codigo += "=," + (int) ((Character) valor).charValue() + ",," + tabla.getTemporal() + "\n";
         } else if (valor instanceof Double) {
             codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
         } else if (valor instanceof Boolean) {

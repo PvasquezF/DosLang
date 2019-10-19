@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package TablaSimbolos;
+
+/**
+ *
+ * @author Pavel
+ */
+public class GenerarNativas4D {
+
+    public String generarConcatenacion(Tabla tabla) {
+        String codigo = "";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String temp7 = tabla.getTemporal();
+        String temp8 = tabla.getTemporal();
+
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        String label3 = tabla.getEtiqueta();
+        String label4 = tabla.getEtiqueta();
+
+        codigo += "begin,,,concatenar_cadenas\n";
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "+,p,1," + temp3 + "\n";
+        codigo += "=,stack," + temp3 + "," + temp4 + "\n";
+        codigo += "=,h,," + temp7;
+        codigo += label1 + ":" + "\n";
+        codigo += "=,heap," + temp2 + "," + temp5 + "\n";
+        codigo += "je," + temp5 + ",0," + label2 + "\n";
+        codigo += "=,h," + temp5 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "+," + temp2 + ",1," + temp2 + "\n";
+        codigo += "jmp,,," + label1 + "\n";
+        codigo += label2 + ":" + "\n";
+
+        codigo += label3 + ":" + "\n";
+        codigo += "=,heap," + temp4 + "," + temp6 + "\n";
+        codigo += "je," + temp6 + ",0," + label4 + "\n";
+        codigo += "=,h," + temp6 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "+," + temp4 + ",1," + temp4 + "\n";
+        codigo += "jmp,,," + label3 + "\n";
+        codigo += label4 + ":" + "\n";
+        codigo += "=,h,0,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "+,p,2," + temp8 + "\n";
+        codigo += "=," + temp8 + "," + temp7 + ",stack\n";
+        codigo += "end,,,concatenar_cadenas" + "\n";
+        return codigo;
+    }
+
+    public String generarPrint(Tabla tabla) {
+        String codigo = "";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        //String temp4 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+
+        codigo += "begin,,,print_str\n";
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += label2 + ":\n";
+        codigo += "=,heap," + temp2 + "," + temp3 + "\n";
+        codigo += "je," + temp3 + ",0," + label1 + "\n";
+        codigo += "print(%c," + temp3 + ")\n";
+        codigo += "+,1," + temp2 + "," + temp2 + "\n";
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "print(%c,13)\n";
+        //codigo += "print(%c,10)\n";
+        codigo += "end,,,print_str\n";
+        return codigo;
+    }
+}

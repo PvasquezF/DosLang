@@ -16,12 +16,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import Excepciones.Excepcion;
+import Instrucciones.Asignacion;
 import Instrucciones.DeclaracionConstante;
 import Instrucciones.DeclaracionType;
 import Instrucciones.DeclaracionVar;
+import Instrucciones.Program;
 import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
+import TablaSimbolos.GenerarNativas4D;
+import TablaSimbolos.ReservarMemoria;
 import TablaSimbolos.Tabla;
 import TablaSimbolos.Tree;
 import java.io.File;
@@ -50,16 +54,34 @@ public class DosLang extends Thread {
         Tree t = s.getArbol();
         Tabla tabla = new Tabla();
         String Cuadruplos = "";
+        int espaciosReservaHeap = 0;
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            ins.ejecutar(tabla, t);
+            if (ins instanceof DeclaracionConstante
+                    || ins instanceof DeclaracionType
+                    || ins instanceof DeclaracionVar) {
+                espaciosReservaHeap++;
+            }
         }
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof DeclaracionConstante
+                    || ins instanceof DeclaracionType
+                    || ins instanceof DeclaracionVar
+                    || ins instanceof Program) {
+                ins.ejecutar(tabla, t);
+            }
+        }
+        Cuadruplos += ReservarMemoria.Reservar(tabla, espaciosReservaHeap);
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar) {
                 Cuadruplos += ins.get4D(tabla, t);
             }
         }
+        GenerarNativas4D gn4D = new GenerarNativas4D();
+        Cuadruplos += gn4D.generarConcatenacion(tabla);
+        Cuadruplos += gn4D.generarPrint(tabla);
         System.out.println(Cuadruplos);
         tabla.generarTablaHTML();
         errores.addAll(t.getErrores());

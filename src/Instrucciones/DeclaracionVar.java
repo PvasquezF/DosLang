@@ -22,7 +22,7 @@ public class DeclaracionVar implements Instruccion {
 
     private ArrayList<String> identificadores;
     private Tipo tipo;
-    Expresion valor;
+    private Expresion valor;
     private int fila;
     private int columna;
 
@@ -47,7 +47,7 @@ public class DeclaracionVar implements Instruccion {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
                 Expresion resultTipo = Tipo.valorPredeterminado(tipo);
-                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", resultTipo, false, tabla.getHeap());
+                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
 
                 Object result = tabla.InsertarVariable(simbolo);
                 if (result != null) {
@@ -61,7 +61,7 @@ public class DeclaracionVar implements Instruccion {
         } else {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
-                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", valor, false, tabla.getHeap());
+                Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
                 Object resultTipo = valor.getTipo(tabla, arbol);
                 if (resultTipo instanceof Excepcion) {
                     return resultTipo;
@@ -113,8 +113,10 @@ public class DeclaracionVar implements Instruccion {
                 return exc;
             } else {
                 Simbolo sim = (Simbolo) result;
+                String temp1 = tabla.getTemporal();
+                codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                 codigo += sim.getValor().get4D(tabla, arbol);
-                codigo += "=, " + sim.getApuntador() + ", " + tabla.getTemporalActual() + ", heap\n";
+                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
             }
         }
         return codigo;

@@ -4,6 +4,7 @@ import java_cup.runtime.*;
 import doslang.DosLang;
 import Excepciones.Excepcion;
 import Excepciones.Excepcion.TIPOERROR;
+import Expresiones.Identificador;
 import Expresiones.Nil;
 import Expresiones.Operacion;
 import Expresiones.Operacion.Operador;
@@ -16,7 +17,8 @@ import Interfaces.AST;
 import TablaSimbolos.Tipo;
 import TablaSimbolos.Tree;
 import Interfaces.Expresion;
-
+import Instrucciones.Asignacion;
+import Instrucciones.Variable;
 parser code 
 {:
     Tree tree;
@@ -51,21 +53,22 @@ terminal char caracter;
 non terminal INICIO;
 non terminal ENUM_TYPE, SUBRANGE_TYPE, LOWER_LIMIT, UPPER_LIMIT, ARRAY_TYPE;
 non terminal RANGO_ARRAY, ARRAY_DECLARATION, MEMORIA_VIRTUAL;
-non terminal VARIABLE, LISTA_EXPRESION;
-non terminal SECCION_FUNCION, PARAMETROS;
-non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES, LISTA_INSTRUCCIONES;
-non terminal INSTRUCCION, FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
-non terminal METHOD_LIST, MAIN, ASIGNACION, SI, LISTAIF, INSTRUCCIONESIF;
+non terminal LISTA_EXPRESION;
+non terminal PARAMETROS;
+non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
+non terminal FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
+non terminal METHOD_LIST, SI, LISTAIF, INSTRUCCIONESIF;
 non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, WRITE, READ;
 non terminal REGISTRO, LISTA_RECORDS, RECORDS;
 non terminal CASE, CASELIST, DEFECTO, SWITCH, ARRAY_DECLARATION_MULTI, LISTA_RANGO_ARRAY;
 non terminal INSIF;
 
 
-non terminal ArrayList<AST> PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS;
-non terminal ArrayList<AST> VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
+non terminal ArrayList<AST> PROGRAM, USES, MAIN, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
+non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
-non terminal AST DECLARACION_TIPOS, TIPO_DECLARACION, VAR, CONST;
+non terminal ArrayList<Expresion> VARIABLE;
+non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, ACCESO, LLAMADA;
 non terminal Tipo TIPO, TIPO_PRIMITIVO;
 
@@ -150,10 +153,10 @@ LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES:e coma identificador:e1 {:RESULT
                         | identificador:e {:RESULT = new ArrayList<String>(); RESULT.add(e);:}
                         ;
 
-VARIABLE ::= identificador
+VARIABLE ::= identificador:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, eleft, eright)); :}
            | VARIABLE corI LISTA_EXPRESION corD
            | VARIABLE parenI LISTA_EXPRESION parenD
-           | VARIABLE punto identificador
+           | VARIABLE:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, eleft, eright)); :}
            ;
 
 LISTA_EXPRESION ::= LISTA_EXPRESION coma EXPRESION
@@ -189,8 +192,8 @@ DECLARACION_CONST ::= DECLARACION_CONST:e CONST:e1 {:RESULT = e; RESULT.add(e1);
 CONST ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionConstante(e1, e, e2, eleft, eright); :}
         ;
 
-SECCION_VAR ::= VARINIT:e SECCION_FUNCION:e1 {:RESULT = e;:}
-              | SECCION_FUNCION
+SECCION_VAR ::= VARINIT:e SECCION_FUNCION:e1 {:RESULT = e; RESULT.addAll(e1);:}
+              | SECCION_FUNCION:e {:RESULT = e;:}
               ;
 
 VARINIT ::= var DECLARACION_VAR:e {:RESULT = e;:}
@@ -200,13 +203,13 @@ DECLARACION_VAR ::= DECLARACION_VAR:e VAR:e1 {:RESULT = e; RESULT.add(e1);:}
                   | VAR:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                   ;
 
-VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright); :}
+VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright);:}
       | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 pComa {: RESULT = new DeclaracionVar(e1, e, eleft, eright); :}
       | LISTA_IDENTIFICADORES dosPuntos REGISTRO pComa
       ;
 
 SECCION_FUNCION ::= METHOD_LIST MAIN
-                  | MAIN
+                  | MAIN:e {:RESULT = e;:}
                   ;
 
 METHOD_LIST ::= METHOD_LIST FUNCION
@@ -247,20 +250,20 @@ RECORDS ::= LISTA_IDENTIFICADORES dosPuntos TIPO pComa
           | LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION_MULTI pComa
           ;
 
-MAIN ::= begin LISTA_INSTRUCCIONES end punto
-       | begin end punto
+MAIN ::= begin LISTA_INSTRUCCIONES:e end punto {:RESULT = e;:}
+       | begin end punto {:RESULT = new ArrayList<AST>();:}
        ;
 
-BLOQUE_INSTRUCCIONES ::= begin LISTA_INSTRUCCIONES end pComa
-                       | begin end pComa
+BLOQUE_INSTRUCCIONES ::= begin LISTA_INSTRUCCIONES:e end pComa {:RESULT = e;:}
+                       | begin end pComa {:RESULT = new ArrayList<AST>();:}
                        ;
 
-LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES INSTRUCCION
-                      | INSTRUCCION
+LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESULT.add(e1);:}
+                      | INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                       ;
 
 INSTRUCCION ::= WITH
-              | ASIGNACION pComa
+              | ASIGNACION:e pComa {:RESULT = e;:}
               | TRANSFERENCIA
               //| SI
               | WHILE
@@ -277,7 +280,7 @@ WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES
        | con identificador hacer INSTRUCCION
        ;
 
-ASIGNACION ::= VARIABLE dosPuntos igual EXPRESION 
+ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new Variable(e), e1, eleft, eright); :}
              ;
 
 TRANSFERENCIA ::= detener pComa
