@@ -75,4 +75,8 @@ public class Identificador implements Expresion {
         }
     }
 
+    public String getIdentificador() {
+        return identificador;
+    }
+
 }

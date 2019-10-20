@@ -53,7 +53,6 @@ terminal char caracter;
 non terminal INICIO;
 non terminal ENUM_TYPE, ARRAY_TYPE;
 non terminal RANGO_ARRAY, ARRAY_DECLARATION, MEMORIA_VIRTUAL;
-non terminal LISTA_EXPRESION;
 non terminal PARAMETROS;
 non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
 non terminal FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
@@ -67,7 +66,7 @@ non terminal INSIF;
 non terminal ArrayList<AST> PROGRAM, USES, MAIN, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
-non terminal ArrayList<Expresion> VARIABLE;
+non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
 non terminal AST SUBRANGE_TYPE;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, ACCESO, LLAMADA;
@@ -109,7 +108,7 @@ LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS:e DECLARACION_TIPOS:e1 {:RES
                           ;
 
 DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
-                    | ENUM_TYPE pComa
+                    //| ENUM_TYPE pComa
                     //| SUBRANGE_TYPE:e pComa {:RESULT = e;:}
                     | ARRAY_TYPE pComa
                     ;
@@ -118,8 +117,8 @@ TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igual TIPO:e1 {:RESULT = new Declar
                    | LISTA_IDENTIFICADORES igual REGISTRO
                    ;
 
-ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_EXPRESION parenD
-            ;
+//ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_EXPRESION parenD {: RESULT = new; :}
+//            ;
 
 //SUBRANGE_TYPE ::= LISTA_IDENTIFICADORES:e igual LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {: RESULT = new DeclaracionType(new Tipo(Tipo.tipo.RANGE, null, e1, e2), e, eleft, eright); :}
 //                ;
@@ -161,8 +160,8 @@ VARIABLE ::= identificador:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(
            | VARIABLE:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, eleft, eright)); :}
            ;
 
-LISTA_EXPRESION ::= LISTA_EXPRESION coma EXPRESION
-                  | EXPRESION
+LISTA_EXPRESION ::= LISTA_EXPRESION:e coma EXPRESION:e1 {:RESULT = e; RESULT.add(e1);:}
+                  | EXPRESION:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(e); :}
                   ;
 
 MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION parenD
@@ -181,6 +180,7 @@ TIPO_PRIMITIVO ::= integer   {:RESULT = new Tipo(Tipo.tipo.INTEGER);:}
 
 TIPO ::= identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
        | LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {:RESULT = new Tipo(Tipo.tipo.RANGE, null, e1, e2);:}
+       | parenI LISTA_EXPRESION:e parenD {:RESULT = new Tipo(Tipo.tipo.ENUMERADO, null, e);:}
        | TIPO_PRIMITIVO:e {:RESULT = e;:}
        ;
 

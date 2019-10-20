@@ -8,6 +8,7 @@ package TablaSimbolos;
 import Expresiones.Nil;
 import Expresiones.Primitivo;
 import Interfaces.Expresion;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,9 +20,10 @@ public class Tipo {
     private String tipoObjeto;
     private Expresion lowerLimit;
     private Expresion upperLimit;
-    
+    private ArrayList<Expresion> identificadores;
 
     public static enum tipo {
+
         INTEGER,
         REAL,
         STRING,
@@ -31,6 +33,7 @@ public class Tipo {
         WORD,
         CHAR,
         RANGE,
+        ENUMERADO,
         OBJETO
     }
 
@@ -42,12 +45,18 @@ public class Tipo {
         this.type = type;
         this.tipoObjeto = tipoObjeto;
     }
-    
+
     public Tipo(tipo type, String tipoObjeto, Expresion lowerLimit, Expresion upperLimit) {
         this.type = type;
         this.tipoObjeto = tipoObjeto;
         this.lowerLimit = lowerLimit;
         this.upperLimit = upperLimit;
+    }
+
+    public Tipo(tipo type, String tipoObjeto, ArrayList<Expresion> identificadores) {
+        this.type = type;
+        this.tipoObjeto = tipoObjeto;
+        this.identificadores = identificadores;
     }
 
     public boolean equals(Tipo t1) {
@@ -63,7 +72,7 @@ public class Tipo {
     }
 
     public static Expresion valorPredeterminado(Tipo t) {
-        if (t.getType() == tipo.INTEGER) {
+        if (t.getType() == tipo.INTEGER || t.getType() == tipo.ENUMERADO) {
             return new Primitivo(0);
         } else if (t.getType() == tipo.REAL) {
             return new Primitivo(0.0);
@@ -84,16 +93,16 @@ public class Tipo {
             return type.toString();
         }
     }
-    /***
-     * a : integer
-     * b : a
-     * c : b
+
+    /**
+     * *
+     * a : integer b : a c : b
      */
     public Tipo verificarUserType(Tabla tabla, Tipo tipoComprobacion) {
         if (this.tipoObjeto != null) {
-            for(int i = 0; i < tabla.getListaTipos().size(); i++){
+            for (int i = 0; i < tabla.getListaTipos().size(); i++) {
                 UserType m = tabla.getListaTipos().get(i);
-                if(this.tipoObjeto.equalsIgnoreCase(m.getNombre())){ 
+                if (this.tipoObjeto.equalsIgnoreCase(m.getNombre())) {
                     // Coincide el tipoObjeto con el userType
                     Tipo result = m.getTipo().verificarUserType(tabla, m.getTipo());
                     return result;
@@ -133,5 +142,13 @@ public class Tipo {
 
     public void setUpperLimit(Expresion upperLimit) {
         this.upperLimit = upperLimit;
+    }
+
+    public ArrayList<Expresion> getIdentificadores() {
+        return identificadores;
+    }
+
+    public void setIdentificadores(ArrayList<Expresion> identificadores) {
+        this.identificadores = identificadores;
     }
 }

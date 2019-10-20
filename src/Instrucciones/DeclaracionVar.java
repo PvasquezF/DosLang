@@ -6,6 +6,8 @@
 package Instrucciones;
 
 import Excepciones.Excepcion;
+import Expresiones.Identificador;
+import Expresiones.Primitivo;
 import Interfaces.Expresion;
 import Interfaces.Instruccion;
 import TablaSimbolos.Simbolo;
@@ -49,7 +51,22 @@ public class DeclaracionVar implements Instruccion {
                 Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
                 Expresion resultTipo = Tipo.valorPredeterminado(tipoAux);
                 Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
-
+                if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
+                    ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
+                    for (int j = 0; j < listaId.size(); j++) {
+                        Expresion m = listaId.get(j);
+                        Identificador id = (Identificador) m;
+                        Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipo, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                        Object result = tabla.InsertarVariable(simboloEnum);
+                        if (result != null) {
+                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                    (String) result,
+                                    fila, columna);
+                            arbol.getErrores().add(exc);
+                            return exc;
+                        }
+                    }
+                }
                 Object result = tabla.InsertarVariable(simbolo);
                 if (result != null) {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -82,10 +99,10 @@ public class DeclaracionVar implements Instruccion {
                 Tipo tipoValor = (Tipo) resultTipo;
                 if (tipoAux.getType() == Tipo.tipo.RANGE) {
                     Object result = tipoAux.getLowerLimit().getTipo(tabla, arbol);
-                    Object result1 = tipoAux.getLowerLimit().getTipo(tabla, arbol);
                     if (result instanceof Excepcion) {
                         return result;
                     }
+                    Object result1 = tipoAux.getLowerLimit().getTipo(tabla, arbol);
                     if (result1 instanceof Excepcion) {
                         return result;
                     }
@@ -115,7 +132,21 @@ public class DeclaracionVar implements Instruccion {
                         arbol.getErrores().add(exc);
                         return exc;
                     }
-
+                } else if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
+                    ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
+                    for (int j = 0; j < listaId.size(); j++) {
+                        Expresion m = listaId.get(j);
+                        Identificador id = (Identificador) m;
+                        Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipo, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                        Object result = tabla.InsertarVariable(simboloEnum);
+                        if (result != null) {
+                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                    (String) result,
+                                    fila, columna);
+                            arbol.getErrores().add(exc);
+                            return exc;
+                        }
+                    }
                 } else {
                     if (tipoAux.equals(tipoValor)) {
                         Object result = tabla.InsertarVariable(simbolo);
@@ -175,6 +206,8 @@ public class DeclaracionVar implements Instruccion {
                     codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
                     codigo += label1 + ":\n";
                     codigo += label2 + ":\n";
+                } else if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
+                    
                 } else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
