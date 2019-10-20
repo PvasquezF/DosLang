@@ -82,6 +82,10 @@ public class DosLang extends Thread {
         GenerarNativas4D gn4D = new GenerarNativas4D();
         Cuadruplos += gn4D.generarConcatenacion(tabla);
         Cuadruplos += gn4D.generarPrint(tabla);
+        Cuadruplos += gn4D.generarTrunk(tabla);
+        Cuadruplos += gn4D.generarRound(tabla);
+        Cuadruplos += gn4D.generarChartAt(tabla);
+        Cuadruplos += gn4D.generarLenght(tabla);
         System.out.println(Cuadruplos);
         tabla.generarTablaHTML();
         errores.addAll(t.getErrores());

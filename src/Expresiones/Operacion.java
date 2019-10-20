@@ -158,26 +158,8 @@ public class Operacion implements Expresion {
         String etiquetaFalsa2 = "";
         switch (operador) {
             case SUMA:
-                if (tipo1.getType() == Tipo.tipo.STRING && tipo2.getType() == Tipo.tipo.STRING) {
-                    String temp1 = tabla.getTemporal();
-                    String temp2 = tabla.getTemporal();
-                    String temp3 = tabla.getTemporal();
-                    String temp4 = tabla.getTemporal();
+                codigo += get4DSuma(tabla, op1Actual, op2Actual, tipo1, tipo2);
 
-                    codigo += "+,p," + tabla.getFuncionSizeActual() + "," + temp1 + "\n";
-
-                    codigo += "+," + temp1 + ",0," + temp2 + "\n";
-                    codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
-
-                    codigo += "+," + temp1 + ",1," + temp3 + "\n";
-                    codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
-
-                    codigo += "+,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
-                    codigo += "call,,,concatenar_cadenas" + "\n";
-                    codigo += "+,p,2," + temp4 + "\n";
-                    codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
-                    codigo += "-,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
-                }
                 //codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
                 break;
             case RESTA:
@@ -585,4 +567,27 @@ public class Operacion implements Expresion {
         }
     }
 
+    String get4DSuma(Tabla tabla, String op1Actual, String op2Actual, Tipo tipo1, Tipo tipo2) {
+        String codigo = "";
+        if (tipo1.getType() == Tipo.tipo.STRING && tipo2.getType() == Tipo.tipo.STRING) {
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            codigo += "+,p," + tabla.getFuncionSizeActual() + "," + temp1 + "\n";
+
+            codigo += "+," + temp1 + ",0," + temp2 + "\n";
+            codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
+
+            codigo += "+," + temp1 + ",1," + temp3 + "\n";
+            codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
+
+            codigo += "+,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,2," + temp4 + "\n";
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            codigo += "-,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
+        }
+        return codigo;
+    }
 }

@@ -82,4 +82,94 @@ public class GenerarNativas4D {
         codigo += "end,,,print_str\n";
         return codigo;
     }
+
+    public String generarTrunk(Tabla tabla) {
+        String codigo = "";
+        codigo += "begin,,,trunk_primitiva\n";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "%," + temp2 + ",1," + temp3 + "\n";
+        codigo += "-," + temp2 + "," + temp3 + "," + temp4 + "\n";
+        codigo += "+,p,1," + temp5 + "\n";
+        codigo += "=," + temp5 + "," + temp4 + ",stack\n";
+        codigo += "end,,,trunk_primitiva\n";
+        return codigo;
+    }
+
+    public String generarRound(Tabla tabla) {
+        String codigo = "";
+        codigo += "begin,,,round_primitiva\n";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "%," + temp2 + ",1," + temp3 + "\n";
+        codigo += "-," + temp2 + "," + temp3 + "," + temp4 + "\n";
+        codigo += "jl," + temp3 + ",0.5," + label1 + "\n";
+        codigo += "+," + temp4 + ",1," + temp4 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "+,p,1," + temp5 + "\n";
+        codigo += "=," + temp5 + "," + temp4 + ",stack\n";
+        codigo += "end,,,round_primitiva\n";
+        return codigo;
+    }
+
+    public String generarChartAt(Tabla tabla) {
+        String codigo = "";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String temp7 = tabla.getTemporal();
+
+        codigo += "begin,,,CharAt_primitiva\n";
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "+,p,1," + temp3 + "\n";
+        codigo += "=,stack," + temp3 + "," + temp4 + "\n";
+        codigo += "+," + temp2 + ", " + temp4 + "," + temp5 + "\n";
+        codigo += "=,heap," + temp5 + "," + temp6 + "\n";
+        codigo += "+,p,2," + temp7 + "\n";
+        codigo += "=," + temp7 + "," + temp6 + ",stack\n";
+        codigo += "end,,,CharAt_primitiva" + "\n";
+        return codigo;
+    }
+
+    public String generarLenght(Tabla tabla) {
+        String codigo = "";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+
+        codigo += "begin,,,lenght_primitiva\n";
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "=,0,," + temp3 + "\n";
+        codigo += label2 + ":\n";
+        codigo += "=,heap," + temp2 + "," + temp4 + "\n";
+        codigo += "je," + temp4 + ",0," + label1 + "\n";
+        codigo += "+,1," + temp3 + "," + temp3 + "\n";
+        codigo += "+,1," + temp2 + "," + temp2 + "\n";
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "+,p,1," + temp5 + "\n";
+        codigo += "=,"+temp5+"," + temp3 + ",stack\n";
+        codigo += "end,,,lenght_primitiva\n";
+        return codigo;
+    }
 }
