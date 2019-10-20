@@ -31,9 +31,11 @@ public class Tabla {
     private int heap;
     private int stack;
     private int funcionSizeActual;
+    private ArrayList<UserType> listaTipos;
 
     public Tabla() {
         tabla = new ArrayList<>();
+        listaTipos = new ArrayList<>();
         listaAmbitos = new Stack();
         funcionSizeActual = 0;
     }
@@ -57,6 +59,16 @@ public class Tabla {
             }
         }
         return "No se ha encontrado la variable " + identificador + ".";
+    }
+
+    public String insertarType(UserType usertype) {
+        for (UserType ut : listaTipos) {
+            if (ut.getNombre().equalsIgnoreCase(usertype.getNombre())) {
+                return "El type " + usertype.getNombre() + " ya existe.";
+            }
+        }
+        this.listaTipos.add(usertype);
+        return null;
     }
 
     public void generarTablaHTML() {
@@ -163,4 +175,11 @@ public class Tabla {
         this.funcionSizeActual = funcionSizeActual;
     }
 
+    public ArrayList<UserType> getListaTipos() {
+        return listaTipos;
+    }
+
+    public void setListaTipos(ArrayList<UserType> listaTipos) {
+        this.listaTipos = listaTipos;
+    }
 }

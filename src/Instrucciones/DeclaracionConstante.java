@@ -38,23 +38,25 @@ public class DeclaracionConstante implements Instruccion {
     public Object ejecutar(Tabla tabla, Tree arbol) {
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
-            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, true, tabla.getStack());
+            Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
+            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
             Object resultTipo = valor.getTipo(tabla, arbol);
             if (resultTipo instanceof Excepcion) {
                 return resultTipo;
             }
-            if ((tipo.equals(new Tipo(Tipo.tipo.CHAR))
-                    || tipo.equals(new Tipo(Tipo.tipo.INTEGER))
-                    || tipo.equals(new Tipo(Tipo.tipo.REAL)))
+            char c;
+            if ((tipoAux.equals(new Tipo(Tipo.tipo.CHAR))
+                    || tipoAux.equals(new Tipo(Tipo.tipo.INTEGER))
+                    || tipoAux.equals(new Tipo(Tipo.tipo.REAL)))
                     && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                        "No se puede asignar NIL al tipo " + tipo.toString() + ".",
+                        "No se puede asignar NIL al tipo " + tipoAux.toString() + ".",
                         fila, columna);
                 arbol.getErrores().add(exc);
                 return exc;
             }
             Tipo tipoValor = (Tipo) resultTipo;
-            if (tipo.equals(tipoValor)) {
+            if (tipoAux.equals(tipoValor)) {
                 Object result = tabla.InsertarVariable(simbolo);
                 if (result != null) {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -87,11 +89,11 @@ public class DeclaracionConstante implements Instruccion {
                 arbol.getErrores().add(exc);
                 return exc;
             } else {
-                String temp1 = tabla.getTemporal();
                 Simbolo sim = (Simbolo) result;
-                codigo += "=," + sim.getApuntador() + ",," + temp1+"\n";
+                String temp1 = tabla.getTemporal();
+                codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                 codigo += sim.getValor().get4D(tabla, arbol);
-                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
+                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
             }
         }
         return codigo;

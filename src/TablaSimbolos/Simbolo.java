@@ -21,6 +21,7 @@ public class Simbolo {
     private int apuntador;
     private boolean constante;
     private Expresion valor;
+    private boolean primitivo;
 
     public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador) {
         this.nombre = nombre;
@@ -101,5 +102,18 @@ public class Simbolo {
 
     public void setNivel(String nivel) {
         this.nivel = nivel;
+    }
+
+    public boolean isPrimitivo() {
+        if(tipo.getType() != Tipo.tipo.OBJETO || tipo.getType() != Tipo.tipo.RECORD){
+            primitivo = false;
+        }else{
+            primitivo = true;
+        }
+        return primitivo;
+    }
+
+    public void setPrimitivo(boolean primitivo) {
+        this.primitivo = primitivo;
     }
 }

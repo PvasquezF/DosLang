@@ -46,7 +46,8 @@ public class DeclaracionVar implements Instruccion {
         if (valor == null) {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
-                Expresion resultTipo = Tipo.valorPredeterminado(tipo);
+                Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
+                Expresion resultTipo = Tipo.valorPredeterminado(tipoAux);
                 Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
 
                 Object result = tabla.InsertarVariable(simbolo);
@@ -61,24 +62,25 @@ public class DeclaracionVar implements Instruccion {
         } else {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
+                Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
                 Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
                 Object resultTipo = valor.getTipo(tabla, arbol);
                 if (resultTipo instanceof Excepcion) {
                     return resultTipo;
                 }
                 char c;
-                if ((tipo.equals(new Tipo(Tipo.tipo.CHAR))
-                        || tipo.equals(new Tipo(Tipo.tipo.INTEGER))
-                        || tipo.equals(new Tipo(Tipo.tipo.REAL)))
+                if ((tipoAux.equals(new Tipo(Tipo.tipo.CHAR))
+                        || tipoAux.equals(new Tipo(Tipo.tipo.INTEGER))
+                        || tipoAux.equals(new Tipo(Tipo.tipo.REAL)))
                         && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                            "No se puede asignar NIL al tipo " + tipo.toString() + ".",
+                            "No se puede asignar NIL al tipo " + tipoAux.toString() + ".",
                             fila, columna);
                     arbol.getErrores().add(exc);
                     return exc;
                 }
                 Tipo tipoValor = (Tipo) resultTipo;
-                if (tipo.equals(tipoValor)) {
+                if (tipoAux.equals(tipoValor)) {
                     Object result = tabla.InsertarVariable(simbolo);
                     if (result != null) {
                         Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

@@ -57,16 +57,15 @@ public class DosLang extends Thread {
         int espaciosReservaHeap = 0;
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionType
-                    || ins instanceof DeclaracionVar) {
+            if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar) {
                 espaciosReservaHeap++;
+            } else if (ins instanceof DeclaracionType) {
+                ins.ejecutar(tabla, t);
             }
         }
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionType
                     || ins instanceof DeclaracionVar
                     || ins instanceof Program) {
                 ins.ejecutar(tabla, t);

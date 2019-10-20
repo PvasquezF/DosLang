@@ -74,6 +74,24 @@ public class Tipo {
             return type.toString();
         }
     }
+    /***
+     * a : integer
+     * b : a
+     * c : b
+     */
+    public Tipo verificarUserType(Tabla tabla, Tipo tipoComprobacion) {
+        if (this.tipoObjeto != null) {
+            for(int i = 0; i < tabla.getListaTipos().size(); i++){
+                UserType m = tabla.getListaTipos().get(i);
+                if(this.tipoObjeto.equalsIgnoreCase(m.getNombre())){ 
+                    // Coincide el tipoObjeto con el userType
+                    Tipo result = m.getTipo().verificarUserType(tabla, m.getTipo());
+                    return result;
+                }
+            };
+        }
+        return this;
+    }
 
     public tipo getType() {
         return type;
