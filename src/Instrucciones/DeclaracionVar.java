@@ -80,21 +80,59 @@ public class DeclaracionVar implements Instruccion {
                     return exc;
                 }
                 Tipo tipoValor = (Tipo) resultTipo;
-                if (tipoAux.equals(tipoValor)) {
-                    Object result = tabla.InsertarVariable(simbolo);
-                    if (result != null) {
+                if (tipoAux.getType() == Tipo.tipo.RANGE) {
+                    Object result = tipoAux.getLowerLimit().getTipo(tabla, arbol);
+                    Object result1 = tipoAux.getLowerLimit().getTipo(tabla, arbol);
+                    if (result instanceof Excepcion) {
+                        return result;
+                    }
+                    if (result1 instanceof Excepcion) {
+                        return result;
+                    }
+                    Tipo tipoLower = (Tipo) result;
+                    Tipo tipoUpper = (Tipo) result;
+                    if (tipoLower.equals(tipoUpper)) {
+                        if (tipoLower.equals(tipoValor)) {
+                            Object result3 = tabla.InsertarVariable(simbolo);
+                            if (result3 != null) {
+                                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                        (String) result3,
+                                        fila, columna);
+                                arbol.getErrores().add(exc);
+                                return exc;
+                            }
+                        } else {
+                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                    "El tipo de la variable no coincide con el valor a asignar.",
+                                    fila, columna);
+                            arbol.getErrores().add(exc);
+                            return exc;
+                        }
+                    } else {
                         Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                                (String) result,
+                                "Los tipos del limite de rango no coinciden.",
                                 fila, columna);
                         arbol.getErrores().add(exc);
                         return exc;
                     }
+
                 } else {
-                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                            "El tipo de la variable no coincide con el valor a asignar.",
-                            fila, columna);
-                    arbol.getErrores().add(exc);
-                    return exc;
+                    if (tipoAux.equals(tipoValor)) {
+                        Object result = tabla.InsertarVariable(simbolo);
+                        if (result != null) {
+                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                    (String) result,
+                                    fila, columna);
+                            arbol.getErrores().add(exc);
+                            return exc;
+                        }
+                    } else {
+                        Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                "El tipo de la variable no coincide con el valor a asignar.",
+                                fila, columna);
+                        arbol.getErrores().add(exc);
+                        return exc;
+                    }
                 }
             }
         }
@@ -115,10 +153,34 @@ public class DeclaracionVar implements Instruccion {
                 return exc;
             } else {
                 Simbolo sim = (Simbolo) result;
-                String temp1 = tabla.getTemporal();
-                codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
-                codigo += sim.getValor().get4D(tabla, arbol);
-                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
+                if (tipoAux.getType() == Tipo.tipo.RANGE) {
+                    String temp1 = tabla.getTemporal();
+                    String temp2 = "";
+                    String temp3 = "";
+                    String temp4 = "";
+                    String label1 = tabla.getEtiqueta();
+                    String label2 = tabla.getEtiqueta();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    codigo += sim.getValor().get4D(tabla, arbol);
+                    temp2 = tabla.getTemporalActual();
+
+                    codigo += tipoAux.getLowerLimit().get4D(tabla, arbol);
+                    temp3 = tabla.getTemporalActual();
+
+                    codigo += tipoAux.getUpperLimit().get4D(tabla, arbol);
+                    temp4 = tabla.getTemporalActual();
+                    codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
+                    codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
+                    codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    codigo += label1 + ":\n";
+                    codigo += label2 + ":\n";
+                } else {
+                    String temp1 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    codigo += sim.getValor().get4D(tabla, arbol);
+                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                }
             }
         }
         return codigo;

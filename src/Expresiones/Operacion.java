@@ -269,6 +269,10 @@ public class Operacion implements Expresion {
                 codigo += "=," + 0 + ",," + tabla.getTemporalActual() + "\n"; //Asignar false 
                 codigo += etiquetaFalsa1 + ":\n";
                 break;
+
+            case MENOS_UNARIO:
+                codigo += "*," + opUActual + ",-1," + tabla.getTemporal() + "\n";
+                break;
         }
         return codigo;
     }
@@ -356,6 +360,9 @@ public class Operacion implements Expresion {
                 break;
             case NOT:
                 tipoResultante = getTipoLogicoNOT((Tipo) tipoU);
+                break;
+            case MENOS_UNARIO:
+                tipoResultante = getTipoMenosUnario((Tipo) tipoU);
                 break;
         }
         if (tipoResultante instanceof Excepcion) {
@@ -564,6 +571,15 @@ public class Operacion implements Expresion {
         } else {
             return new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Error, el tipo " + t1.getType() + ""
                     + " no se puede utilizar con el operador Logico NOT.", fila, columna);
+        }
+    }
+
+    Object getTipoMenosUnario(Tipo t1) {
+        if (t1.getType() == tipo.INTEGER || t1.getType() == tipo.REAL) {
+            return t1;
+        } else {
+            return new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Error, el tipo " + t1.getType() + ""
+                    + " no se puede utilizar con el operador Menos Unario.", fila, columna);
         }
     }
 

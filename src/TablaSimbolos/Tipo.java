@@ -17,9 +17,11 @@ public class Tipo {
 
     private tipo type;
     private String tipoObjeto;
+    private Expresion lowerLimit;
+    private Expresion upperLimit;
+    
 
     public static enum tipo {
-
         INTEGER,
         REAL,
         STRING,
@@ -28,6 +30,7 @@ public class Tipo {
         NIL,
         WORD,
         CHAR,
+        RANGE,
         OBJETO
     }
 
@@ -38,6 +41,13 @@ public class Tipo {
     public Tipo(tipo type, String tipoObjeto) {
         this.type = type;
         this.tipoObjeto = tipoObjeto;
+    }
+    
+    public Tipo(tipo type, String tipoObjeto, Expresion lowerLimit, Expresion upperLimit) {
+        this.type = type;
+        this.tipoObjeto = tipoObjeto;
+        this.lowerLimit = lowerLimit;
+        this.upperLimit = upperLimit;
     }
 
     public boolean equals(Tipo t1) {
@@ -107,5 +117,21 @@ public class Tipo {
 
     public void setTipoObjeto(String tipoObjeto) {
         this.tipoObjeto = tipoObjeto;
+    }
+
+    public Expresion getLowerLimit() {
+        return lowerLimit;
+    }
+
+    public void setLowerLimit(Expresion lowerLimit) {
+        this.lowerLimit = lowerLimit;
+    }
+
+    public Expresion getUpperLimit() {
+        return upperLimit;
+    }
+
+    public void setUpperLimit(Expresion upperLimit) {
+        this.upperLimit = upperLimit;
     }
 }
