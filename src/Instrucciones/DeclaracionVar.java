@@ -218,5 +218,4 @@ public class DeclaracionVar implements Instruccion {
         }
         return codigo;
     }
-
 }
