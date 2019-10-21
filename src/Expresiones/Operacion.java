@@ -601,13 +601,10 @@ public class Operacion implements Expresion {
             String temp3 = tabla.getTemporal();
             String temp4 = tabla.getTemporal();
             codigo += "+,p," + tabla.getFuncionSizeActual() + "," + temp1 + "\n";
-
             codigo += "+," + temp1 + ",0," + temp2 + "\n";
             codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
-
             codigo += "+," + temp1 + ",1," + temp3 + "\n";
             codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
-
             codigo += "+,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
             codigo += "call,,,concatenar_cadenas" + "\n";
             codigo += "+,p,2," + temp4 + "\n";
