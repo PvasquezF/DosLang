@@ -14,4 +14,5 @@ import TablaSimbolos.Tree;
  */
 public interface Instruccion extends AST {
     Object ejecutar(Tabla tabla, Tree arbol);
+    int getEspacios(int espacios);
 }

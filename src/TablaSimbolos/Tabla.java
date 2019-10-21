@@ -91,7 +91,8 @@ public class Tabla {
         String filas = "";
         encabezado += "<th scope=\"col\">No</th>";
         encabezado += "<th scope=\"col\">Identificador</th>";
-        encabezado += "<th scope=\"col\">Tipo</th>";
+        encabezado += "<th scope=\"col\">Tipo Primitivo</th>";
+        encabezado += "<th scope=\"col\">Tipo Generado</th>";
         encabezado += "<th scope=\"col\">Ambito</th>";
         encabezado += "<th scope=\"col\">Constante</th>";
         encabezado += "<th scope=\"col\">Parametros</th>";
@@ -102,7 +103,14 @@ public class Tabla {
             filas += "<tr>";
             filas += "<td scope=\"row\">" + i + "</td>";
             filas += "<td scope=\"row\">" + sim.getNombre() + "</td>";
-            filas += "<td scope=\"row\">" + sim.getTipo() + "</td>";
+            filas += "<td scope=\"row\">" + sim.getTipo().getType() + "</td>";
+            if (sim.getTipo().getType() == Tipo.tipo.ENUMERADO) {
+                filas += "<td scope=\"row\">" + sim.getTipo().getNombreEnum() + "</td>";
+            } else if (sim.getTipo().getType() == Tipo.tipo.OBJETO) {
+                filas += "<td scope=\"row\">" + sim.getTipo().getTipoObjeto() + "</td>";
+            } else {
+                filas += "<td scope=\"row\"> - </td>";
+            }
             filas += "<td scope=\"row\">" + sim.getAmbito() + "</td>";
             filas += "<td scope=\"row\">" + sim.isConstante() + "</td>";
             filas += "<td scope=\"row\"> - </td>";

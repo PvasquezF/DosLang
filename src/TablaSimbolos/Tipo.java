@@ -18,6 +18,7 @@ public class Tipo {
 
     private tipo type;
     private String tipoObjeto;
+    private String nombreEnum;
     private Expresion lowerLimit;
     private Expresion upperLimit;
     private ArrayList<Expresion> identificadores;
@@ -66,6 +67,8 @@ public class Tipo {
             } else {
                 return this.getTipoObjeto().equalsIgnoreCase(t1.getTipoObjeto());
             }
+        } else if (this.getType() == tipo.ENUMERADO && t1.getType() == tipo.ENUMERADO) {
+            return this.getNombreEnum().equalsIgnoreCase(t1.getNombreEnum());
         } else {
             return this.getType() == t1.getType();
         }
@@ -146,5 +149,13 @@ public class Tipo {
 
     public void setIdentificadores(ArrayList<Expresion> identificadores) {
         this.identificadores = identificadores;
+    }
+
+    public String getNombreEnum() {
+        return nombreEnum;
+    }
+
+    public void setNombreEnum(String nombreEnum) {
+        this.nombreEnum = nombreEnum;
     }
 }

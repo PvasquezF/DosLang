@@ -58,23 +58,27 @@ public class DosLang extends Thread {
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar) {
-                espaciosReservaHeap++;
+                espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
             } else if (ins instanceof DeclaracionType) {
+                ins.ejecutar(tabla, t);
+                espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
+            } else if (ins instanceof Program) {
                 ins.ejecutar(tabla, t);
             }
         }
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionVar
-                    || ins instanceof Program) {
+                    || ins instanceof DeclaracionVar) {
                 ins.ejecutar(tabla, t);
             }
         }
         Cuadruplos += ReservarMemoria.Reservar(tabla, espaciosReservaHeap);
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar) {
+            if (ins instanceof DeclaracionConstante
+                    || ins instanceof DeclaracionVar
+                    || ins instanceof DeclaracionType) {
                 Cuadruplos += ins.get4D(tabla, t);
             }
         }

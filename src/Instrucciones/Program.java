@@ -13,13 +13,14 @@ import TablaSimbolos.Tree;
  *
  * @author Pavel
  */
-public class Program implements Instruccion{
+public class Program implements Instruccion {
 
     private String nombreProgram;
-    
-    public Program(String nombreProgram){
+
+    public Program(String nombreProgram) {
         this.nombreProgram = nombreProgram;
     }
+
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
         //Siempre estara en el top de la pila para determinar el ambito actual,
@@ -34,5 +35,9 @@ public class Program implements Instruccion{
     public String get4D(Tabla tabla, Tree arbol) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    public int getEspacios(int espacios) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

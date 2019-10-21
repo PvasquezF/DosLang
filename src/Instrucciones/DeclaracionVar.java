@@ -52,18 +52,22 @@ public class DeclaracionVar implements Instruccion {
                 Expresion resultTipo = Tipo.valorPredeterminado(tipoAux);
                 Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
                 if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
-                    ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
-                    for (int j = 0; j < listaId.size(); j++) {
-                        Expresion m = listaId.get(j);
-                        Identificador id = (Identificador) m;
-                        Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipo, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
-                        Object result = tabla.InsertarVariable(simboloEnum);
-                        if (result != null) {
-                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                                    (String) result,
-                                    fila, columna);
-                            arbol.getErrores().add(exc);
-                            return exc;
+                    if (tipo.getType() == Tipo.tipo.ENUMERADO) {
+                        ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
+                        for (int j = 0; j < listaId.size(); j++) {
+                            Expresion m = listaId.get(j);
+                            Identificador id = (Identificador) m;
+                            Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
+                            tipoEnum.setNombreEnum(identificador);
+                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoEnum, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            Object result = tabla.InsertarVariable(simboloEnum);
+                            if (result != null) {
+                                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                        (String) result,
+                                        fila, columna);
+                                arbol.getErrores().add(exc);
+                                return exc;
+                            }
                         }
                     }
                 }
@@ -88,7 +92,8 @@ public class DeclaracionVar implements Instruccion {
                 char c;
                 if ((tipoAux.equals(new Tipo(Tipo.tipo.CHAR))
                         || tipoAux.equals(new Tipo(Tipo.tipo.INTEGER))
-                        || tipoAux.equals(new Tipo(Tipo.tipo.REAL)))
+                        || tipoAux.equals(new Tipo(Tipo.tipo.REAL))
+                        || tipoAux.equals(new Tipo(Tipo.tipo.RANGE)))
                         && ((Tipo) resultTipo).equals(new Tipo(Tipo.tipo.NIL))) {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                             "No se puede asignar NIL al tipo " + tipoAux.toString() + ".",
@@ -133,12 +138,26 @@ public class DeclaracionVar implements Instruccion {
                         return exc;
                     }
                 } else if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
-                    ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
-                    for (int j = 0; j < listaId.size(); j++) {
-                        Expresion m = listaId.get(j);
-                        Identificador id = (Identificador) m;
-                        Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipo, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
-                        Object result = tabla.InsertarVariable(simboloEnum);
+                    if (tipo.getType() == Tipo.tipo.ENUMERADO) {
+                        ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
+                        for (int j = 0; j < listaId.size(); j++) {
+                            Expresion m = listaId.get(j);
+                            Identificador id = (Identificador) m;
+                            Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
+                            tipoEnum.setNombreEnum(identificador);
+                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoEnum, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            Object result = tabla.InsertarVariable(simboloEnum);
+                            if (result != null) {
+                                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                        (String) result,
+                                        fila, columna);
+                                arbol.getErrores().add(exc);
+                                return exc;
+                            }
+                        }
+                    }
+                    if (tipoAux.equals(tipoValor)) {
+                        Object result = tabla.InsertarVariable(simbolo);
                         if (result != null) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                                     (String) result,
@@ -146,6 +165,14 @@ public class DeclaracionVar implements Instruccion {
                             arbol.getErrores().add(exc);
                             return exc;
                         }
+                    } else {
+                        Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                "El tipo de la variable no coincide con el valor a asignar, "
+                                + "Tipo " + tipoAux.getNombreEnum() + " = "
+                                + "Tipo " + (tipoValor.getNombreEnum() != null ? tipoValor.getNombreEnum() : tipoValor.getType()) + ".",
+                                fila, columna);
+                        arbol.getErrores().add(exc);
+                        return exc;
                     }
                 } else {
                     if (tipoAux.equals(tipoValor)) {
@@ -207,7 +234,30 @@ public class DeclaracionVar implements Instruccion {
                     codigo += label1 + ":\n";
                     codigo += label2 + ":\n";
                 } else if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
-                    
+                    if (tipo.getType() == Tipo.tipo.ENUMERADO) {
+                        for (int j = 0; j < tipo.getIdentificadores().size(); j++) {
+                            //Tipo t = tabla.getListaTipos().get(i).getTipo();
+                            Identificador identificadorEnum = (Identificador) tipo.getIdentificadores().get(j);
+                            Object resultEnum = tabla.getVariable(identificadorEnum.getIdentificador());
+                            if (resultEnum instanceof String) {
+                                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                        (String) resultEnum,
+                                        fila, columna);
+                                arbol.getErrores().add(exc);
+                                return exc;
+                            } else {
+                                Simbolo simEnum = (Simbolo) resultEnum;
+                                String temp1 = tabla.getTemporal();
+                                codigo += "=," + simEnum.getApuntador() + ",," + temp1 + "\n";
+                                codigo += simEnum.getValor().get4D(tabla, arbol);
+                                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                            }
+                        }
+                    }
+                    String temp1 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    codigo += sim.getValor().get4D(tabla, arbol);
+                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
                 } else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
@@ -217,5 +267,13 @@ public class DeclaracionVar implements Instruccion {
             }
         }
         return codigo;
+    }
+
+    @Override
+    public int getEspacios(int espacios) {
+        if (tipo.getType() == Tipo.tipo.ENUMERADO){
+            espacios += tipo.getIdentificadores().size();
+        }
+        return espacios += identificadores.size();
     }
 }
