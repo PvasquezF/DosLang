@@ -19,11 +19,19 @@ public class Identificador implements Expresion {
 
     private String identificador;
     public boolean accesoGlobal = false;
+    public boolean asExpresion = false;
     private int fila;
     private int columna;
 
     public Identificador(String identificador, int fila, int columna) {
         this.identificador = identificador;
+        this.fila = fila;
+        this.columna = columna;
+    }
+
+    public Identificador(String identificador, boolean asExpresion, int fila, int columna) {
+        this.identificador = identificador;
+        this.asExpresion = asExpresion;
         this.fila = fila;
         this.columna = columna;
     }
@@ -64,7 +72,16 @@ public class Identificador implements Expresion {
         String codigo = "";
         if (sim instanceof Simbolo) {
             accesoGlobal = ((Simbolo) sim).getNivel().equalsIgnoreCase("global");
-            codigo += "=," + ((Simbolo) sim).getApuntador() + ",," + tabla.getTemporal() + "// Id = " + this.identificador + "\n";
+            String temp1 = tabla.getTemporal();
+            codigo += "=," + ((Simbolo) sim).getApuntador() + ",," + temp1 + "// Id = " + this.identificador + "\n";
+            if (asExpresion) {
+                String temp2 = tabla.getTemporal();
+                if (accesoGlobal) {
+                    codigo += "=,heap," + temp1 + "," + temp2 + "\n";
+                } else {
+                    codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+                }
+            }
             return codigo;
         } else {
             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

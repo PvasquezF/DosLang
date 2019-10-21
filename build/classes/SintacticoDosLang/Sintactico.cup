@@ -355,7 +355,7 @@ EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}
            |   MEMORIA_VIRTUAL
            ;
 
-ACCESO   ::= identificador:e {:RESULT = new Identificador(e,eleft,eright);:}
+ACCESO   ::= identificador:e {:RESULT = new Identificador(e, true, eleft,eright);:}
            | ACCESO corI LISTA_EXPRESION corD
            | ACCESO parenI LISTA_EXPRESION parenD
            | ACCESO punto identificador

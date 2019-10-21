@@ -125,6 +125,7 @@ public class Operacion implements Expresion {
             codigo += op1;
             op1Actual = tabla.getTemporalActual();
             tipo1 = (Tipo) tipoOP1;
+            tipo1 = tipo1.verificarUserType(tabla, tipo1);
 
             op2 = operando2.get4D(tabla, arbol);
             tipoOP2 = operando2.getTipo(tabla, arbol);
@@ -138,6 +139,7 @@ public class Operacion implements Expresion {
             codigo += op2;
             op2Actual = tabla.getTemporalActual();
             tipo2 = (Tipo) tipoOP2;
+            tipo2 = tipo2.verificarUserType(tabla, tipo2);
         } else {
             opU = operandoU.get4D(tabla, arbol);
             tipoOPU = operandoU.getTipo(tabla, arbol);
@@ -151,6 +153,7 @@ public class Operacion implements Expresion {
             codigo += opU;
             opUActual = tabla.getTemporalActual();
             tipoU = (Tipo) tipoOPU;
+            tipoU = tipoU.verificarUserType(tabla, tipoU);
         }
         String etiquetaVerdadera1 = "";
         String etiquetaFalsa1 = "";
@@ -280,6 +283,7 @@ public class Operacion implements Expresion {
     @Override
     public Object getTipo(Tabla tabla, Tree arbol) {
         Object tipo1 = null, tipo2 = null, tipoU = null;
+        Tipo tipoOP1 = null, tipoOP2 = null, tipoOPU = null;
         Object tipoResultante = null;
         if (operandoU == null) {
             tipo1 = operando1.getTipo(tabla, arbol);
@@ -290,6 +294,8 @@ public class Operacion implements Expresion {
                 arbol.getErrores().add((Excepcion) tipoResultante);
                 return tipoResultante;
             }
+            tipoOP1 = (Tipo) tipo1;
+            tipoOP1 = tipoOP1.verificarUserType(tabla, tipoOP1);
             tipo2 = operando2.getTipo(tabla, arbol);
             if (tipo2 instanceof Excepcion) {
                 return tipo2;
@@ -298,6 +304,8 @@ public class Operacion implements Expresion {
                 arbol.getErrores().add((Excepcion) tipoResultante);
                 return tipoResultante;
             }
+            tipoOP2 = (Tipo) tipo2;
+            tipoOP2 = tipoOP2.verificarUserType(tabla, tipoOP2);
         } else {
             tipoU = operandoU.getTipo(tabla, arbol);
             if (tipoU instanceof Excepcion) {
@@ -307,62 +315,64 @@ public class Operacion implements Expresion {
                 arbol.getErrores().add((Excepcion) tipoResultante);
                 return tipoResultante;
             }
+            tipoOPU = (Tipo) tipoU;
+            tipoOPU = tipoOPU.verificarUserType(tabla, tipoOPU);
         }
 
         switch (operador) {
             case SUMA:
-                tipoResultante = getTipoSuma((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoSuma(tipoOP1, tipoOP2);
                 break;
             case RESTA:
-                tipoResultante = getTipoResta((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoResta(tipoOP1, tipoOP2);
                 break;
             case MULTIPLICACION:
-                tipoResultante = getTipoMultiplicacion((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoMultiplicacion(tipoOP1, tipoOP2);
                 break;
             case DIVISION:
-                tipoResultante = getTipoDivison((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoDivison(tipoOP1, tipoOP2);
                 break;
             case MODULO:
-                tipoResultante = getTipoModulo((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoModulo(tipoOP1, tipoOP2);
                 break;
             case POTENCIA:
-                tipoResultante = getTipoPotencia((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoPotencia(tipoOP1, tipoOP2);
                 break;
             case MENOR_QUE:
-                tipoResultante = getTipoRelacional((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoRelacional(tipoOP1, tipoOP2);
                 break;
             case MENOR_IGUAL:
-                tipoResultante = getTipoRelacional((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoRelacional(tipoOP1, tipoOP2);
                 break;
             case MAYOR_QUE:
-                tipoResultante = getTipoRelacional((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoRelacional(tipoOP1, tipoOP2);
                 break;
             case MAYOR_IGUAL:
-                tipoResultante = getTipoRelacional((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoRelacional(tipoOP1, tipoOP2);
                 break;
             case IGUAL_IGUAL:
-                tipoResultante = getTipoRelacionalIgualdad((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoRelacionalIgualdad(tipoOP1, tipoOP2);
                 break;
             case DIFERENTE_QUE:
-                tipoResultante = getTipoRelacionalIgualdad((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoRelacionalIgualdad(tipoOP1, tipoOP2);
                 break;
             case AND:
-                tipoResultante = getTipoLogico((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoLogico(tipoOP1, tipoOP2);
                 break;
             case OR:
-                tipoResultante = getTipoLogico((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoLogico(tipoOP1, tipoOP2);
                 break;
             case NOR:
-                tipoResultante = getTipoLogico((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoLogico(tipoOP1, tipoOP2);
                 break;
             case NAND:
-                tipoResultante = getTipoLogico((Tipo) tipo1, (Tipo) tipo2);
+                tipoResultante = getTipoLogico(tipoOP1, tipoOP2);
                 break;
             case NOT:
-                tipoResultante = getTipoLogicoNOT((Tipo) tipoU);
+                tipoResultante = getTipoLogicoNOT(tipoOPU);
                 break;
             case MENOS_UNARIO:
-                tipoResultante = getTipoMenosUnario((Tipo) tipoU);
+                tipoResultante = getTipoMenosUnario(tipoOPU);
                 break;
         }
         if (tipoResultante instanceof Excepcion) {
@@ -603,6 +613,8 @@ public class Operacion implements Expresion {
             codigo += "+,p,2," + temp4 + "\n";
             codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
             codigo += "-,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
+        } else {
+            codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
         }
         return codigo;
     }

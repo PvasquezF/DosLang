@@ -84,11 +84,7 @@ public class Tipo {
             return type.toString();
         }
     }
-    /***
-     * a : integer
-     * b : a
-     * c : b
-     */
+
     public Tipo verificarUserType(Tabla tabla, Tipo tipoComprobacion) {
         if (this.tipoObjeto != null) {
             for(int i = 0; i < tabla.getListaTipos().size(); i++){
