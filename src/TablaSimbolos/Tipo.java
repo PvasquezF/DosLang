@@ -17,11 +17,13 @@ import java.util.ArrayList;
 public class Tipo {
 
     private tipo type;
+    private tipo tipoArreglo;
     private String tipoObjeto;
     private String nombreEnum;
     private Expresion lowerLimit;
     private Expresion upperLimit;
     private ArrayList<Expresion> identificadores;
+    private ArrayList<Dimension> dimensiones;
 
     public static enum tipo {
 
@@ -35,6 +37,7 @@ public class Tipo {
         CHAR,
         RANGE,
         ENUMERADO,
+        ARREGLO,
         OBJETO
     }
 
@@ -60,6 +63,13 @@ public class Tipo {
         this.identificadores = identificadores;
     }
 
+    public Tipo(tipo type, tipo tipoArreglo, String tipoObjeto, ArrayList<Dimension> dimensiones) {
+        this.type = type;
+        this.tipoArreglo = tipoArreglo;
+        this.tipoObjeto = tipoObjeto;
+        this.dimensiones = dimensiones;
+    }
+
     public boolean equals(Tipo t1) {
         if (this.type == tipo.OBJETO || this.type == tipo.RECORD) {
             if (t1.getType() == tipo.NIL || this.getType() == tipo.NIL) {
@@ -83,6 +93,8 @@ public class Tipo {
             return new Primitivo(' ');
         } else if (t.getType() == tipo.BOOLEAN) {
             return new Primitivo(false);
+        } else if (t.getType() == tipo.ARREGLO) {
+            return valorPredeterminado(new Tipo(t.getTipoArreglo(), null));
         } else {
             return new Nil();
         }
@@ -157,5 +169,21 @@ public class Tipo {
 
     public void setNombreEnum(String nombreEnum) {
         this.nombreEnum = nombreEnum;
+    }
+
+    public tipo getTipoArreglo() {
+        return tipoArreglo;
+    }
+
+    public void setTipoArreglo(tipo tipoArreglo) {
+        this.tipoArreglo = tipoArreglo;
+    }
+
+    public ArrayList<Dimension> getDimensiones() {
+        return dimensiones;
+    }
+
+    public void setDimensiones(ArrayList<Dimension> dimensiones) {
+        this.dimensiones = dimensiones;
     }
 }

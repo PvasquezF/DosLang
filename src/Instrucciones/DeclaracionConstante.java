@@ -10,14 +10,11 @@ import Expresiones.Identificador;
 import Expresiones.Primitivo;
 import Interfaces.Expresion;
 import Interfaces.Instruccion;
-import TablaSimbolos.Simbolo;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tipo;
-import TablaSimbolos.Tree;
+import TablaSimbolos.*;
+
 import java.util.ArrayList;
 
 /**
- *
  * @author Pavel
  */
 public class DeclaracionConstante implements Instruccion {
@@ -43,7 +40,7 @@ public class DeclaracionConstante implements Instruccion {
             Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
             Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, true, tabla.getHeap());
             Object resultTipo = valor.getTipo(tabla, arbol);
-            if(tipo.getType() == Tipo.tipo.ENUMERADO){
+            if (tipo.getType() == Tipo.tipo.ENUMERADO) {
             }
             if (resultTipo instanceof Excepcion) {
                 return resultTipo;
@@ -128,8 +125,8 @@ public class DeclaracionConstante implements Instruccion {
                 } else {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                             "El tipo de la variable no coincide con el valor a asignar, "
-                            + "Tipo " + tipoAux.getNombreEnum() + " = "
-                            + "Tipo " + (tipoValor.getNombreEnum() != null ? tipoValor.getNombreEnum() : tipoValor.getType()) + ".",
+                                    + "Tipo " + tipoAux.getNombreEnum() + " = "
+                                    + "Tipo " + (tipoValor.getNombreEnum() != null ? tipoValor.getNombreEnum() : tipoValor.getType()) + ".",
                             fila, columna);
                     arbol.getErrores().add(exc);
                     return exc;
@@ -217,6 +214,44 @@ public class DeclaracionConstante implements Instruccion {
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);
                     codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                } else if (tipoAux.getType() == Tipo.tipo.ARREGLO) {
+                    String temp1 = tabla.getTemporal();
+                    String temp2 = tabla.getTemporal();
+                    String temp3 = tabla.getTemporal();
+                    String temp4 = tabla.getTemporal();
+                    String temp5 = tabla.getTemporal();
+                    String temp6 = tabla.getTemporal();
+                    String temp7 = tabla.getTemporal();
+                    String label1 = tabla.getEtiqueta();
+                    String label2 = tabla.getEtiqueta();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    ArrayList<Dimension> dimension = tipoAux.getDimensiones();
+                    codigo += "=,h," + dimension.size() + ",heap // Cantidad dimensiones arreglo\n";
+                    codigo += "=,h,," + temp6 + "\n";
+                    codigo += "+,h,1,h\n";
+                    codigo += "=,1,," + temp5 + "\n";
+                    for (int k = 0; k < dimension.size(); k++) {
+                        Dimension dim = dimension.get(k);
+                        codigo += dim.getLimiteInferior().get4D(tabla, arbol);
+                        codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + "\n";
+                        codigo += dim.getLimiteSuperior().get4D(tabla, arbol);
+                        codigo += "=," + tabla.getTemporalActual() + ",," + temp3 + "\n";
+                        codigo += "-," + temp3 + "," + temp2 + "," + temp4 + "// Tamaño dimension " + k + "\n";
+                        codigo += "=,h," + temp4 + ",heap // dimension " + k + "\n";
+                        codigo += "+,h,1,h\n";
+                        codigo += "*," + temp5 + "," + temp4 + "," + temp5 + "\n";
+                    }
+                    codigo += label1 + ":\n";
+                    codigo += "je," + temp5 + ",0," + label2 + "\n";
+                    codigo += "-," + temp5 + ",1," + temp5 + "\n";
+                    codigo += Tipo.valorPredeterminado(tipoAux).get4D(tabla, arbol);
+                    codigo += "=," + tabla.getTemporalActual() + ",," + temp7 + "\n";
+                    codigo += "=,h," + temp7 + ",heap\n";
+                    codigo += "+,h,1,h\n";
+                    codigo += "jmp,,," + label1 + "\n";
+                    codigo += label2 + ":\n";
+
+                    codigo += "=, " + temp1 + ", " + temp6 + ", heap // Fin declaracion Array " + identificador + "\n";
                 } else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";

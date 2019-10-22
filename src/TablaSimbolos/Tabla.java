@@ -108,6 +108,12 @@ public class Tabla {
                 filas += "<td scope=\"row\">" + sim.getTipo().getNombreEnum() + "</td>";
             } else if (sim.getTipo().getType() == Tipo.tipo.OBJETO) {
                 filas += "<td scope=\"row\">" + sim.getTipo().getTipoObjeto() + "</td>";
+            } else if (sim.getTipo().getType() == Tipo.tipo.ARREGLO) {
+                if (sim.getTipo().getTipoObjeto() != null) {
+                    filas += "<td scope=\"row\">" + sim.getTipo().getTipoObjeto() + "</td>";
+                } else {
+                    filas += "<td scope=\"row\">" + sim.getTipo().getTipoArreglo() + "</td>";
+                }
             } else {
                 filas += "<td scope=\"row\"> - </td>";
             }
