@@ -5,7 +5,10 @@
  */
 package TablaSimbolos;
 
+import Interfaces.AST;
 import Interfaces.Expresion;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -19,9 +22,12 @@ public class Simbolo {
     private String rol;
     private String nivel;
     private int apuntador;
+    private int tamaño;
     private boolean constante;
     private Expresion valor;
     private boolean primitivo;
+    private ArrayList<AST> instrucciones;
+    private ArrayList<AST> parametros;
 
     public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador) {
         this.nombre = nombre;
@@ -42,6 +48,19 @@ public class Simbolo {
         this.apuntador = apuntador;
         this.valor = valor;
         this.constante = constante;
+    }
+
+    public Simbolo(String nombre, ArrayList<AST> parametros, Tipo tipo, String ambito, String rol, String nivel, ArrayList<AST> instrucciones, boolean constante, int apuntador, int tamaño) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ambito = ambito;
+        this.rol = rol;
+        this.nivel = nivel;
+        this.apuntador = apuntador;
+        this.instrucciones = instrucciones;
+        this.constante = constante;
+        this.tamaño = tamaño;
+        this.parametros = parametros;
     }
 
     public String getNombre() {
@@ -115,5 +134,21 @@ public class Simbolo {
 
     public void setPrimitivo(boolean primitivo) {
         this.primitivo = primitivo;
+    }
+
+    public ArrayList<AST> getInstrucciones() {
+        return instrucciones;
+    }
+
+    public void setInstrucciones(ArrayList<AST> instrucciones) {
+        this.instrucciones = instrucciones;
+    }
+
+    public int getTamaño() {
+        return tamaño;
+    }
+
+    public void setTamaño(int tamaño) {
+        this.tamaño = tamaño;
     }
 }

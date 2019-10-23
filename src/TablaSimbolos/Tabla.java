@@ -50,6 +50,16 @@ public class Tabla {
         return null;
     }
 
+    public String InsertarFuncion(Simbolo simbolo) {
+        for (Simbolo i : tabla) {
+            if (i.getNombre().equalsIgnoreCase(simbolo.getNombre()) && i.getAmbito().equalsIgnoreCase(simbolo.getAmbito())) {
+                return "La funcion " + simbolo.getNombre() + " ya ha sido declarada.";
+            }
+        }
+        tabla.add(simbolo);
+        return null;
+    }
+
     public Object getVariable(String identificador) {
         for (Simbolo i : tabla) {
             for (Object env : listaAmbitos) {

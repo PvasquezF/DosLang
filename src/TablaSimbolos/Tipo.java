@@ -40,7 +40,8 @@ public class Tipo {
         RANGE,
         ENUMERADO,
         ARREGLO,
-        OBJETO
+        OBJETO,
+        VOID
     }
 
     public Tipo(tipo type) {

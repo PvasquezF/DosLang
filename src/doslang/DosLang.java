@@ -16,11 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import Excepciones.Excepcion;
-import Instrucciones.Asignacion;
-import Instrucciones.DeclaracionConstante;
-import Instrucciones.DeclaracionType;
-import Instrucciones.DeclaracionVar;
-import Instrucciones.Program;
+import Instrucciones.*;
 import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
@@ -70,7 +66,8 @@ public class DosLang extends Thread {
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionVar) {
+                    || ins instanceof DeclaracionVar
+                    || ins instanceof Main) {
                 ins.ejecutar(tabla, t);
             }
         }
@@ -80,6 +77,13 @@ public class DosLang extends Thread {
             if (ins instanceof DeclaracionConstante
                     || ins instanceof DeclaracionVar
                     || ins instanceof DeclaracionType) {
+                Cuadruplos += ins.get4D(tabla, t);
+            }
+        }
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof Main) {
                 Cuadruplos += ins.get4D(tabla, t);
             }
         }

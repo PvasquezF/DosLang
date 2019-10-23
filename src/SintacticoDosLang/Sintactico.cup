@@ -24,6 +24,7 @@ import TablaSimbolos.Registro;
 import java.util.Collections;
 import Expresiones.AccesoArreglo;
 import Expresiones.Acceso;
+import Instrucciones.Main;
 parser code 
 {:
     Tree tree;
@@ -67,14 +68,14 @@ non terminal CASE, CASELIST, DEFECTO, SWITCH;
 non terminal INSIF;
 
 
-non terminal ArrayList<AST> PROGRAM, USES, MAIN, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
+non terminal ArrayList<AST> PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST SUBRANGE_TYPE;
+non terminal AST SUBRANGE_TYPE, MAIN;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -230,7 +231,7 @@ VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RE
       ;
 
 SECCION_FUNCION ::= METHOD_LIST MAIN
-                  | MAIN:e {:RESULT = e;:}
+                  | MAIN:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                   ;
 
 METHOD_LIST ::= METHOD_LIST FUNCION
@@ -271,8 +272,8 @@ RECORDS ::= identificador:e dosPuntos TIPO:e1 pComa {: RESULT = new Registro(e1,
           //| LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION_MULTI pComa
           ;
 
-MAIN ::= begin LISTA_INSTRUCCIONES:e end punto {:RESULT = e;:}
-       | begin end punto {:RESULT = new ArrayList<AST>();:}
+MAIN ::= begin LISTA_INSTRUCCIONES:e end punto {:RESULT = new Main(e, eleft, eright);:}
+       | begin end:e punto {:RESULT = new Main(new ArrayList<AST>(), eleft, eright);:}
        ;
 
 BLOQUE_INSTRUCCIONES ::= begin LISTA_INSTRUCCIONES:e end pComa {:RESULT = e;:}
