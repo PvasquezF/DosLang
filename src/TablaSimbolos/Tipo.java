@@ -24,7 +24,7 @@ public class Tipo {
     private Expresion upperLimit;
     private ArrayList<Expresion> identificadores;
     private ArrayList<Dimension> dimensiones;
-
+    private ArrayList<Registro> atributos;
     public static enum tipo {
 
         INTEGER,
@@ -68,6 +68,11 @@ public class Tipo {
         this.tipoArreglo = tipoArreglo;
         this.tipoObjeto = tipoObjeto;
         this.dimensiones = dimensiones;
+    }
+
+    public Tipo(ArrayList<Registro> atributos) {
+        this.type = tipo.RECORD;
+        this.atributos = atributos;
     }
 
     public boolean equals(Tipo t1) {

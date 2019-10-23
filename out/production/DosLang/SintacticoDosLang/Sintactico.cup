@@ -20,6 +20,7 @@ import Interfaces.Expresion;
 import Instrucciones.Asignacion;
 import Instrucciones.Variable;
 import TablaSimbolos.Dimension;
+import TablaSimbolos.Registro;
 import java.util.Collections;
 import Expresiones.AccesoArreglo;
 import Expresiones.Acceso;
@@ -62,7 +63,6 @@ non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
 non terminal FUNCION, WITH, PROCEDURE;
 non terminal METHOD_LIST, SI, LISTAIF, INSTRUCCIONESIF;
 non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, WRITE, READ;
-non terminal REGISTRO, LISTA_RECORDS, RECORDS;
 non terminal CASE, CASELIST, DEFECTO, SWITCH;
 non terminal INSIF;
 
@@ -71,6 +71,7 @@ non terminal ArrayList<AST> PROGRAM, USES, MAIN, SECCION_TIPO, LISTA_DECLARACION
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
+non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
 non terminal AST SUBRANGE_TYPE;
@@ -78,6 +79,7 @@ non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAM
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
 non terminal Dimension RANGO_ARRAY;
+non terminal Registro RECORDS;
 
 precedence left then;
 //precedence left sino;
@@ -120,7 +122,7 @@ DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
                     ;
 
 TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igual TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
-                   | LISTA_IDENTIFICADORES igual REGISTRO
+                   //| LISTA_IDENTIFICADORES igual REGISTRO
                    ;
 
 //ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_EXPRESION parenD {: RESULT = new; :}
@@ -197,6 +199,7 @@ TIPO ::= identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
        | ARRAY_DECLARATION:e {:RESULT = e; 
         Collections.reverse(RESULT.getDimensiones());:}
        | ARRAY_DECLARATION_MULTI:e {:RESULT = e;:}
+       | REGISTRO:e {:RESULT = new Tipo(e);:}
        ;
 
 SECCION_CONST ::= constante DECLARACION_CONST:e SECCION_VAR:e1 {:RESULT = e; RESULT.addAll(e1);:}
@@ -223,7 +226,7 @@ DECLARACION_VAR ::= DECLARACION_VAR:e VAR:e1 {:RESULT = e; RESULT.add(e1);:}
 
 VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright);:}
       | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 pComa {: RESULT = new DeclaracionVar(e1, e, eleft, eright); :}
-      | LISTA_IDENTIFICADORES dosPuntos REGISTRO pComa
+      //| LISTA_IDENTIFICADORES dosPuntos REGISTRO pComa
       ;
 
 SECCION_FUNCION ::= METHOD_LIST MAIN
@@ -256,14 +259,14 @@ CUERPO_FUNCION ::= VARINIT BLOQUE_INSTRUCCIONES
                  | BLOQUE_INSTRUCCIONES
                  ;
 
-REGISTRO ::= record LISTA_RECORDS end 
+REGISTRO ::= record LISTA_RECORDS:e end {:RESULT = e;:}
            ;
 
-LISTA_RECORDS ::= LISTA_RECORDS RECORDS
-                | RECORDS
+LISTA_RECORDS ::= LISTA_RECORDS:e RECORDS:e1 {:RESULT = e; RESULT.add(e1);:}
+                | RECORDS:e {:RESULT = new ArrayList<Registro>(); RESULT.add(e);:}
                 ;
 
-RECORDS ::= LISTA_IDENTIFICADORES dosPuntos TIPO pComa 
+RECORDS ::= identificador:e dosPuntos TIPO:e1 pComa {: RESULT = new Registro(e1, e); :}
           //| LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION pComa
           //| LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION_MULTI pComa
           ;
