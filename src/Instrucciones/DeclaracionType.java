@@ -16,10 +16,10 @@ import TablaSimbolos.Tabla;
 import TablaSimbolos.Tipo;
 import TablaSimbolos.Tree;
 import TablaSimbolos.UserType;
+
 import java.util.ArrayList;
 
 /**
- *
  * @author Pavel
  */
 public class DeclaracionType implements Instruccion {
@@ -40,7 +40,6 @@ public class DeclaracionType implements Instruccion {
     public Object ejecutar(Tabla tabla, Tree arbol) {
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
-            tipo.setNombreEnum(identificador);
             Object result = tabla.insertarType(new UserType(identificador, tipo));
             if (result != null) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -50,6 +49,7 @@ public class DeclaracionType implements Instruccion {
                 return exc;
             }
             if (tipo.getType() == Tipo.tipo.ENUMERADO) {
+                tipo.setNombreEnum(identificador);
                 ArrayList<Expresion> listaId = tipo.getIdentificadores();
                 for (int j = 0; j < listaId.size(); j++) {
                     Expresion m = listaId.get(j);
@@ -67,6 +67,28 @@ public class DeclaracionType implements Instruccion {
                         return exc;
                     }
                 }
+            } else if (tipo.getType() == Tipo.tipo.RANGE) {
+                Object res = tipo.getLowerLimit().getTipo(tabla, arbol);
+                if (res instanceof Excepcion) {
+                    return res;
+                }
+                Object res1 = tipo.getUpperLimit().getTipo(tabla, arbol);
+                if (res1 instanceof Excepcion) {
+                    return res1;
+                }
+                Tipo tipoLower = (Tipo) res;
+                Tipo tipoUpper = (Tipo) res1;
+                if (tipoLower.equals(tipoUpper)) {
+                    tipo.setTipoRange(tipoLower.getType());
+                } else {
+                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                            "Los tipos del limite de rango no coinciden.",
+                            fila, columna);
+                    arbol.getErrores().add(exc);
+                    return exc;
+                }
+            } else if (tipo.getType() == Tipo.tipo.RECORD || tipo.getType() == Tipo.tipo.OBJETO) {
+                tipo.setTipoObjeto(identificador);
             }
         }
         return null;

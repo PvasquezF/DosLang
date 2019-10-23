@@ -31,7 +31,7 @@ public class Acceso implements Expresion {
             return exc;
         }
         Simbolo sim = (Simbolo) result;
-        tipoResultado = sim.getTipo().verificarUserType(tabla, sim.getTipo());
+        tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
             Expresion acceso = accesos.get(i);
             if (tipoResultado.getType() == Tipo.tipo.ARREGLO) {
@@ -40,7 +40,7 @@ public class Acceso implements Expresion {
                     int cantidadAccesos = ((AccesoArreglo) acceso).getIndices().size();
                     if (cantidadAccesos == cantidadDimensiones) {
                         tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
-                        tipoResultado = tipoResultado.verificarUserType(tabla, tipoResultado);
+                        tipoResultado = tipoResultado.verificarUserType(tabla);
                     } else {
                         if (cantidadAccesos < cantidadDimensiones) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -105,7 +105,7 @@ public class Acceso implements Expresion {
             return exc;
         }
         Simbolo sim = (Simbolo) result;
-        tipoResultado = sim.getTipo().verificarUserType(tabla, sim.getTipo());
+        tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
             Expresion acceso = accesos.get(i);
             if (tipoResultado.getType() == Tipo.tipo.ARREGLO) {
@@ -169,7 +169,7 @@ public class Acceso implements Expresion {
                         }
                     }
                     tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
-                    tipoResultado = tipoResultado.verificarUserType(tabla, tipoResultado);
+                    tipoResultado = tipoResultado.verificarUserType(tabla);
                 } else {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                             "El tipo de acceso que se intenta no es de tipo arreglo.",

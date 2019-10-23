@@ -6,6 +6,7 @@
 package TablaSimbolos;
 
 import Excepciones.Excepcion;
+
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -17,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Pavel
  */
 public class Tabla {
@@ -106,8 +106,10 @@ public class Tabla {
             filas += "<td scope=\"row\">" + sim.getTipo().getType() + "</td>";
             if (sim.getTipo().getType() == Tipo.tipo.ENUMERADO) {
                 filas += "<td scope=\"row\">" + sim.getTipo().getNombreEnum() + "</td>";
-            } else if (sim.getTipo().getType() == Tipo.tipo.OBJETO) {
+            } else if (sim.getTipo().getType() == Tipo.tipo.OBJETO || sim.getTipo().getType() == Tipo.tipo.RECORD) {
                 filas += "<td scope=\"row\">" + sim.getTipo().getTipoObjeto() + "</td>";
+            }else if (sim.getTipo().getType() == Tipo.tipo.RANGE) {
+                filas += "<td scope=\"row\">" + sim.getTipo().getTipoRange() + "</td>";
             } else if (sim.getTipo().getType() == Tipo.tipo.ARREGLO) {
                 if (sim.getTipo().getTipoObjeto() != null) {
                     filas += "<td scope=\"row\">" + sim.getTipo().getTipoObjeto() + "</td>";

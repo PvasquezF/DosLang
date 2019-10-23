@@ -8,16 +8,17 @@ package TablaSimbolos;
 import Expresiones.Nil;
 import Expresiones.Primitivo;
 import Interfaces.Expresion;
+
 import java.util.ArrayList;
 
 /**
- *
  * @author Pavel
  */
 public class Tipo {
 
     private tipo type;
     private tipo tipoArreglo;
+    private tipo tipoRange;
     private String tipoObjeto;
     private String nombreEnum;
     private Expresion lowerLimit;
@@ -25,6 +26,7 @@ public class Tipo {
     private ArrayList<Expresion> identificadores;
     private ArrayList<Dimension> dimensiones;
     private ArrayList<Registro> atributos;
+
     public static enum tipo {
 
         INTEGER,
@@ -114,16 +116,16 @@ public class Tipo {
         }
     }
 
-    public Tipo verificarUserType(Tabla tabla, Tipo tipoComprobacion) {
-        if (this.tipoObjeto != null) {
+    public Tipo verificarUserType(Tabla tabla) {
+        if (this.tipoObjeto != null && this.getType() != tipo.RECORD) {
             for (int i = 0; i < tabla.getListaTipos().size(); i++) {
                 UserType m = tabla.getListaTipos().get(i);
                 if (this.tipoObjeto.equalsIgnoreCase(m.getNombre())) {
                     // Coincide el tipoObjeto con el userType
-                    Tipo result = m.getTipo().verificarUserType(tabla, m.getTipo());
+                    Tipo result = m.getTipo().verificarUserType(tabla);
                     return result;
                 }
-            };
+            }
         }
         return this;
     }
@@ -190,5 +192,21 @@ public class Tipo {
 
     public void setDimensiones(ArrayList<Dimension> dimensiones) {
         this.dimensiones = dimensiones;
+    }
+
+    public ArrayList<Registro> getAtributos() {
+        return atributos;
+    }
+
+    public void setAtributos(ArrayList<Registro> atributos) {
+        this.atributos = atributos;
+    }
+
+    public tipo getTipoRange() {
+        return tipoRange;
+    }
+
+    public void setTipoRange(tipo tipoRange) {
+        this.tipoRange = tipoRange;
     }
 }

@@ -37,8 +37,8 @@ public class DeclaracionConstante implements Instruccion {
     public Object ejecutar(Tabla tabla, Tree arbol) {
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
-            Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
-            Simbolo simbolo = new Simbolo(identificador, tipo, tabla.getAmbito(), "variable", "global", valor, true, tabla.getHeap());
+            Tipo tipoAux = tipo.verificarUserType(tabla);
+            Simbolo simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", valor, true, tabla.getHeap());
             Object resultTipo = valor.getTipo(tabla, arbol);
             if (tipo.getType() == Tipo.tipo.ENUMERADO) {
             }
@@ -61,17 +61,18 @@ public class DeclaracionConstante implements Instruccion {
             Tipo tipoValor = (Tipo) resultTipo;
             if (tipoAux.getType() == Tipo.tipo.RANGE) {
                 Object result = tipoAux.getLowerLimit().getTipo(tabla, arbol);
-                Object result1 = tipoAux.getLowerLimit().getTipo(tabla, arbol);
+                Object result1 = tipoAux.getUpperLimit().getTipo(tabla, arbol);
                 if (result instanceof Excepcion) {
                     return result;
                 }
                 if (result1 instanceof Excepcion) {
-                    return result;
+                    return result1;
                 }
                 Tipo tipoLower = (Tipo) result;
-                Tipo tipoUpper = (Tipo) result;
+                Tipo tipoUpper = (Tipo) result1;
                 if (tipoLower.equals(tipoUpper)) {
                     if (tipoLower.equals(tipoValor)) {
+                        simbolo.getTipo().setTipoRange(tipoLower.getType());
                         Object result3 = tabla.InsertarVariable(simbolo);
                         if (result3 != null) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -131,6 +132,27 @@ public class DeclaracionConstante implements Instruccion {
                     arbol.getErrores().add(exc);
                     return exc;
                 }
+            } else if (tipoAux.getType() == Tipo.tipo.RECORD) {
+                if (tipo.getType() == Tipo.tipo.RECORD) {
+                    simbolo.getTipo().setTipoObjeto(identificador);
+                }
+                ArrayList<Registro> registros = tipoAux.getAtributos();
+                int apariciones = 0;
+                for (Registro reg : registros) {
+                    apariciones = 0;
+                    for (Registro r : registros) {
+                        if (reg.getIdentificador().equalsIgnoreCase(r.getIdentificador())) {
+                            apariciones++;
+                        }
+                    }
+                    if (apariciones > 1) {
+                        Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                "El atributo " + reg.getIdentificador() + " esta duplicado.",
+                                fila, columna);
+                        arbol.getErrores().add(exc);
+                        return exc;
+                    }
+                }
             } else {
                 if (tipoAux.equals(tipoValor)) {
                     Object result = tabla.InsertarVariable(simbolo);
@@ -167,7 +189,7 @@ public class DeclaracionConstante implements Instruccion {
                 return exc;
             } else {
                 Simbolo sim = (Simbolo) result;
-                Tipo tipoAux = tipo.verificarUserType(tabla, tipo);
+                Tipo tipoAux = tipo.verificarUserType(tabla);
                 if (tipoAux.getType() == Tipo.tipo.RANGE) {
                     String temp1 = tabla.getTemporal();
                     String temp2 = "";
@@ -252,7 +274,20 @@ public class DeclaracionConstante implements Instruccion {
                     codigo += label2 + ":\n";
 
                     codigo += "=, " + temp1 + ", " + temp6 + ", heap // Fin declaracion Array " + identificador + "\n";
-                } else {
+                } else if (tipoAux.getType() == Tipo.tipo.RECORD) {
+                    /*String temp1 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion objeto\n";
+                    codigo += "=," + temp1 + ",h,heap\n";
+                    for (int k = 0; k < tipoAux.getAtributos().size(); k++) {
+                        Registro r = tipoAux.getAtributos().get(k);
+                        codigo += Tipo.valorPredeterminado(r.getTipo()).get4D(tabla, arbol);
+                        codigo += "=,h," + tabla.getTemporalActual() + ",heap\n";
+                        codigo += "+,h,1,h\n";
+                    }*/
+                    String temp1 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion objeto\n";
+                    codigo += "=," + temp1 + ",-1,heap\n";
+                }  else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);

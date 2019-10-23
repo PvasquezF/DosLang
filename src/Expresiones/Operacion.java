@@ -125,7 +125,7 @@ public class Operacion implements Expresion {
             codigo += op1;
             op1Actual = tabla.getTemporalActual();
             tipo1 = (Tipo) tipoOP1;
-            tipo1 = tipo1.verificarUserType(tabla, tipo1);
+            tipo1 = tipo1.verificarUserType(tabla);
 
             op2 = operando2.get4D(tabla, arbol);
             tipoOP2 = operando2.getTipo(tabla, arbol);
@@ -139,7 +139,7 @@ public class Operacion implements Expresion {
             codigo += op2;
             op2Actual = tabla.getTemporalActual();
             tipo2 = (Tipo) tipoOP2;
-            tipo2 = tipo2.verificarUserType(tabla, tipo2);
+            tipo2 = tipo2.verificarUserType(tabla);
         } else {
             opU = operandoU.get4D(tabla, arbol);
             tipoOPU = operandoU.getTipo(tabla, arbol);
@@ -153,7 +153,7 @@ public class Operacion implements Expresion {
             codigo += opU;
             opUActual = tabla.getTemporalActual();
             tipoU = (Tipo) tipoOPU;
-            tipoU = tipoU.verificarUserType(tabla, tipoU);
+            tipoU = tipoU.verificarUserType(tabla);
         }
         String etiquetaVerdadera1 = "";
         String etiquetaFalsa1 = "";
@@ -295,7 +295,7 @@ public class Operacion implements Expresion {
                 return tipoResultante;
             }
             tipoOP1 = (Tipo) tipo1;
-            tipoOP1 = tipoOP1.verificarUserType(tabla, tipoOP1);
+            tipoOP1 = tipoOP1.verificarUserType(tabla);
             tipo2 = operando2.getTipo(tabla, arbol);
             if (tipo2 instanceof Excepcion) {
                 return tipo2;
@@ -305,7 +305,7 @@ public class Operacion implements Expresion {
                 return tipoResultante;
             }
             tipoOP2 = (Tipo) tipo2;
-            tipoOP2 = tipoOP2.verificarUserType(tabla, tipoOP2);
+            tipoOP2 = tipoOP2.verificarUserType(tabla);
         } else {
             tipoU = operandoU.getTipo(tabla, arbol);
             if (tipoU instanceof Excepcion) {
@@ -316,7 +316,7 @@ public class Operacion implements Expresion {
                 return tipoResultante;
             }
             tipoOPU = (Tipo) tipoU;
-            tipoOPU = tipoOPU.verificarUserType(tabla, tipoOPU);
+            tipoOPU = tipoOPU.verificarUserType(tabla);
         }
 
         switch (operador) {
