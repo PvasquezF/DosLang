@@ -21,6 +21,8 @@ import Instrucciones.Asignacion;
 import Instrucciones.Variable;
 import TablaSimbolos.Dimension;
 import java.util.Collections;
+import Expresiones.AccesoArreglo;
+import Expresiones.Acceso;
 parser code 
 {:
     Tree tree;
@@ -57,23 +59,24 @@ non terminal ENUM_TYPE, ARRAY_TYPE;
 non terminal MEMORIA_VIRTUAL;
 non terminal PARAMETROS;
 non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
-non terminal FUNCION, WITH, PROCEDURE, ARRAY_MULTI;
+non terminal FUNCION, WITH, PROCEDURE;
 non terminal METHOD_LIST, SI, LISTAIF, INSTRUCCIONESIF;
 non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, WRITE, READ;
 non terminal REGISTRO, LISTA_RECORDS, RECORDS;
-non terminal CASE, CASELIST, DEFECTO, SWITCH, ARRAY_DECLARATION_MULTI, LISTA_RANGO_ARRAY;
+non terminal CASE, CASELIST, DEFECTO, SWITCH;
 non terminal INSIF;
 
 
 non terminal ArrayList<AST> PROGRAM, USES, MAIN, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
-non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION;
+non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
+non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
 non terminal AST SUBRANGE_TYPE;
-non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, ACCESO, LLAMADA;
+non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT;
-non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO;
+non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
 non terminal Dimension RANGO_ARRAY;
 
 precedence left then;
@@ -149,14 +152,14 @@ ARRAY_DECLARATION ::= array corI RANGO_ARRAY:e corD of ARRAY_DECLARATION:e1 {:
 RANGO_ARRAY ::= EXPRESION:e dosP EXPRESION:e1 {: RESULT = new Dimension(e, e1, eleft, eright); :}
               ;
 
-ARRAY_DECLARATION_MULTI ::= array corI ARRAY_MULTI corD of TIPO_PRIMITIVO
+ARRAY_DECLARATION_MULTI ::= array corI ARRAY_MULTI:e corD of TIPO_PRIMITIVO:e1 {:RESULT = new Tipo(Tipo.tipo.ARREGLO, e1.getType(), null, e);:}
                           ;
 
-ARRAY_MULTI ::= RANGO_ARRAY coma LISTA_RANGO_ARRAY
+ARRAY_MULTI ::= RANGO_ARRAY:e coma LISTA_RANGO_ARRAY:e1 {: RESULT = e1; RESULT.add(0, e);  :}
               ;
 
-LISTA_RANGO_ARRAY ::= LISTA_RANGO_ARRAY coma RANGO_ARRAY
-                    | RANGO_ARRAY
+LISTA_RANGO_ARRAY ::= LISTA_RANGO_ARRAY:e coma RANGO_ARRAY:e1 {:RESULT = e; RESULT.add(e1);:}
+                    | RANGO_ARRAY:e {:RESULT = new ArrayList<Dimension>(); RESULT.add(e);:}
                     ;
 
 LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES:e coma identificador:e1 {:RESULT = e; RESULT.add(e1);:}
@@ -193,6 +196,7 @@ TIPO ::= identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
        | TIPO_PRIMITIVO:e {:RESULT = e;:}
        | ARRAY_DECLARATION:e {:RESULT = e; 
         Collections.reverse(RESULT.getDimensiones());:}
+       | ARRAY_DECLARATION_MULTI:e {:RESULT = e;:}
        ;
 
 SECCION_CONST ::= constante DECLARACION_CONST:e SECCION_VAR:e1 {:RESULT = e; RESULT.addAll(e1);:}
@@ -362,12 +366,12 @@ EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}
            |   RELACIONAL:e                 {: RESULT = e; :}
            |   PRIMITIVO:e                  {: RESULT = e; :}
            |   parenI EXPRESION:e parenD    {: RESULT = e; :}
-           |   ACCESO:e                     {: RESULT = e; :}
+           |   ACCESO:e                     {: RESULT = new Acceso(e, eleft, eright); :}
            |   MEMORIA_VIRTUAL
            ;
 
-ACCESO   ::= identificador:e {:RESULT = new Identificador(e, true, eleft,eright);:}
-           | ACCESO corI LISTA_EXPRESION corD
+ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, true, eleft,eright));:}
+           | ACCESO:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
            | ACCESO parenI LISTA_EXPRESION parenD
            | ACCESO punto identificador
            ;

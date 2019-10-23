@@ -265,11 +265,11 @@ public class DeclaracionVar implements Instruccion {
                     String temp7 = tabla.getTemporal();
                     String label1 = tabla.getEtiqueta();
                     String label2 = tabla.getEtiqueta();
-                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion array\n";
                     ArrayList<Dimension> dimension = tipoAux.getDimensiones();
-                    codigo += "=,h," + dimension.size() + ",heap // Cantidad dimensiones arreglo\n";
+                    //codigo += "=,h," + dimension.size() + ",heap // Cantidad dimensiones arreglo\n";
                     codigo += "=,h,," + temp6 + "\n";
-                    codigo += "+,h,1,h\n";
+                    //codigo += "+,h,1,h\n";
                     codigo += "=,1,," + temp5 + "\n";
                     for (int k = 0; k < dimension.size(); k++) {
                         Dimension dim = dimension.get(k);
@@ -278,8 +278,8 @@ public class DeclaracionVar implements Instruccion {
                         codigo += dim.getLimiteSuperior().get4D(tabla, arbol);
                         codigo += "=," + tabla.getTemporalActual() + ",," + temp3 + "\n";
                         codigo += "-," + temp3 + "," + temp2 + "," + temp4 + "// Tamaño dimension " + k + "\n";
-                        codigo += "=,h," + temp4 + ",heap // dimension " + k + "\n";
-                        codigo += "+,h,1,h\n";
+                        //codigo += "=,h," + temp4 + ",heap // dimension " + k + "\n";
+                        //codigo += "+,h,1,h\n";
                         codigo += "*," + temp5 + "," + temp4 + "," + temp5 + "\n";
                     }
                     codigo += label1 + ":\n";
