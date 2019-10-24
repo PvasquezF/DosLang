@@ -2,6 +2,7 @@ package SintacticoDosLang;
 import java.util.ArrayList;
 import java_cup.runtime.*;
 import doslang.DosLang;
+import Instrucciones.*;
 import Excepciones.Excepcion;
 import Excepciones.Excepcion.TIPOERROR;
 import Expresiones.Identificador;
@@ -9,22 +10,15 @@ import Expresiones.Nil;
 import Expresiones.Operacion;
 import Expresiones.Operacion.Operador;
 import Expresiones.Primitivo;
-import Instrucciones.DeclaracionType;
-import Instrucciones.DeclaracionVar;
-import Instrucciones.DeclaracionConstante;
-import Instrucciones.Program;
 import Interfaces.AST;
 import TablaSimbolos.Tipo;
 import TablaSimbolos.Tree;
 import Interfaces.Expresion;
-import Instrucciones.Asignacion;
-import Instrucciones.Variable;
 import TablaSimbolos.Dimension;
 import TablaSimbolos.Registro;
 import java.util.Collections;
 import Expresiones.AccesoArreglo;
 import Expresiones.Acceso;
-import Instrucciones.Main;
 parser code 
 {:
     Tree tree;
@@ -63,7 +57,7 @@ non terminal PARAMETROS;
 non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
 non terminal FUNCION, WITH, PROCEDURE;
 non terminal METHOD_LIST, SI, LISTAIF, INSTRUCCIONESIF;
-non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, WRITE, READ;
+non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, READ;
 non terminal CASE, CASELIST, DEFECTO, SWITCH;
 non terminal INSIF;
 
@@ -75,7 +69,7 @@ non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST SUBRANGE_TYPE, MAIN;
+non terminal AST SUBRANGE_TYPE, MAIN, WRITE;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -291,7 +285,7 @@ INSTRUCCION ::= WITH
               | WHILE
               | REPEAT
               | FOR
-              | WRITE
+              | WRITE:e {:RESULT = e;:}
               | READ
               | SWITCH
               | free parenI EXPRESION parenD pComa
@@ -358,8 +352,8 @@ FOR ::= para ASIGNACION to EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
       | para ASIGNACION downto EXPRESION hacer INSTRUCCION
       ;
 
-WRITE ::= escribir parenI LISTA_EXPRESION parenD pComa
-        | escribirln parenI LISTA_EXPRESION parenD pComa
+WRITE ::= escribir parenI LISTA_EXPRESION:e parenD pComa {: RESULT = new Write(e, eleft, eright); :}
+        | escribirln parenI LISTA_EXPRESION:e parenD pComa {: RESULT = new Writeln(e, eleft, eright); :}
         ; 
 
 READ ::= leer parenI LISTA_IDENTIFICADORES parenD pComa

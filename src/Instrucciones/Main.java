@@ -51,7 +51,7 @@ public class Main extends Simbolo implements Instruccion {
         codigo += "end,,,main\n";
         //codigo += "=," + this.instrucciones.size() + ",," + temp1 + "\n";
         //codigo += "+,p," + temp1 + ",p\n";
-        codigo += "call,,,main";
+        codigo += "call,,,main\n";
         //codigo += "-,p," + temp1 + ",p\n";
         return codigo;
     }

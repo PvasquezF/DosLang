@@ -55,9 +55,9 @@ public class DeclaracionType implements Instruccion {
                     Expresion m = listaId.get(j);
                     Acceso acceso = (Acceso) m;
                     Identificador id = (Identificador) acceso.getAccesos().get(0);
-                    Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
-                    tipoEnum.setNombreEnum(identificador);
-                    Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoEnum, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                    //Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
+                    //tipoEnum.setNombreEnum(identificador);
+                    Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipo, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
                     Object result1 = tabla.InsertarVariable(simboloEnum);
                     if (result1 != null) {
                         Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

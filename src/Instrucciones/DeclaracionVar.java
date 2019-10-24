@@ -82,9 +82,9 @@ public class DeclaracionVar implements Instruccion {
                         for (int j = 0; j < listaId.size(); j++) {
                             Expresion m = listaId.get(j);
                             Identificador id = (Identificador) m;
-                            Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
-                            tipoEnum.setNombreEnum(identificador);
-                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoEnum, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            //Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
+                            //tipoEnum.setNombreEnum(identificador);
+                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
                             Object result = tabla.InsertarVariable(simboloEnum);
                             if (result != null) {
                                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -190,9 +190,9 @@ public class DeclaracionVar implements Instruccion {
                         for (int j = 0; j < listaId.size(); j++) {
                             Expresion m = listaId.get(j);
                             Identificador id = (Identificador) m;
-                            Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
-                            tipoEnum.setNombreEnum(identificador);
-                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoEnum, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            //Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
+                            //tipoEnum.setNombreEnum(identificador);
+                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
                             Object result = tabla.InsertarVariable(simboloEnum);
                             if (result != null) {
                                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
