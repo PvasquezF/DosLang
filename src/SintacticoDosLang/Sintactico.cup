@@ -3,22 +3,13 @@ import java.util.ArrayList;
 import java_cup.runtime.*;
 import doslang.DosLang;
 import Instrucciones.*;
+import Expresiones.*;
+import Interfaces.*;
+import TablaSimbolos.*;
 import Excepciones.Excepcion;
 import Excepciones.Excepcion.TIPOERROR;
-import Expresiones.Identificador;
-import Expresiones.Nil;
-import Expresiones.Operacion;
 import Expresiones.Operacion.Operador;
-import Expresiones.Primitivo;
-import Interfaces.AST;
-import TablaSimbolos.Tipo;
-import TablaSimbolos.Tree;
-import Interfaces.Expresion;
-import TablaSimbolos.Dimension;
-import TablaSimbolos.Registro;
 import java.util.Collections;
-import Expresiones.AccesoArreglo;
-import Expresiones.Acceso;
 parser code 
 {:
     Tree tree;
@@ -52,7 +43,6 @@ terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
 non terminal ENUM_TYPE, ARRAY_TYPE;
-non terminal MEMORIA_VIRTUAL;
 non terminal PARAMETROS;
 non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
 non terminal FUNCION, WITH, PROCEDURE;
@@ -71,7 +61,7 @@ non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
 non terminal AST SUBRANGE_TYPE, MAIN, WRITE;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
-non terminal Expresion LOWER_LIMIT, UPPER_LIMIT;
+non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
 non terminal Dimension RANGO_ARRAY;
 non terminal Registro RECORDS;
@@ -174,7 +164,7 @@ LISTA_EXPRESION ::= LISTA_EXPRESION:e coma EXPRESION:e1 {:RESULT = e; RESULT.add
                   ;
 
 MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION parenD
-                  | malloc parenI EXPRESION parenD
+                  | malloc parenI EXPRESION:e parenD {: RESULT = new Malloc(e, eleft, eright); :}
                   //| free parenI EXPRESION parenD
                   ;
 
@@ -365,7 +355,7 @@ EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}
            |   PRIMITIVO:e                  {: RESULT = e; :}
            |   parenI EXPRESION:e parenD    {: RESULT = e; :}
            |   ACCESO:e                     {: RESULT = new Acceso(e, eleft, eright); :}
-           |   MEMORIA_VIRTUAL
+           |   MEMORIA_VIRTUAL:e            {: RESULT = e; :}
            ;
 
 ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, true, eleft,eright));:}

@@ -26,6 +26,7 @@ public class Tipo {
     private ArrayList<Expresion> identificadores;
     private ArrayList<Dimension> dimensiones;
     private ArrayList<Registro> atributos;
+    private boolean instancia;
 
     public static enum tipo {
 
@@ -78,9 +79,16 @@ public class Tipo {
         this.atributos = atributos;
     }
 
+    public Tipo(tipo type, boolean instancia) {
+        this.type = type;
+        this.instancia = instancia;
+    }
+
     public boolean equals(Tipo t1) {
         if (this.type == tipo.OBJETO || this.type == tipo.RECORD) {
             if (t1.getType() == tipo.NIL || this.getType() == tipo.NIL) {
+                return true;
+            } else if (t1.isInstancia()) {
                 return true;
             } else {
                 return this.getTipoObjeto().equalsIgnoreCase(t1.getTipoObjeto());
@@ -209,5 +217,13 @@ public class Tipo {
 
     public void setTipoRange(tipo tipoRange) {
         this.tipoRange = tipoRange;
+    }
+
+    public boolean isInstancia() {
+        return instancia;
+    }
+
+    public void setInstancia(boolean instancia) {
+        this.instancia = instancia;
     }
 }

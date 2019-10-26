@@ -149,6 +149,12 @@ public class Asignacion implements Instruccion {
             codigo += valor.get4D(tabla, arbol);
             String temp2 = tabla.getTemporalActual();
             codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+        } else if (tipoVariable.getType() == Tipo.tipo.RECORD) {
+            codigo += variable.get4D(tabla, arbol);
+            String temp1 = tabla.getTemporalActual();
+            codigo += valor.get4D(tabla, arbol);
+            String temp2 = tabla.getTemporalActual();
+            codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
         }
         codigo += "// Fin asignacion\n";
         return codigo;
