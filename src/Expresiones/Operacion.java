@@ -13,7 +13,6 @@ import TablaSimbolos.Tipo.tipo;
 import TablaSimbolos.Tree;
 
 /**
- *
  * @author Pavel
  */
 public class Operacion implements Expresion {
@@ -108,7 +107,7 @@ public class Operacion implements Expresion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "", op1Actual = "", op2Actual = "", opUActual = "";
+        String codigo = "// Inicio operacion linea: " + fila + ", columna: " + columna + "\n", op1Actual = "", op2Actual = "", opUActual = "";
         Object tipoOP1 = null, tipoOP2 = null, tipoOPU = null, tipoResultante = null;
         Object op1 = null, op2 = null, opU = null;
         Tipo tipo1 = null, tipo2 = null, tipoU = null;
@@ -178,7 +177,7 @@ public class Operacion implements Expresion {
                 codigo += "%," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
                 break;
             case POTENCIA:
-                codigo += "*," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                codigo += "^," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
                 break;
             case MENOR_QUE:
                 codigo += "jl," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
@@ -277,6 +276,7 @@ public class Operacion implements Expresion {
                 codigo += "*," + opUActual + ",-1," + tabla.getTemporal() + "\n";
                 break;
         }
+        codigo += "// Fin operacion\n";
         return codigo;
     }
 

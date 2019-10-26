@@ -22,6 +22,7 @@ public class Simbolo {
     private String rol;
     private String nivel;
     private int apuntador;
+    private int apuntadorRef;
     private int tamaño;
     private boolean constante;
     private Expresion valor;
@@ -37,6 +38,7 @@ public class Simbolo {
         this.nivel = nivel;
         this.apuntador = apuntador;
         this.constante = constante;
+        this.apuntadorRef = -1;
     }
     
     public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, Expresion valor, boolean constante, int apuntador) {
@@ -48,6 +50,30 @@ public class Simbolo {
         this.apuntador = apuntador;
         this.valor = valor;
         this.constante = constante;
+        this.apuntadorRef = -1;
+    }
+
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador, int apuntadorRef) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ambito = ambito;
+        this.rol = rol;
+        this.nivel = nivel;
+        this.apuntador = apuntador;
+        this.constante = constante;
+        this.apuntadorRef = apuntadorRef;
+    }
+
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, Expresion valor, boolean constante, int apuntador, int apuntadorRef) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ambito = ambito;
+        this.rol = rol;
+        this.nivel = nivel;
+        this.apuntador = apuntador;
+        this.valor = valor;
+        this.constante = constante;
+        this.apuntadorRef = apuntadorRef;
     }
 
     public Simbolo(String nombre, ArrayList<AST> parametros, Tipo tipo, String ambito, String rol, String nivel, ArrayList<AST> instrucciones, boolean constante, int apuntador, int tamaño) {
@@ -61,6 +87,7 @@ public class Simbolo {
         this.constante = constante;
         this.tamaño = tamaño;
         this.parametros = parametros;
+        this.apuntadorRef = -1;
     }
 
     public String getNombre() {
@@ -150,5 +177,13 @@ public class Simbolo {
 
     public void setTamaño(int tamaño) {
         this.tamaño = tamaño;
+    }
+
+    public int getApuntadorRef() {
+        return apuntadorRef;
+    }
+
+    public void setApuntadorRef(int apuntadorRef) {
+        this.apuntadorRef = apuntadorRef;
     }
 }

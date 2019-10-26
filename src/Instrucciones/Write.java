@@ -34,7 +34,7 @@ public class Write implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio write linea: " + fila + ", columna: " + columna + "\n";
         for (Expresion valor : valores) {
             Object result = valor.getTipo(tabla, arbol);
             if (result instanceof Excepcion) {
@@ -89,13 +89,15 @@ public class Write implements Instruccion {
                 codigo += labelSalida + ":\n";
             } else if (tipo.getType() == Tipo.tipo.STRING || tipo.getType() == Tipo.tipo.WORD) {
                 String temp3 = tabla.getTemporal();
+                String temp4 = tabla.getTemporal();
                 String label1 = tabla.getEtiqueta();
                 String label2 = tabla.getEtiqueta();
-                codigo += label2 + ":\n";
                 codigo += "=,heap," + temp + "," + temp3 + "\n";
-                codigo += "je," + temp3 + ",0," + label1 + "\n";
-                codigo += "print(%c," + temp3 + ")\n";
-                codigo += "+,1," + temp + "," + temp + "\n";
+                codigo += label2 + ":\n";
+                codigo += "=,heap," + temp3 + "," + temp4 + "\n";
+                codigo += "je," + temp4 + ",0," + label1 + "\n";
+                codigo += "print(%c," + temp4 + ")\n";
+                codigo += "+,1," + temp3 + "," + temp3 + "\n";
                 codigo += "jmp,,," + label2 + "\n";
                 codigo += label1 + ":\n";
                 //codigo += "print(%c,13)\n";
@@ -118,6 +120,7 @@ public class Write implements Instruccion {
                 }
             }
         }
+        codigo += "// Fin write\n";
         return codigo;
     }
 }

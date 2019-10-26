@@ -96,7 +96,7 @@ public class DeclaracionType implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio declaracion type linea: " + fila + ", columna: " + columna + "\n";
         if (tipo.getType() == Tipo.tipo.ENUMERADO) {
             //for (int i = 0; i < tabla.getListaTipos().size(); i++) {
             for (int j = 0; j < tipo.getIdentificadores().size(); j++) {
@@ -134,6 +134,7 @@ public class DeclaracionType implements Instruccion {
          codigo += "=," + tabla.getTemporal() + "," + sim.getApuntador() + ",heap\n";
          }
          }*/
+        codigo += "// Fin declaracion type\n";
         return codigo;
     }
 

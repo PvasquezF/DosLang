@@ -6,6 +6,7 @@
 package doslang;
 
 import Conexion.Listener;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,8 +16,10 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+
 import Excepciones.Excepcion;
 import Instrucciones.*;
+import Interfaces.AST;
 import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
@@ -24,13 +27,13 @@ import TablaSimbolos.GenerarNativas4D;
 import TablaSimbolos.ReservarMemoria;
 import TablaSimbolos.Tabla;
 import TablaSimbolos.Tree;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
 import java.util.Collections;
 
 /**
- *
  * @author Pavel
  */
 public class DosLang extends Thread {
@@ -52,25 +55,42 @@ public class DosLang extends Thread {
         Tabla tabla = new Tabla();
         String Cuadruplos = "";
         int espaciosReservaHeap = 0;
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof DeclaracionConstante
+                    || ins instanceof DeclaracionVar
+                    || ins instanceof DeclaracionType
+                    || ins instanceof Program) {
+                ins.ejecutar(tabla, t);
+            }
+        }
+
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar) {
                 espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
             } else if (ins instanceof DeclaracionType) {
-                ins.ejecutar(tabla, t);
+                //ins.ejecutar(tabla, t);
                 espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
-            } else if (ins instanceof Program) {
-                ins.ejecutar(tabla, t);
-            }
+            } //else if (ins instanceof Program) {
+              //  ins.ejecutar(tabla, t);
+            //}
         }
+
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionVar
-                    || ins instanceof Main) {
-                ins.ejecutar(tabla, t);
+            if (ins instanceof Main) {
+                Main m = (Main) ins;
+                for (AST instruccion : m.getInstrucciones()) {
+                    if (instruccion instanceof Instruccion) {
+                        ((Instruccion) instruccion).ejecutar(tabla, t);
+                    }
+                }
+                break;
             }
         }
+
         Cuadruplos += ReservarMemoria.Reservar(tabla, espaciosReservaHeap);
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
@@ -94,6 +114,7 @@ public class DosLang extends Thread {
         Cuadruplos += gn4D.generarRound(tabla);
         Cuadruplos += gn4D.generarChartAt(tabla);
         Cuadruplos += gn4D.generarLenght(tabla);
+        Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
         System.out.println(Cuadruplos);
         tabla.generarTablaHTML();
         errores.addAll(t.getErrores());

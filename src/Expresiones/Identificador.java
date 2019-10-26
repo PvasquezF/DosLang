@@ -69,7 +69,7 @@ public class Identificador implements Expresion {
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         Object sim = tabla.getVariable(identificador);
-        String codigo = "";
+        String codigo = "// Inicio identificador linea: " + fila + ", columna: " + columna + "\n";
         if (sim instanceof Simbolo) {
             accesoGlobal = ((Simbolo) sim).getNivel().equalsIgnoreCase("global");
             String temp1 = tabla.getTemporal();
@@ -82,6 +82,7 @@ public class Identificador implements Expresion {
                     codigo += "=,stack," + temp1 + "," + temp2 + "\n";
                 }
             }
+            codigo += "// Fin identificador\n";
             return codigo;
         } else {
             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

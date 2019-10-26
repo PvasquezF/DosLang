@@ -177,7 +177,7 @@ public class DeclaracionConstante implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio DeclaracionConstante linea: " + fila + ", columna: " + columna + "\n";
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
             Object result = tabla.getVariable(identificador);
@@ -197,6 +197,7 @@ public class DeclaracionConstante implements Instruccion {
                     String temp4 = "";
                     String label1 = tabla.getEtiqueta();
                     String label2 = tabla.getEtiqueta();
+                    String label3 = tabla.getEtiqueta();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);
                     temp2 = tabla.getTemporalActual();
@@ -209,8 +210,11 @@ public class DeclaracionConstante implements Instruccion {
                     codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
                     codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
                     codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    codigo += "jmp,,," + label3 + "\n";
                     codigo += label1 + ":\n";
                     codigo += label2 + ":\n";
+                    codigo += "call,,,rango_sobrepasado\n";
+                    codigo += label3 + ":\n";
                 } else if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
                     if (tipo.getType() == Tipo.tipo.ENUMERADO) {
                         for (int j = 0; j < tipo.getIdentificadores().size(); j++) {
@@ -287,7 +291,12 @@ public class DeclaracionConstante implements Instruccion {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion objeto\n";
                     codigo += "=," + temp1 + ",-1,heap\n";
-                }  else {
+                } else if (tipoAux.getType() == Tipo.tipo.STRING) {
+                    String temp1 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    codigo += sim.getValor().get4D(tabla, arbol);
+                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                } else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);
@@ -295,6 +304,7 @@ public class DeclaracionConstante implements Instruccion {
                 }
             }
         }
+        codigo += "// Fin declaracion constante\n";
         return codigo;
     }
 
@@ -303,6 +313,9 @@ public class DeclaracionConstante implements Instruccion {
 //        if (tipo.getType() == Tipo.tipo.ENUMERADO){
 //            espacios += tipo.getIdentificadores().size();
 //        }
+        if (tipo.getType() == Tipo.tipo.STRING) {
+            espacios += identificadores.size();
+        }
         return espacios += identificadores.size();
     }
 }

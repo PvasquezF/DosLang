@@ -29,8 +29,9 @@ public class Nil implements Expresion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio nil linea\n";
         codigo += "=, -1,, " + tabla.getTemporal()+"\n";
+        codigo += " // Fin nil\n";
         return codigo;
     }
 

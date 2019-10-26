@@ -12,7 +12,6 @@ import TablaSimbolos.Tipo.tipo;
 import TablaSimbolos.Tree;
 
 /**
- *
  * @author Pavel
  */
 public class Primitivo implements Expresion {
@@ -49,14 +48,13 @@ public class Primitivo implements Expresion {
 
     @Override
     public String get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "//Inicio primitivo\n";
         if (valor instanceof String) {
             String temporalInicio = tabla.getTemporal();
             //String heapTemp = "" + tabla.getHeap();
             //String temporalSize = tabla.getTemporal();
             codigo += "=,h,," + temporalInicio + "\n";
             //codigo += "+,h,1,h\n";
-            //codigo += "=," + tabla.getHeap() + "," + temporalInicio + ",heap\n";
             String str = (String) valor;
             //codigo += "=," + tabla.getHeap() + "," + str.length() + ",heap\n"; //size
             for (int i = 0; i <= str.length(); i++) {
@@ -72,7 +70,6 @@ public class Primitivo implements Expresion {
                 }
             }
             codigo += "=," + temporalInicio + ",," + tabla.getTemporal() + "\n";
-
         } else if (valor instanceof Integer) {
             codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
         } else if (valor instanceof Character) {
@@ -90,6 +87,7 @@ public class Primitivo implements Expresion {
         } else {
             codigo += new Nil().get4D(tabla, arbol);
         }
+        codigo += "//Fin primitivo\n";
         return codigo;
     }
 

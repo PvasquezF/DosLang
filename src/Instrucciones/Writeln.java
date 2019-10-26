@@ -34,7 +34,7 @@ public class Writeln implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio Writeln linea: " + fila + ", columna: " + columna + "\n";
         for (Expresion valor : valores) {
             Object result = valor.getTipo(tabla, arbol);
             if (result instanceof Excepcion) {
@@ -89,8 +89,11 @@ public class Writeln implements Instruccion {
                 codigo += labelSalida + ":\n";
             } else if (tipo.getType() == Tipo.tipo.STRING || tipo.getType() == Tipo.tipo.WORD) {
                 String temp3 = tabla.getTemporal();
+                //String temp4 = tabla.getTemporal();
                 String label1 = tabla.getEtiqueta();
                 String label2 = tabla.getEtiqueta();
+                //codigo += "=,heap," + temp + "," + temp3 + "\n";
+                //codigo += "=,heap," + temp3 + "," + temp3 + "\n";
                 codigo += label2 + ":\n";
                 codigo += "=,heap," + temp + "," + temp3 + "\n";
                 codigo += "je," + temp3 + ",0," + label1 + "\n";
@@ -119,6 +122,7 @@ public class Writeln implements Instruccion {
             }
         }
         codigo += "print(%c,10)\n";
+        codigo += "// Fin Writeln\n";
         return codigo;
     }
 }

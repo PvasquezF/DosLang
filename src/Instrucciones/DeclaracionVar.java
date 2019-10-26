@@ -6,6 +6,7 @@
 package Instrucciones;
 
 import Excepciones.Excepcion;
+import Expresiones.Acceso;
 import Expresiones.Identificador;
 import Expresiones.Primitivo;
 import Interfaces.Expresion;
@@ -47,7 +48,8 @@ public class DeclaracionVar implements Instruccion {
                 String identificador = identificadores.get(i);
                 Tipo tipoAux = tipo.verificarUserType(tabla);
                 Expresion resultTipo = Tipo.valorPredeterminado(tipoAux);
-                Simbolo simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
+                Simbolo simbolo = null;
+                simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
                 if (tipoAux.getType() == Tipo.tipo.RANGE) {
                     Object result = tipoAux.getLowerLimit().getTipo(tabla, arbol);
                     if (result instanceof Excepcion) {
@@ -130,7 +132,8 @@ public class DeclaracionVar implements Instruccion {
             for (int i = 0; i < identificadores.size(); i++) {
                 String identificador = identificadores.get(i);
                 Tipo tipoAux = tipo.verificarUserType(tabla);
-                Simbolo simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
+                Simbolo simbolo = null;
+                simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
                 Object resultTipo = valor.getTipo(tabla, arbol);
                 if (resultTipo instanceof Excepcion) {
                     return resultTipo;
@@ -267,7 +270,7 @@ public class DeclaracionVar implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio declaracion var linea: " + fila + ", columna: " + columna + "\n";
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
             Object result = tabla.getVariable(identificador);
@@ -287,6 +290,7 @@ public class DeclaracionVar implements Instruccion {
                     String temp4 = "";
                     String label1 = tabla.getEtiqueta();
                     String label2 = tabla.getEtiqueta();
+                    String label3 = tabla.getEtiqueta();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);
                     temp2 = tabla.getTemporalActual();
@@ -299,8 +303,11 @@ public class DeclaracionVar implements Instruccion {
                     codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
                     codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
                     codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    codigo += "jmp,,," + label3 + "\n";
                     codigo += label1 + ":\n";
                     codigo += label2 + ":\n";
+                    codigo += "call,,,rango_sobrepasado\n";
+                    codigo += label3 + ":\n";
                 } else if (tipoAux.getType() == Tipo.tipo.ENUMERADO) {
                     if (tipo.getType() == Tipo.tipo.ENUMERADO) {
                         for (int j = 0; j < tipo.getIdentificadores().size(); j++) {
@@ -377,6 +384,19 @@ public class DeclaracionVar implements Instruccion {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion objeto\n";
                     codigo += "=," + temp1 + ",-1,heap\n";
+                } else if (tipoAux.getType() == Tipo.tipo.STRING) {
+                    String temp1 = tabla.getTemporal();
+                    if (valor == null) {
+                        codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                        //codigo += "=," + sim.getApuntadorRef() + ",," + temp2 + "\n";
+                        //codigo += sim.getValor().get4D(tabla, arbol);
+                        //codigo += "=, " + temp2 + ", " + tabla.getTemporalActual() + ", heap\n";
+                        codigo += "=, " + temp1 + ", -1, heap\n";
+                    } else {
+                        codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                        codigo += sim.getValor().get4D(tabla, arbol);
+                        codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                    }
                 } else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
@@ -385,6 +405,7 @@ public class DeclaracionVar implements Instruccion {
                 }
             }
         }
+        codigo += "// Fin declaracion var\n";
         return codigo;
     }
 

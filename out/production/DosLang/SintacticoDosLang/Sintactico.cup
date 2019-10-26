@@ -164,8 +164,8 @@ LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES:e coma identificador:e1 {:RESULT
                         ;
 
 VARIABLE ::= identificador:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, eleft, eright)); :}
-           | VARIABLE corI LISTA_EXPRESION corD
-           | VARIABLE parenI LISTA_EXPRESION parenD
+           | VARIABLE:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
+           | VARIABLE:e parenI LISTA_EXPRESION:e1 parenD
            | VARIABLE:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, eleft, eright)); :}
            ;
 
@@ -296,7 +296,7 @@ WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES
        | con identificador hacer INSTRUCCION
        ;
 
-ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new Variable(e), e1, eleft, eright); :}
+ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}
              ;
 
 TRANSFERENCIA ::= detener pComa

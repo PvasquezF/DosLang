@@ -1,18 +1,20 @@
-package Expresiones;
+package Instrucciones;
 
 import Excepciones.Excepcion;
+import Expresiones.AccesoArreglo;
+import Expresiones.Identificador;
 import Interfaces.Expresion;
 import TablaSimbolos.*;
 
 import java.util.ArrayList;
 
-public class Acceso implements Expresion {
+public class AccesoVariable implements Expresion {
     private ArrayList<Expresion> accesos;
     public boolean accesoGlobal = false;
     private int fila;
     private int columna;
 
-    public Acceso(ArrayList<Expresion> accesos, int fila, int columna) {
+    public AccesoVariable(ArrayList<Expresion> accesos, int fila, int columna) {
         this.accesos = accesos;
         this.fila = fila;
         this.columna = columna;
@@ -31,10 +33,10 @@ public class Acceso implements Expresion {
             arbol.getErrores().add(exc);
             return exc;
         }
+        identificador.getTipo(tabla, arbol);
         Simbolo sim = (Simbolo) result;
         accesoGlobal = ((Simbolo) sim).getNivel().equalsIgnoreCase("global");
         tipoResultado = sim.getTipo();
-        //tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
             Expresion acceso = accesos.get(i);
             if (tipoResultado.getType() == Tipo.tipo.ARREGLO) {
@@ -43,7 +45,7 @@ public class Acceso implements Expresion {
                     int cantidadAccesos = ((AccesoArreglo) acceso).getIndices().size();
                     if (cantidadAccesos == cantidadDimensiones) {
                         tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
-                        tipoResultado = tipoResultado.verificarUserType(tabla);
+                        //tipoResultado = tipoResultado.verificarUserType(tabla);
                     } else {
                         if (cantidadAccesos < cantidadDimensiones) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -82,7 +84,6 @@ public class Acceso implements Expresion {
                 }
             }
         }
-
         return tipoResultado;
     }
 
@@ -93,7 +94,7 @@ public class Acceso implements Expresion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "// Inicio acceso linea: " + fila + ", columna: " + columna + "\n";
+        String codigo = "// Inicio AccesoVariable linea: " + fila + ", columna: " + columna + "\n";
         Tipo tipoResultado = null;
         String temp7 = tabla.getTemporal();
         //String temp9 = tabla.getTemporal();
@@ -109,7 +110,8 @@ public class Acceso implements Expresion {
             return exc;
         }
         Simbolo sim = (Simbolo) result;
-        tipoResultado = sim.getTipo().verificarUserType(tabla);
+        tipoResultado = sim.getTipo();
+        //tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
             Expresion acceso = accesos.get(i);
             if (tipoResultado.getType() == Tipo.tipo.ARREGLO) {
@@ -123,7 +125,7 @@ public class Acceso implements Expresion {
                         String temp4 = tabla.getTemporal();
                         String temp5 = tabla.getTemporal();
                         String temp6 = tabla.getTemporal();
-                        //String temp8 = tabla.getTemporal();
+                        String temp8 = tabla.getTemporal();
                         String label1 = tabla.getEtiqueta();
                         String label2 = tabla.getEtiqueta();
                         codigo += "=,-1,," + temp4 + "\n";
@@ -147,12 +149,13 @@ public class Acceso implements Expresion {
                             codigo += "+," + temp4 + "," + temp6 + "," + temp4 + "\n";
                         }
                         //codigo += "=," + temp4 + ",," + tabla.getTemporal() + "//Valor que se tiene que accesar\n";
-                        codigo += "+," + temp4 + "," + temp7 + "," + temp7 + "\n";
+                        codigo += "=,heap," + temp7 + "," + temp8 + "\n";
+                        codigo += "+," + temp4 + "," + temp8 + "," + temp7 + "\n";
                         if (identificador.accesoGlobal) {
-                            codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
+                            //codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
                             //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",heap //Fin acceso\n";
                         } else {
-                            codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
+                            //codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
                             //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",stack  //Fin acceso\n";
                         }
                         codigo += label1 + ":\n";
@@ -198,7 +201,7 @@ public class Acceso implements Expresion {
             }
         }
         codigo += "=," + temp7 + ",," + tabla.getTemporal() + "\n";
-        codigo += "// fin acceso\n";
+        codigo += "//Fin acceso variable\n";
         return codigo;
     }
 

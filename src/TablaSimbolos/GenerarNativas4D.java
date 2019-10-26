@@ -172,4 +172,50 @@ public class GenerarNativas4D {
         codigo += "end,,,lenght_primitiva\n";
         return codigo;
     }
+
+    public String generarRangoFueraLimites(Tabla tabla) {
+        String codigo = "";
+        codigo += "begin,,,rango_sobrepasado\n";
+        codigo += "print(%c,86)\n";
+        codigo += "print(%c,97)\n";
+        codigo += "print(%c,108)\n";
+        codigo += "print(%c,111)\n";
+        codigo += "print(%c,114)\n";
+        codigo += "print(%c,32)\n";
+        codigo += "print(%c,102)\n";
+        codigo += "print(%c,117)\n";
+        codigo += "print(%c,101)\n";
+        codigo += "print(%c,114)\n";
+        codigo += "print(%c,97)\n";
+        codigo += "print(%c,32)\n";
+        codigo += "print(%c,100)\n";
+        codigo += "print(%c,101)\n";
+        codigo += "print(%c,32)\n";
+        codigo += "print(%c,108)\n";
+        codigo += "print(%c,111)\n";
+        codigo += "print(%c,115)\n";
+        codigo += "print(%c,32)\n";
+        codigo += "print(%c,108)\n";
+        codigo += "print(%c,105)\n";
+        codigo += "print(%c,109)\n";
+        codigo += "print(%c,105)\n";
+        codigo += "print(%c,116)\n";
+        codigo += "print(%c,101)\n";
+        codigo += "print(%c,115)\n";
+        codigo += "print(%c,32)\n";
+        codigo += "print(%c,100)\n";
+        codigo += "print(%c,101)\n";
+        codigo += "print(%c,108)\n";
+        codigo += "print(%c,32)\n";
+        codigo += "print(%c,114)\n";
+        codigo += "print(%c,97)\n";
+        codigo += "print(%c,110)\n";
+        codigo += "print(%c,103)\n";
+        codigo += "print(%c,111)\n";
+        codigo += "print(%c,46)\n";
+        codigo += "print(%c,10)\n";
+        codigo += "end,,,rango_sobrepasado\n";
+        return codigo;
+    }
 }
+//86 97 108 111 114 32 102 117 101 114 97 32 100 101 32 108 111 115 32 108 105 109 105 116 101 115 32 100 101 108 32 114 97 110 103 111 46

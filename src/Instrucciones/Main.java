@@ -42,7 +42,7 @@ public class Main extends Simbolo implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Inicio main linea: " + fila + ", columna: " + columna + "\n";
         String temp1 = tabla.getTemporal();
         codigo += "begin,,,main\n";
         for (AST ins : this.instrucciones) {
@@ -53,6 +53,7 @@ public class Main extends Simbolo implements Instruccion {
         //codigo += "+,p," + temp1 + ",p\n";
         codigo += "call,,,main\n";
         //codigo += "-,p," + temp1 + ",p\n";
+        codigo += "//Fin main\n";
         return codigo;
     }
 }
