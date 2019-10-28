@@ -32,12 +32,13 @@ public class Tabla {
     private int stack;
     private int funcionSizeActual;
     private Ambito enviroment;
-
+    private Stack tamañoActualFuncion;
     public Tabla() {
         this.enviroment = new Ambito(null);
         tabla = new ArrayList<>();
         listaAmbitos = new Stack();
         funcionSizeActual = 0;
+        this.tamañoActualFuncion = new Stack();
     }
 
     public String InsertarVariable(Simbolo simbolo) {
@@ -236,5 +237,13 @@ public class Tabla {
 
     public void setEnviroment(Ambito enviroment) {
         this.enviroment = enviroment;
+    }
+
+    public Stack getTamañoActualFuncion() {
+        return tamañoActualFuncion;
+    }
+
+    public void setTamañoActualFuncion(Stack tamañoActualFuncion) {
+        this.tamañoActualFuncion = tamañoActualFuncion;
     }
 }

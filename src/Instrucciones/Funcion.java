@@ -29,15 +29,18 @@ public class Funcion extends Simbolo implements Instruccion {
         String nombreCompleto = this.getNombre();
         for (int i = 0; i < this.getParametros().size(); i++) {
             Tipo t = this.getParametros().get(i).getTipo();
-            if (t.getType() == Tipo.tipo.ARREGLO) {
-                nombreCompleto += "_" + t.getType() + "_" + t.getTipoArreglo();
-                if (t.getTipoArreglo() == Tipo.tipo.RECORD) {
-                    nombreCompleto += "_" + t.getTipoObjeto();
+            ArrayList<String> lista = this.getParametros().get(i).getIdentificador();
+            for (String item : lista) {
+                if (t.getType() == Tipo.tipo.ARREGLO) {
+                    nombreCompleto += "_" + t.getType() + "_" + t.getTipoArreglo();
+                    if (t.getTipoArreglo() == Tipo.tipo.RECORD) {
+                        nombreCompleto += "_" + t.getTipoObjeto();
+                    }
+                } else if (t.getType() == Tipo.tipo.RECORD) {
+                    nombreCompleto += "_" + t.getType() + "_" + t.getTipoObjeto();
+                } else {
+                    nombreCompleto += "_" + t.getType();
                 }
-            } else if (t.getType() == Tipo.tipo.RECORD) {
-                nombreCompleto += "_" + t.getType() + "_" + t.getTipoObjeto();
-            } else {
-                nombreCompleto += "_" + t.getType();
             }
         }
         return nombreCompleto;
@@ -88,16 +91,20 @@ public class Funcion extends Simbolo implements Instruccion {
         int indiceFinal = 0;
         indiceInicio = tabla.indiceTemporal;
         tabla.setEnviroment(this.getEntorno());
-        codigo += "begin,,," + this.getNombreCompleto()+"\n";
+        String temp1 = tabla.getTemporal();
+        codigo += "begin,,," + this.getNombreCompleto() + "\n";
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "=," + temp1 + ",-1,stack\n";
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
+            declaracion.setStack(true);
             codigo += declaracion.get4D(tabla, arbol);
         }
         for (int i = 0; i < this.instrucciones.size(); i++) {
             AST instruccion = instrucciones.get(i);
             codigo += instruccion.get4D(tabla, arbol);
         }
-        codigo += "end,,," + this.getNombreCompleto()+"\n";
+        codigo += "end,,," + this.getNombreCompleto() + "\n";
         tabla.setEnviroment(this.getEntorno().getAnterior());
         return codigo;
     }

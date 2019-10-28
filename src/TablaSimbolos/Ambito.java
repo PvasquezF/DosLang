@@ -36,7 +36,7 @@ public class Ambito {
         while (aux != null) {
             for (int i = 0; i < aux.getFunciones().size(); i++) {
                 Simbolo sim = aux.getFunciones().get(i);
-                if (sim.getNombre().equalsIgnoreCase(simbolo.getNombre())) {
+                if (sim.getNombreCompleto().equalsIgnoreCase(simbolo.getNombreCompleto())) {
                     return "La funcion " + simbolo.getNombre() + " ya ha sido declarada.";
                 }
             }
@@ -65,7 +65,7 @@ public class Ambito {
         while (aux != null) {
             for (int i = 0; i < aux.getFunciones().size(); i++) {
                 Simbolo sim = aux.getFunciones().get(i);
-                if (sim.getNombre().equalsIgnoreCase(identificador)) {
+                if (sim.getNombreCompleto().equalsIgnoreCase(identificador)) {
                     return sim;
                 }
             }

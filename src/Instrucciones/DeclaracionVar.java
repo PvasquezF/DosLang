@@ -338,9 +338,9 @@ public class DeclaracionVar implements Instruccion {
                                 String temp1 = tabla.getTemporal();
                                 codigo += "=," + simEnum.getApuntador() + ",," + temp1 + "\n";
                                 codigo += simEnum.getValor().get4D(tabla, arbol);
-                                if(isStack()){
+                                if (isStack()) {
                                     codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
-                                }else{
+                                } else {
                                     codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
                                 }
                             }
@@ -418,7 +418,11 @@ public class DeclaracionVar implements Instruccion {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);
-                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                    if (stack) {
+                        codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
+                    } else {
+                        codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                    }
                 }
             }
         }

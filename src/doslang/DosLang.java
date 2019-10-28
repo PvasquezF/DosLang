@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import Excepciones.Excepcion;
 import Instrucciones.*;
 import Interfaces.AST;
+import Interfaces.Expresion;
 import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
@@ -97,6 +98,8 @@ public class DosLang extends Thread {
                 for (AST instruccion : m.getInstrucciones()) {
                     if (instruccion instanceof Instruccion) {
                         ((Instruccion) instruccion).ejecutar(tabla, t);
+                    } else {
+                        ((Expresion) instruccion).getTipo(tabla, t);
                     }
                 }
                 break;
@@ -104,31 +107,34 @@ public class DosLang extends Thread {
         }
 
         Cuadruplos += ReservarMemoria.Reservar(tabla, espaciosReservaHeap);
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionVar
-                    || ins instanceof DeclaracionType
-                    || ins instanceof Funcion) {
-                Cuadruplos += ins.get4D(tabla, t);
+        if (errores.size() == 0) {
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+                if (ins instanceof DeclaracionConstante
+                        || ins instanceof DeclaracionVar
+                        || ins instanceof DeclaracionType
+                        || ins instanceof Funcion) {
+                    Cuadruplos += ins.get4D(tabla, t);
+                }
             }
-        }
 
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof Main) {
-                Cuadruplos += ins.get4D(tabla, t);
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+                if (ins instanceof Main) {
+                    Cuadruplos += ins.get4D(tabla, t);
+                }
             }
+
+            GenerarNativas4D gn4D = new GenerarNativas4D();
+            Cuadruplos += gn4D.generarConcatenacion(tabla);
+            Cuadruplos += gn4D.generarPrint(tabla);
+            Cuadruplos += gn4D.generarTrunk(tabla);
+            Cuadruplos += gn4D.generarRound(tabla);
+            Cuadruplos += gn4D.generarChartAt(tabla);
+            Cuadruplos += gn4D.generarLenght(tabla);
+            Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
+            System.out.println(Cuadruplos);
         }
-        GenerarNativas4D gn4D = new GenerarNativas4D();
-        Cuadruplos += gn4D.generarConcatenacion(tabla);
-        Cuadruplos += gn4D.generarPrint(tabla);
-        Cuadruplos += gn4D.generarTrunk(tabla);
-        Cuadruplos += gn4D.generarRound(tabla);
-        Cuadruplos += gn4D.generarChartAt(tabla);
-        Cuadruplos += gn4D.generarLenght(tabla);
-        Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
-        System.out.println(Cuadruplos);
         tabla.generarTablaHTML();
         errores.addAll(t.getErrores());
         errores.forEach(m -> {

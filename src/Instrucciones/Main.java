@@ -42,8 +42,8 @@ public class Main extends Simbolo implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
+        tabla.getTamañoActualFuncion().push(0);
         String codigo = "// Inicio main linea: " + fila + ", columna: " + columna + "\n";
-        String temp1 = tabla.getTemporal();
         codigo += "begin,,,main\n";
         for (AST ins : this.instrucciones) {
             codigo += ins.get4D(tabla, arbol);

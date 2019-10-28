@@ -285,7 +285,7 @@ INSTRUCCION ::= WITH
               | READ
               | SWITCH
               | free parenI EXPRESION parenD pComa
-              | LLAMADA pComa
+              | LLAMADA:e pComa {:RESULT = e;:}
               ;
 
 WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES 
@@ -362,15 +362,17 @@ EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}
            |   parenI EXPRESION:e parenD    {: RESULT = e; :}
            |   ACCESO:e                     {: RESULT = new Acceso(e, eleft, eright); :}
            |   MEMORIA_VIRTUAL:e            {: RESULT = e; :}
+           |   LLAMADA:e                    {: RESULT = e; :}
            ;
 
 ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, true, eleft,eright));:}
            | ACCESO:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
-           | ACCESO parenI LISTA_EXPRESION parenD
+           //| ACCESO parenI LISTA_EXPRESION parenD
            | ACCESO:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, true, eleft, eright)); :}
            ;
 
-LLAMADA ::= identificador parenI LISTA_EXPRESION parenD
+LLAMADA ::= identificador:e parenI LISTA_EXPRESION:e1 parenD {:RESULT = new Llamada(e, e1, eleft, eright);:}
+          | identificador:e parenI parenD {:RESULT = new Llamada(e, new ArrayList<Expresion>(), eleft, eright);:}
           ;
 
 ARITMETICA ::= menos  EXPRESION:e                 {: RESULT = new Operacion(e, Operador.MENOS_UNARIO, eleft, eright); :} %prec UMENOS 
