@@ -134,6 +134,10 @@ ARRAY_DECLARATION ::= array corI RANGO_ARRAY:e corD of ARRAY_DECLARATION:e1 {:
                                 ArrayList<Dimension> dims = new ArrayList<>(); dims.add(e);  
                                 RESULT = new Tipo(Tipo.tipo.ARREGLO, e1.getType(), null, dims);
                         :}
+                    | array corI RANGO_ARRAY:e corD of identificador:e1 {: 
+                                ArrayList<Dimension> dims = new ArrayList<>(); dims.add(e);  
+                                RESULT = new Tipo(Tipo.tipo.ARREGLO, Tipo.tipo.OBJETO, e1, dims);
+                        :}
                     ;
 
 RANGO_ARRAY ::= EXPRESION:e dosP EXPRESION:e1 {: RESULT = new Dimension(e, e1, eleft, eright); :}
@@ -361,7 +365,7 @@ EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}
 ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, true, eleft,eright));:}
            | ACCESO:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
            | ACCESO parenI LISTA_EXPRESION parenD
-           | ACCESO punto identificador
+           | ACCESO:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, true, eleft, eright)); :}
            ;
 
 LLAMADA ::= identificador parenI LISTA_EXPRESION parenD

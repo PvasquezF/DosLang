@@ -58,7 +58,7 @@ public class Malloc implements Expresion {
         codigo += "+," + temp2 + ",1," + temp2 + "\n";
         codigo += "jmp,,," + label1 + "\n";
         codigo += label2 + ":\n";
-        codigo += "=,"+temp3+",,"+tabla.getTemporal()+"\n";
+        codigo += "=," + temp3 + ",," + tabla.getTemporal() + "\n";
         return codigo;
     }
 }

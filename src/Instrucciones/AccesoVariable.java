@@ -44,7 +44,13 @@ public class AccesoVariable implements Expresion {
                     int cantidadDimensiones = tipoResultado.getDimensiones().size();
                     int cantidadAccesos = ((AccesoArreglo) acceso).getIndices().size();
                     if (cantidadAccesos == cantidadDimensiones) {
-                        tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
+                        if (tipoResultado.getTipoArreglo() == Tipo.tipo.RECORD) {
+                            Tipo tipoArAtr = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
+                            tipoArAtr.setAtributos(tipoResultado.getAtributos());
+                            tipoResultado = tipoArAtr;
+                        } else {
+                            tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
+                        }
                         //tipoResultado = tipoResultado.verificarUserType(tabla);
                     } else {
                         if (cantidadAccesos < cantidadDimensiones) {
@@ -68,11 +74,31 @@ public class AccesoVariable implements Expresion {
                     arbol.getErrores().add(exc);
                     return exc;
                 }
-            } else if (tipoResultado.getType() == Tipo.tipo.OBJETO) {
-                try {
-                    throw new Exception("Intentando acceder a un objeto, aun no se tiene esta funcionalidad.");
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+            } else if (tipoResultado.getType() == Tipo.tipo.RECORD) {
+                if (acceso instanceof Identificador) {
+                    Identificador atributo = (Identificador) acceso;
+                    boolean encontrado = false;
+                    for (int j = 0; j < tipoResultado.getAtributos().size(); j++) {
+                        Registro registro = tipoResultado.getAtributos().get(j);
+                        if (registro.getIdentificador().equalsIgnoreCase(atributo.getIdentificador())) {
+                            tipoResultado = registro.getTipo();
+                            encontrado = true;
+                            break;
+                        }
+                    }
+                    if (!encontrado) {
+                        Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                "No existe el atributo " + atributo.getIdentificador(),
+                                fila, columna);
+                        arbol.getErrores().add(exc);
+                        return exc;
+                    }
+                } else {
+                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                            "El tipo de acceso que se intenta no es de tipo registro.",
+                            fila, columna);
+                    arbol.getErrores().add(exc);
+                    return exc;
                 }
             } else {
                 if (acceso instanceof AccesoArreglo) {
@@ -175,8 +201,15 @@ public class AccesoVariable implements Expresion {
                             return exc;
                         }
                     }
-                    tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
-                    tipoResultado = tipoResultado.verificarUserType(tabla);
+                    if (tipoResultado.getTipoArreglo() == Tipo.tipo.RECORD) {
+                        Tipo tipoArAtr = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
+                        tipoArAtr.setAtributos(tipoResultado.getAtributos());
+                        tipoResultado = tipoArAtr;
+                        tipoResultado = tipoResultado.verificarUserType(tabla);
+                    } else {
+                        tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
+                        tipoResultado = tipoResultado.verificarUserType(tabla);
+                    }
                 } else {
                     Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                             "El tipo de acceso que se intenta no es de tipo arreglo.",
@@ -184,11 +217,18 @@ public class AccesoVariable implements Expresion {
                     arbol.getErrores().add(exc);
                     return exc;
                 }
-            } else if (tipoResultado.getType() == Tipo.tipo.OBJETO) {
-                try {
-                    throw new Exception("Intentando acceder a un objeto, aun no se tiene esta funcionalidad.");
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+            } else if (tipoResultado.getType() == Tipo.tipo.RECORD) {
+                Identificador atributo = (Identificador) acceso;
+                for (int j = 0; j < tipoResultado.getAtributos().size(); j++) {
+                    Registro registro = tipoResultado.getAtributos().get(j);
+                    if (registro.getIdentificador().equalsIgnoreCase(atributo.getIdentificador())) {
+                        //codigo += atributo.get4D(tabla, arbol);
+                        String temp1 = tabla.getTemporal();
+                        codigo += "=,heap," + temp7 + "," + temp1 + "\n";
+                        codigo += "+," + temp1 + "," + j + "," + temp7 + "\n";
+                        tipoResultado = registro.getTipo();
+                        break;
+                    }
                 }
             } else {
                 if (acceso instanceof AccesoArreglo) {

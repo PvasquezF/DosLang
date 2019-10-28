@@ -129,10 +129,19 @@ public class Tipo {
         if (this.tipoObjeto != null && this.getType() != tipo.RECORD) {
             for (int i = 0; i < tabla.getListaTipos().size(); i++) {
                 UserType m = tabla.getListaTipos().get(i);
+
                 if (this.tipoObjeto.equalsIgnoreCase(m.getNombre())) {
                     // Coincide el tipoObjeto con el userType
-                    Tipo result = m.getTipo().verificarUserType(tabla);
-                    return result;
+                    if (this.getType() == tipo.ARREGLO) {
+                        Tipo result = m.getTipo().verificarUserType(tabla);
+                        this.setTipoArreglo(result.getType());
+                        this.setTipoObjeto(result.tipoObjeto);
+                        this.setAtributos(result.getAtributos());
+                        return this;
+                    } else {
+                        Tipo result = m.getTipo().verificarUserType(tabla);
+                        return result;
+                    }
                 }
             }
         }

@@ -11,11 +11,7 @@ import Expresiones.Identificador;
 import Expresiones.Primitivo;
 import Interfaces.Expresion;
 import Interfaces.Instruccion;
-import TablaSimbolos.Simbolo;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tipo;
-import TablaSimbolos.Tree;
-import TablaSimbolos.UserType;
+import TablaSimbolos.*;
 
 import java.util.ArrayList;
 
@@ -89,6 +85,10 @@ public class DeclaracionType implements Instruccion {
                 }
             } else if (tipo.getType() == Tipo.tipo.RECORD || tipo.getType() == Tipo.tipo.OBJETO) {
                 tipo.setTipoObjeto(identificador);
+                for(int k = 0; k < tipo.getAtributos().size(); k++){
+                    Registro r = tipo.getAtributos().get(k);
+                    r.setTipo(r.getTipo().verificarUserType(tabla));
+                }
             }
         }
         return null;
