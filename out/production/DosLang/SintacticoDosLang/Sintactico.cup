@@ -66,8 +66,8 @@ non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MUL
 non terminal Dimension RANGO_ARRAY;
 non terminal Registro RECORDS;
 
-precedence left then;
-//precedence left sino;
+//precedence left then;
+precedence left sino;
 precedence left or;
 precedence left nand, nor;
 precedence left and;
@@ -275,7 +275,7 @@ LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESUL
 INSTRUCCION ::= WITH
               | ASIGNACION:e pComa {:RESULT = e;:}
               | TRANSFERENCIA
-              //| SI
+              | SI
               | WHILE
               | REPEAT
               | FOR
@@ -298,10 +298,8 @@ TRANSFERENCIA ::= detener pComa
                 | salir pComa
                 ;
 
-SI ::= si EXPRESION then INSIF
-     | si EXPRESION then INSIF sino INSIF
-     | si EXPRESION then INSIF LISTAIF
-     | si EXPRESION then INSIF LISTAIF sino INSIF
+SI ::= si EXPRESION then INSIF sino INSIF
+     | si EXPRESION then INSIF
      ;
 
 LISTAIF ::= LISTAIF sino si EXPRESION then INSIF
