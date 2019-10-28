@@ -23,6 +23,7 @@ public class DeclaracionVar implements Instruccion {
     private ArrayList<String> identificadores;
     private Tipo tipo;
     private Expresion valor;
+    private boolean stack;
     private int fila;
     private int columna;
 
@@ -49,7 +50,11 @@ public class DeclaracionVar implements Instruccion {
                 Tipo tipoAux = tipo.verificarUserType(tabla);
                 Expresion resultTipo = Tipo.valorPredeterminado(tipoAux);
                 Simbolo simbolo = null;
-                simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
+                if (stack) {
+                    simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "local", resultTipo, false, tabla.getEnviroment().getPosicionStack());
+                } else {
+                    simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", resultTipo, false, tabla.getHeap());
+                }
                 if (tipoAux.getType() == Tipo.tipo.RANGE) {
                     Object result = tipoAux.getLowerLimit().getTipo(tabla, arbol);
                     if (result instanceof Excepcion) {
@@ -133,7 +138,11 @@ public class DeclaracionVar implements Instruccion {
                 String identificador = identificadores.get(i);
                 Tipo tipoAux = tipo.verificarUserType(tabla);
                 Simbolo simbolo = null;
-                simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
+                if (stack) {
+                    simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "local", valor, false, tabla.getEnviroment().getPosicionStack());
+                } else {
+                    simbolo = new Simbolo(identificador, tipoAux, tabla.getAmbito(), "variable", "global", valor, false, tabla.getHeap());
+                }
                 Object resultTipo = valor.getTipo(tabla, arbol);
                 if (resultTipo instanceof Excepcion) {
                     return resultTipo;
@@ -302,7 +311,11 @@ public class DeclaracionVar implements Instruccion {
                     temp4 = tabla.getTemporalActual();
                     codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
                     codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
-                    codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    if (isStack()) {
+                        codigo += "=, " + temp1 + ", " + temp2 + ", stack\n";
+                    } else {
+                        codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    }
                     codigo += "jmp,,," + label3 + "\n";
                     codigo += label1 + ":\n";
                     codigo += label2 + ":\n";
@@ -325,7 +338,11 @@ public class DeclaracionVar implements Instruccion {
                                 String temp1 = tabla.getTemporal();
                                 codigo += "=," + simEnum.getApuntador() + ",," + temp1 + "\n";
                                 codigo += simEnum.getValor().get4D(tabla, arbol);
-                                codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                                if(isStack()){
+                                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
+                                }else{
+                                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                                }
                             }
                         }
                     }
@@ -415,5 +432,21 @@ public class DeclaracionVar implements Instruccion {
             espacios += tipo.getIdentificadores().size();
         }
         return espacios += identificadores.size();
+    }
+
+    public boolean isStack() {
+        return stack;
+    }
+
+    public void setStack(boolean stack) {
+        this.stack = stack;
+    }
+
+    public ArrayList<String> getIdentificadores() {
+        return identificadores;
+    }
+
+    public void setIdentificadores(ArrayList<String> identificadores) {
+        this.identificadores = identificadores;
     }
 }

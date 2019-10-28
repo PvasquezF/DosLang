@@ -23,10 +23,7 @@ import Interfaces.AST;
 import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
-import TablaSimbolos.GenerarNativas4D;
-import TablaSimbolos.ReservarMemoria;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tree;
+import TablaSimbolos.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -61,8 +58,23 @@ public class DosLang extends Thread {
             if (ins instanceof DeclaracionConstante
                     || ins instanceof DeclaracionVar
                     || ins instanceof DeclaracionType
-                    || ins instanceof Program) {
+                    || ins instanceof Program
+                    || ins instanceof Funcion) {
                 ins.ejecutar(tabla, t);
+            }
+        }
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof Funcion) {
+                ins.ejecutar(tabla, t);
+            }
+        }
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof Funcion) {
+                tabla.InsertarFuncion((Funcion) ins);
             }
         }
 
@@ -74,7 +86,7 @@ public class DosLang extends Thread {
                 //ins.ejecutar(tabla, t);
                 espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
             } //else if (ins instanceof Program) {
-              //  ins.ejecutar(tabla, t);
+            //  ins.ejecutar(tabla, t);
             //}
         }
 
@@ -96,7 +108,8 @@ public class DosLang extends Thread {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante
                     || ins instanceof DeclaracionVar
-                    || ins instanceof DeclaracionType) {
+                    || ins instanceof DeclaracionType
+                    || ins instanceof Funcion) {
                 Cuadruplos += ins.get4D(tabla, t);
             }
         }
