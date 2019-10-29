@@ -2,10 +2,7 @@ package Expresiones;
 
 import Excepciones.Excepcion;
 import Interfaces.Expresion;
-import TablaSimbolos.Simbolo;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tipo;
-import TablaSimbolos.Tree;
+import TablaSimbolos.*;
 
 import java.util.ArrayList;
 
@@ -66,8 +63,17 @@ public class Llamada implements Expresion {
         String temp3 = tabla.getTemporal();
         for (int i = 0; i < parametros.size(); i++) {
             int contador = i + 1;
+            Parametro param = sim.getParametros().get(i);
             codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
             codigo += "+," + temp1 + "," + contador + "," + temp2 + "\n";
+            /*if (param.isReferencia()) {
+                if (param.getTipo().getType() == Tipo.tipo.INTEGER) {
+                    codigo += parametros.get(i).get4D(tabla, arbol);
+                }
+            } else { // por valor
+                if (param.getTipo().getType() == Tipo.tipo.INTEGER) {
+                }
+            }*/
             codigo += parametros.get(i).get4D(tabla, arbol);
             codigo += "=," + temp2 + "," + tabla.getTemporalActual() + ",stack\n";
         }
