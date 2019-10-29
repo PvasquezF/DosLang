@@ -2,6 +2,7 @@ package Instrucciones;
 
 import Excepciones.Excepcion;
 import Interfaces.AST;
+import Interfaces.Expresion;
 import Interfaces.Instruccion;
 import TablaSimbolos.*;
 
@@ -56,9 +57,9 @@ public class Funcion extends Simbolo implements Instruccion {
         tabla.setAmbito(this.getNombreCompleto());
         Simbolo simbolo = null;
         int tamaño = 0;
-        String nombre = "retorno";
+        String nombre = this.getNombre();
         Tipo tipoAux = this.getTipo().verificarUserType(tabla);
-        simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", false, tabla.getEnviroment().getPosicionStack(), false);
+        simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false,tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
         for (int i = 0; i < this.getParametros().size(); i++) {
             Parametro parametro = this.getParametros().get(i);
@@ -72,6 +73,20 @@ public class Funcion extends Simbolo implements Instruccion {
             tamaño += declaracion.getIdentificadores().size();
             declaracion.ejecutar(tabla, arbol);
         }
+
+        for (int i = 0; i < instrucciones.size(); i++) {
+            AST ins = instrucciones.get(i);
+            Object respuesta = null;
+            if (ins instanceof Instruccion) {
+                respuesta = ((Instruccion) ins).ejecutar(tabla, arbol);
+            } else {
+                respuesta = ((Expresion) ins).getTipo(tabla, arbol);
+            }
+            if(respuesta instanceof Excepcion){
+                return respuesta;
+            }
+        }
+
         tamaño += 1;
         this.setTamaño(tamaño);
         tabla.setAmbito(nombreAmbitoAnterior);

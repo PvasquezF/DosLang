@@ -44,7 +44,7 @@ public class Simbolo {
         this.apuntadorRef = -1;
     }
 
-    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador, boolean referencia) {
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, Expresion valor, boolean constante, int apuntador, boolean referencia) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ambito = ambito;

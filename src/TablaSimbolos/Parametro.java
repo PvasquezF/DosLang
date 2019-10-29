@@ -50,7 +50,7 @@ public class Parametro implements Instruccion {
             Simbolo simbolo = null;
             String nombre = identificador.get(i);
             Tipo tipoAux = tipo.verificarUserType(tabla);
-            simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "parametro", "local", false, tabla.getEnviroment().getPosicionStack(), referencia);
+            simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "parametro", "local", Tipo.valorPredeterminado(tipoAux), false, tabla.getEnviroment().getPosicionStack(), referencia);
             Object result = tabla.InsertarVariable(simbolo);
             if (result != null) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

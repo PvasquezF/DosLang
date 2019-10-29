@@ -59,15 +59,7 @@ public class DosLang extends Thread {
             if (ins instanceof DeclaracionConstante
                     || ins instanceof DeclaracionVar
                     || ins instanceof DeclaracionType
-                    || ins instanceof Program
-                    || ins instanceof Funcion) {
-                ins.ejecutar(tabla, t);
-            }
-        }
-
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof Funcion) {
+                    || ins instanceof Program) {
                 ins.ejecutar(tabla, t);
             }
         }
@@ -76,6 +68,13 @@ public class DosLang extends Thread {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof Funcion) {
                 tabla.InsertarFuncion((Funcion) ins);
+            }
+        }
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof Funcion) {
+                ins.ejecutar(tabla, t);
             }
         }
 
