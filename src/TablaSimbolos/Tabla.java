@@ -63,6 +63,10 @@ public class Tabla {
         //return null;
     }
 
+    public String InsertarProcedimiento(Simbolo simbolo) {
+        return this.enviroment.insertarProcedimiento(simbolo);
+    }
+
     public Object getVariable(String identificador) {
         return this.enviroment.getVariable(identificador);
         //for (Simbolo i : tabla) {
@@ -85,6 +89,10 @@ public class Tabla {
         //    }
         //}
         //return "No se ha encontrado la variable " + identificador + ".";
+    }
+
+    public Object getProcedimiento(String identificador) {
+        return this.enviroment.getProcedimiento(identificador);
     }
 
     public String insertarType(UserType usertype) {
@@ -224,7 +232,7 @@ public class Tabla {
     }
 
     public ArrayList<UserType> getListaTipos() {
-        return this.enviroment.getListaTipos();
+        return this.enviroment.getUserTypes();
     }
 
     public void setListaTipos(ArrayList<UserType> listaTipos) {

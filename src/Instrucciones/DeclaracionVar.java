@@ -88,10 +88,16 @@ public class DeclaracionVar implements Instruccion {
                         ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
                         for (int j = 0; j < listaId.size(); j++) {
                             Expresion m = listaId.get(j);
-                            Identificador id = (Identificador) m;
+                            Acceso acceso = (Acceso) m;
+                            Identificador id = (Identificador) acceso.getAccesos().get(0);
                             //Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
                             //tipoEnum.setNombreEnum(identificador);
-                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            Simbolo simboloEnum;
+                            if (stack) {
+                                simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "local", new Primitivo(j), false, tabla.getEnviroment().getPosicionStack());
+                            } else {
+                                simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            }
                             Object result = tabla.InsertarVariable(simboloEnum);
                             if (result != null) {
                                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -201,10 +207,16 @@ public class DeclaracionVar implements Instruccion {
                         ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
                         for (int j = 0; j < listaId.size(); j++) {
                             Expresion m = listaId.get(j);
-                            Identificador id = (Identificador) m;
+                            Acceso acceso = (Acceso) m;
+                            Identificador id = (Identificador) acceso.getAccesos().get(0);
                             //Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
                             //tipoEnum.setNombreEnum(identificador);
-                            Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            Simbolo simboloEnum = null;
+                            if (stack) {
+                                simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "local", new Primitivo(j), false, tabla.getEnviroment().getPosicionStack());
+                            } else {
+                                simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
+                            }
                             Object result = tabla.InsertarVariable(simboloEnum);
                             if (result != null) {
                                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -312,7 +324,9 @@ public class DeclaracionVar implements Instruccion {
                     codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
                     codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
                     if (isStack()) {
-                        codigo += "=, " + temp1 + ", " + temp2 + ", stack\n";
+                        String temp5 = tabla.getTemporal();
+                        codigo += "+,p," + temp1 + "," + temp5 + "\n";
+                        codigo += "=," + temp5 + "," + temp2 + ",stack\n";
                     } else {
                         codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
                     }
@@ -325,7 +339,8 @@ public class DeclaracionVar implements Instruccion {
                     if (tipo.getType() == Tipo.tipo.ENUMERADO) {
                         for (int j = 0; j < tipo.getIdentificadores().size(); j++) {
                             //Tipo t = tabla.getListaTipos().get(i).getTipo();
-                            Identificador identificadorEnum = (Identificador) tipo.getIdentificadores().get(j);
+                            Acceso acceso = (Acceso) tipo.getIdentificadores().get(j);
+                            Identificador identificadorEnum = (Identificador) acceso.getAccesos().get(0);
                             Object resultEnum = tabla.getVariable(identificadorEnum.getIdentificador());
                             if (resultEnum instanceof String) {
                                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -336,20 +351,32 @@ public class DeclaracionVar implements Instruccion {
                             } else {
                                 Simbolo simEnum = (Simbolo) resultEnum;
                                 String temp1 = tabla.getTemporal();
+                                String temp5 = tabla.getTemporal();
                                 codigo += "=," + simEnum.getApuntador() + ",," + temp1 + "\n";
                                 codigo += simEnum.getValor().get4D(tabla, arbol);
+                                codigo += "=," + tabla.getTemporalActual() + ",," + temp5 + "\n";
                                 if (isStack()) {
-                                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
+                                    String temp6 = tabla.getTemporal();
+                                    codigo += "+,p," + temp1 + "," + temp6 + "\n";
+                                    codigo += "=, " + temp6 + ", " + temp5 + ", stack\n";
                                 } else {
-                                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                                    codigo += "=, " + temp1 + ", " + temp5 + ", heap\n";
                                 }
                             }
                         }
                     }
                     String temp1 = tabla.getTemporal();
+                    String temp2 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     codigo += sim.getValor().get4D(tabla, arbol);
-                    codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                    codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + "\n";
+                    if (isStack()) {
+                        String temp6 = tabla.getTemporal();
+                        codigo += "+,p," + temp1 + "," + temp6 + "\n";
+                        codigo += "=, " + temp6 + ", " + temp2 + ", stack\n";
+                    } else {
+                        codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    }
                 } else if (tipoAux.getType() == Tipo.tipo.ARREGLO) {
                     String temp1 = tabla.getTemporal();
                     String temp2 = tabla.getTemporal();
@@ -386,8 +413,14 @@ public class DeclaracionVar implements Instruccion {
                     codigo += "+,h,1,h\n";
                     codigo += "jmp,,," + label1 + "\n";
                     codigo += label2 + ":\n";
-
-                    codigo += "=, " + temp1 + ", " + temp6 + ", heap // Fin declaracion Array " + identificador + "\n";
+                    if (isStack()) {
+                        String temp8 = tabla.getTemporal();
+                        codigo += "+,p," + temp1 + "," + temp8 + "\n";
+                        codigo += "=, " + temp8 + ", " + temp6 + ", stack// Fin declaracion Array " + identificador + "\n";
+                    } else {
+                        //codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                        codigo += "=, " + temp1 + ", " + temp6 + ", heap // Fin declaracion Array " + identificador + "\n";
+                    }
                 } else if (tipoAux.getType() == Tipo.tipo.RECORD) {
                     /*String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion objeto\n";
@@ -400,27 +433,48 @@ public class DeclaracionVar implements Instruccion {
                     }*/
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion objeto\n";
-                    codigo += "=," + temp1 + ",-1,heap\n";
+                    if (isStack()) {
+                        String temp2 = tabla.getTemporal();
+                        codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                        codigo += "=, " + temp2 + ", -1, stack\n";
+                    } else {
+                        codigo += "=," + temp1 + ",-1,heap\n";
+                    }
                 } else if (tipoAux.getType() == Tipo.tipo.STRING) {
                     String temp1 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                     if (valor == null) {
-                        codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
                         //codigo += "=," + sim.getApuntadorRef() + ",," + temp2 + "\n";
                         //codigo += sim.getValor().get4D(tabla, arbol);
                         //codigo += "=, " + temp2 + ", " + tabla.getTemporalActual() + ", heap\n";
-                        codigo += "=, " + temp1 + ", -1, heap\n";
+                        if (isStack()) {
+                            String temp2 = tabla.getTemporal();
+                            codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                            codigo += "=, " + temp2 + ", -1, stack\n";
+                        } else {
+                            codigo += "=," + temp1 + ",-1,heap\n";
+                        }
                     } else {
-                        codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
-                        codigo += sim.getValor().get4D(tabla, arbol);
-                        codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                        if (isStack()) {
+                            String temp2 = tabla.getTemporal();
+                            codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                            codigo += sim.getValor().get4D(tabla, arbol);
+                            codigo += "=, " + temp2 + ", " + tabla.getTemporalActual() + ", stack\n";
+                        } else {
+                            codigo += sim.getValor().get4D(tabla, arbol);
+                            codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                        }
                     }
                 } else {
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
-                    codigo += sim.getValor().get4D(tabla, arbol);
                     if (stack) {
-                        codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", stack\n";
+                        String temp2 = tabla.getTemporal();
+                        codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                        codigo += sim.getValor().get4D(tabla, arbol);
+                        codigo += "=, " + temp2 + ", " + tabla.getTemporalActual() + ", stack\n";
                     } else {
+                        codigo += sim.getValor().get4D(tabla, arbol);
                         codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
                     }
                 }

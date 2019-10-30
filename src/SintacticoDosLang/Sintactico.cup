@@ -44,7 +44,7 @@ terminal char caracter;
 non terminal INICIO;
 non terminal ENUM_TYPE, ARRAY_TYPE;
 non terminal CUERPO_FUNCION;
-non terminal WITH, PROCEDURE;
+non terminal WITH;
 non terminal SI, LISTAIF, INSTRUCCIONESIF;
 non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, READ;
 non terminal CASE, CASELIST, DEFECTO, SWITCH;
@@ -59,7 +59,7 @@ non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST FUNCION, SUBRANGE_TYPE, MAIN, WRITE;
+non terminal AST FUNCION, SUBRANGE_TYPE, MAIN, WRITE, PROCEDURE;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -224,16 +224,17 @@ SECCION_FUNCION ::= METHOD_LIST:e MAIN:e1 {:RESULT = e; RESULT.add(e1);:}
                   ;
 
 METHOD_LIST ::= METHOD_LIST:e FUNCION:e1 {: RESULT = e; RESULT.add(e1); :}
-              | METHOD_LIST PROCEDURE
+              | METHOD_LIST:e PROCEDURE:e1 {: RESULT = e; RESULT.add(e1); :}
               | FUNCION:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
-              | PROCEDURE
+              | PROCEDURE:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
               ;
 
 FUNCION ::= function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 BLOQUE_INSTRUCCIONES:e4 {: RESULT = new Funcion(e, e1, e2, e4, e3, eleft, eright); :}
           | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa BLOQUE_INSTRUCCIONES:e4 {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), eleft, eright); :}
           ;
 
-PROCEDURE ::= procedure identificador PARAMETROS pComa CUERPO_FUNCION
+PROCEDURE ::= procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 BLOQUE_INSTRUCCIONES:e3 {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa BLOQUE_INSTRUCCIONES:e2 {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e2, new ArrayList<AST>(), eleft, eright); :}
             ;
 
 PARAMETROS ::= parenI LISTA_PARAMETROS:e parenD {:RESULT = e;:}

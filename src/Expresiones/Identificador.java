@@ -79,9 +79,12 @@ public class Identificador implements Expresion {
                 if (accesoGlobal) {
                     codigo += "=,heap," + temp1 + "," + temp2 + "\n";
                 } else {
-                    codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+                    String temp3 = tabla.getTemporal();
+                    codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                    codigo += "=,stack," + temp2 + "," + temp3 + "\n";
                 }
             }
+
             codigo += "// Fin identificador\n";
             return codigo;
         } else {

@@ -123,7 +123,6 @@ public class AccesoVariable implements Expresion {
         String codigo = "// Inicio AccesoVariable linea: " + fila + ", columna: " + columna + "\n";
         Tipo tipoResultado = null;
         String temp7 = tabla.getTemporal();
-        //String temp9 = tabla.getTemporal();
         Identificador identificador = (Identificador) accesos.get(0);
         codigo += identificador.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp7 + "\n";
@@ -137,6 +136,13 @@ public class AccesoVariable implements Expresion {
         }
         Simbolo sim = (Simbolo) result;
         tipoResultado = sim.getTipo();
+        if (!identificador.accesoGlobal && accesos.size() > 1) {
+            String temp9 = tabla.getTemporal();
+            codigo += "+,p," + temp7 + "," + temp9 + "\n";
+            codigo += "=,stack," + temp9 + "," + temp7 + "\n";
+        } else if (identificador.accesoGlobal && accesos.size() > 1) {
+            codigo += "=,heap," + temp7 + "," + temp7 + "\n";
+        }
         //tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
             Expresion acceso = accesos.get(i);
@@ -175,17 +181,25 @@ public class AccesoVariable implements Expresion {
                             codigo += "+," + temp4 + "," + temp6 + "," + temp4 + "\n";
                         }
                         //codigo += "=," + temp4 + ",," + tabla.getTemporal() + "//Valor que se tiene que accesar\n";
-                        codigo += "=,heap," + temp7 + "," + temp8 + "\n";
-                        codigo += "+," + temp4 + "," + temp8 + "," + temp7 + "\n";
-                        if (identificador.accesoGlobal) {
-                            //codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
-                            //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",heap //Fin acceso\n";
+
+                        //codigo += "=,heap," + temp7 + "," + temp8 + "\n";
+                        //codigo += "+," + temp4 + "," + temp8 + "," + temp7 + "\n";
+                        codigo += "+," + temp4 + "," + temp7 + "," + temp7 + "\n";
+                        /*if (identificador.accesoGlobal) {
+                            //codigo += "=,heap," + temp7 + "," + temp8 + "\n";
                         } else {
+                            //String temp9 = tabla.getTemporal();
+                            //codigo += "+,p," + temp7 + "," + temp9 + "\n";
+                            //codigo += "=,stack," + temp9 + "," + temp7 + "\n";
+                            codigo += "+," + temp4 + "," + temp7 + "," + temp7 + "\n";
                             //codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
                             //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",stack  //Fin acceso\n";
-                        }
+
+                        }*/
+
                         codigo += label1 + ":\n";
                         codigo += label2 + ":\n";
+                        accesoGlobal = true;
                     } else {
                         if (cantidadAccesos < cantidadDimensiones) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -223,10 +237,15 @@ public class AccesoVariable implements Expresion {
                     Registro registro = tipoResultado.getAtributos().get(j);
                     if (registro.getIdentificador().equalsIgnoreCase(atributo.getIdentificador())) {
                         //codigo += atributo.get4D(tabla, arbol);
-                        String temp1 = tabla.getTemporal();
-                        codigo += "=,heap," + temp7 + "," + temp1 + "\n";
-                        codigo += "+," + temp1 + "," + j + "," + temp7 + "\n";
+                        //String temp1 = tabla.getTemporal();
+                        /*if (identificador.accesoGlobal) {
+                            codigo += "=,heap," + temp7 + "," + temp1 + "\n";
+                            codigo += "+," + temp1 + "," + j + "," + temp7 + "\n";
+                        } else {
+                        }*/
+                        codigo += "+," + temp7 + "," + j + "," + temp7 + "\n";
                         tipoResultado = registro.getTipo();
+                        accesoGlobal = true;
                         break;
                     }
                 }
@@ -238,6 +257,9 @@ public class AccesoVariable implements Expresion {
                     arbol.getErrores().add(exc);
                     return exc;
                 }
+            }
+            if (i + 1 != accesos.size()) {
+                codigo += "=,heap," + temp7 + "," + temp7 + "\n";
             }
         }
         codigo += "=," + temp7 + ",," + tabla.getTemporal() + "\n";

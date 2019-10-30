@@ -8,22 +8,20 @@ import TablaSimbolos.*;
 
 import java.util.ArrayList;
 
-public class Funcion extends Simbolo implements Instruccion {
-    // String nombre, ArrayList<AST> parametros, Tipo tipo, String ambito,
-    // String rol, String nivel, ArrayList<AST> instrucciones, boolean constante, int apuntador, int tamaño
+public class Procedimiento extends Simbolo implements Instruccion {
     private ArrayList<AST> instrucciones;
     private ArrayList<AST> variables;
     private int fila;
     private int columna;
 
-    public Funcion(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, int fila, int columna) {
+    public Procedimiento(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, int fila, int columna) {
         super(nombre, nombre, parametros, tipo, 0, null);
         this.instrucciones = instrucciones;
         this.variables = variables;
         this.fila = fila;
         this.columna = columna;
         this.setNombreCompleto(generarNombreCompleto());
-        this.setRol("funcion");
+        this.setRol("procedimiento");
     }
 
     public String generarNombreCompleto() {
@@ -49,31 +47,30 @@ public class Funcion extends Simbolo implements Instruccion {
 
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
-        int tamaño = 0;
-        Simbolo simbolo = null;
-        String nombre = this.getNombre();
         Ambito entorno = new Ambito(tabla.getEnviroment());
-        Tipo tipoAux = this.getTipo().verificarUserType(tabla);
         String nombreAmbitoAnterior = tabla.getAmbito();
-
-        this.setNombreCompleto(generarNombreCompleto());
-        this.setAmbito(generarNombreCompleto());
+        int tamaño = 0;
         this.setEntorno(entorno);
         this.setAmbito(nombreAmbitoAnterior);
         tabla.setEnviroment(entorno);
+        Simbolo simbolo = null;
+        String nombre = this.getNombre();
+        Tipo tipoAux = this.getTipo().verificarUserType(tabla);
         tabla.setAmbito(this.getNombreCompleto());
-        simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false, tabla.getEnviroment().getPosicionStack(), false);
+        simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false,tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
         for (int i = 0; i < this.getParametros().size(); i++) {
             Parametro parametro = this.getParametros().get(i);
+            parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
             parametro.ejecutar(tabla, arbol);
             tamaño += parametro.getIdentificador().size();
         }
-
+        this.setNombreCompleto(generarNombreCompleto());
+        this.setAmbito(generarNombreCompleto());
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
             declaracion.setStack(true);
-            tamaño += declaracion.getEspacios(tamaño);
+            tamaño += declaracion.getIdentificadores().size();
             declaracion.ejecutar(tabla, arbol);
         }
 
@@ -85,7 +82,7 @@ public class Funcion extends Simbolo implements Instruccion {
             } else {
                 respuesta = ((Expresion) ins).getTipo(tabla, arbol);
             }
-            if (respuesta instanceof Excepcion) {
+            if(respuesta instanceof Excepcion){
                 return respuesta;
             }
         }

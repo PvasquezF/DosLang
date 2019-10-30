@@ -58,11 +58,11 @@ public class Llamada implements Expresion {
             return exc;
         }
         Simbolo sim = (Simbolo) result;
-        String temp1 = tabla.getTemporal();
-        String temp2 = tabla.getTemporal();
         String temp3 = tabla.getTemporal();
         for (int i = 0; i < parametros.size(); i++) {
             int contador = i + 1;
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
             Parametro param = sim.getParametros().get(i);
             codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
             codigo += "+," + temp1 + "," + contador + "," + temp2 + "\n";
