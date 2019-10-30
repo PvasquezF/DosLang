@@ -305,10 +305,6 @@ SI ::= si EXPRESION then INSIF sino INSIF
      | si EXPRESION then INSIF
      ;
 
-LISTAIF ::= LISTAIF sino si EXPRESION then INSIF
-          | sino si EXPRESION then INSIF
-          ;
-
 INSIF ::= INSTRUCCIONESIF
         | INSTRUCCIONESIF pComa
         | INSTRUCCION

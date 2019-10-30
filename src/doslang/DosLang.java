@@ -49,7 +49,6 @@ public class DosLang extends Thread {
         Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang2.txt")));
         Syntax s = new Syntax(lexer);
         s.parse();
-        System.exit(0);
         Tree t = s.getArbol();
         Tabla tabla = new Tabla();
         String Cuadruplos = "";
