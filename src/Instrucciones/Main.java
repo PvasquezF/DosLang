@@ -2,6 +2,7 @@ package Instrucciones;
 
 import Excepciones.Excepcion;
 import Interfaces.AST;
+import Interfaces.Expresion;
 import Interfaces.Instruccion;
 import TablaSimbolos.Simbolo;
 import TablaSimbolos.Tabla;
@@ -32,6 +33,18 @@ public class Main extends Simbolo implements Instruccion {
             arbol.getErrores().add(exc);
             return exc;
         }
+        for (int i = 0; i < instrucciones.size(); i++) {
+            AST ins = instrucciones.get(i);
+            Object respuesta = null;
+            if (ins instanceof Instruccion) {
+                respuesta = ((Instruccion) ins).ejecutar(tabla, arbol);
+            } else {
+                respuesta = ((Expresion) ins).getTipo(tabla, arbol);
+            }
+            if(respuesta instanceof Excepcion){
+                return respuesta;
+            }
+        }
         return null;
     }
 
@@ -42,8 +55,8 @@ public class Main extends Simbolo implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
+        tabla.getTamañoActualFuncion().push(0);
         String codigo = "// Inicio main linea: " + fila + ", columna: " + columna + "\n";
-        String temp1 = tabla.getTemporal();
         codigo += "begin,,,main\n";
         for (AST ins : this.instrucciones) {
             codigo += ins.get4D(tabla, arbol);

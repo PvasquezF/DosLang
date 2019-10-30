@@ -20,13 +20,11 @@ import java.util.ArrayList;
 import Excepciones.Excepcion;
 import Instrucciones.*;
 import Interfaces.AST;
+import Interfaces.Expresion;
 import Interfaces.Instruccion;
 import LexicoDosLang.Lexer;
 import SintacticoDosLang.Syntax;
-import TablaSimbolos.GenerarNativas4D;
-import TablaSimbolos.ReservarMemoria;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tree;
+import TablaSimbolos.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -69,14 +67,37 @@ public class DosLang extends Thread {
 
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar) {
+            if (ins instanceof Funcion) {
+                Funcion f = (Funcion) ins;
+                tabla.InsertarFuncion(f);
+                for (int j = 0; j < f.getParametros().size(); j++) {
+                    Parametro parametro = f.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
+                }
+                f.setNombreCompleto(f.generarNombreCompleto());
+            } else if (ins instanceof Procedimiento) {
+                Procedimiento p = (Procedimiento) ins;
+                tabla.InsertarFuncion(p);
+                for (int j = 0; j < p.getParametros().size(); j++) {
+                    Parametro parametro = p.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
+                }
+                p.setNombreCompleto(p.generarNombreCompleto());
+            }
+        }
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof Funcion || ins instanceof Procedimiento || ins instanceof Asignacion) {
+                ins.ejecutar(tabla, t);
+            }
+        }
+
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar || ins instanceof DeclaracionType) {
                 espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
-            } else if (ins instanceof DeclaracionType) {
-                //ins.ejecutar(tabla, t);
-                espaciosReservaHeap = ins.getEspacios(espaciosReservaHeap);
-            } //else if (ins instanceof Program) {
-              //  ins.ejecutar(tabla, t);
-            //}
+            }
         }
 
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
@@ -86,6 +107,8 @@ public class DosLang extends Thread {
                 for (AST instruccion : m.getInstrucciones()) {
                     if (instruccion instanceof Instruccion) {
                         ((Instruccion) instruccion).ejecutar(tabla, t);
+                    } else {
+                        ((Expresion) instruccion).getTipo(tabla, t);
                     }
                 }
                 break;
@@ -93,35 +116,41 @@ public class DosLang extends Thread {
         }
 
         Cuadruplos += ReservarMemoria.Reservar(tabla, espaciosReservaHeap);
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionVar
-                    || ins instanceof DeclaracionType) {
-                Cuadruplos += ins.get4D(tabla, t);
-            }
-        }
-
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof Main) {
-                Cuadruplos += ins.get4D(tabla, t);
-            }
-        }
-        GenerarNativas4D gn4D = new GenerarNativas4D();
-        Cuadruplos += gn4D.generarConcatenacion(tabla);
-        Cuadruplos += gn4D.generarPrint(tabla);
-        Cuadruplos += gn4D.generarTrunk(tabla);
-        Cuadruplos += gn4D.generarRound(tabla);
-        Cuadruplos += gn4D.generarChartAt(tabla);
-        Cuadruplos += gn4D.generarLenght(tabla);
-        Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
-        System.out.println(Cuadruplos);
-        tabla.generarTablaHTML();
         errores.addAll(t.getErrores());
-        errores.forEach(m -> {
-            System.err.println(m.ToString());
-        });
+        if (errores.size() == 0) {
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+                if (ins instanceof DeclaracionConstante
+                        || ins instanceof DeclaracionVar
+                        || ins instanceof DeclaracionType
+                        || ins instanceof Funcion
+                        || ins instanceof Procedimiento) {
+                    Cuadruplos += ins.get4D(tabla, t);
+                }
+            }
+
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+                if (ins instanceof Main) {
+                    Cuadruplos += ins.get4D(tabla, t);
+                }
+            }
+
+            GenerarNativas4D gn4D = new GenerarNativas4D();
+            Cuadruplos += gn4D.generarConcatenacion(tabla);
+            Cuadruplos += gn4D.generarPrint(tabla);
+            Cuadruplos += gn4D.generarTrunk(tabla);
+            Cuadruplos += gn4D.generarRound(tabla);
+            Cuadruplos += gn4D.generarChartAt(tabla);
+            Cuadruplos += gn4D.generarLenght(tabla);
+            Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
+            System.out.println(Cuadruplos);
+        }else{
+            errores.forEach(m -> {
+                System.err.println(m.ToString());
+            });
+        }
+        tabla.generarTablaHTML();
         //Listener socket = new Listener();
         //socket.connect();
         //socket.start();

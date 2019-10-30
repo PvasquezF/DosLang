@@ -6,6 +6,7 @@
 package Instrucciones;
 
 import Excepciones.Excepcion;
+import Expresiones.Acceso;
 import Expresiones.Identificador;
 import Expresiones.Primitivo;
 import Interfaces.Expresion;
@@ -100,7 +101,8 @@ public class DeclaracionConstante implements Instruccion {
                     ArrayList<Expresion> listaId = tipoAux.getIdentificadores();
                     for (int j = 0; j < listaId.size(); j++) {
                         Expresion m = listaId.get(j);
-                        Identificador id = (Identificador) m;
+                        Acceso acceso = (Acceso) m;
+                        Identificador id = (Identificador) acceso.getAccesos().get(0);
                         //Tipo tipoEnum = new Tipo(Tipo.tipo.ENUMERADO, null);
                         //tipoEnum.setNombreEnum(identificador);
                         Simbolo simboloEnum = new Simbolo(id.getIdentificador(), tipoAux, tabla.getAmbito(), identificador + "_Enum_Item", "global", new Primitivo(j), false, tabla.getHeap());
@@ -219,7 +221,8 @@ public class DeclaracionConstante implements Instruccion {
                     if (tipo.getType() == Tipo.tipo.ENUMERADO) {
                         for (int j = 0; j < tipo.getIdentificadores().size(); j++) {
                             //Tipo t = tabla.getListaTipos().get(i).getTipo();
-                            Identificador identificadorEnum = (Identificador) tipo.getIdentificadores().get(j);
+                            Acceso acceso = (Acceso) tipo.getIdentificadores().get(j);
+                            Identificador identificadorEnum = (Identificador) acceso.getAccesos().get(0);
                             Object resultEnum = tabla.getVariable(identificadorEnum.getIdentificador());
                             if (resultEnum instanceof String) {
                                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,

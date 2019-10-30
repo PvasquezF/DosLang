@@ -24,64 +24,90 @@ public class Tabla {
 
     private ArrayList<Simbolo> tabla;
     private String ambito;
-    private int indiceTemporal;
+    public int indiceTemporal;
     private String etiqueta;
     private int indiceEtiqueta;
     private Stack listaAmbitos;
     private int heap;
     private int stack;
     private int funcionSizeActual;
-    private ArrayList<UserType> listaTipos;
-
+    private Ambito enviroment;
+    private Stack tamañoActualFuncion;
     public Tabla() {
+        this.enviroment = new Ambito(null);
         tabla = new ArrayList<>();
-        listaTipos = new ArrayList<>();
         listaAmbitos = new Stack();
         funcionSizeActual = 0;
+        this.tamañoActualFuncion = new Stack();
     }
 
     public String InsertarVariable(Simbolo simbolo) {
-        for (Simbolo i : tabla) {
-            if (i.getNombre().equalsIgnoreCase(simbolo.getNombre()) && i.getAmbito().equalsIgnoreCase(simbolo.getAmbito())) {
-                return "La variable " + simbolo.getNombre() + " ya ha sido declarada.";
-            }
-        }
-        tabla.add(simbolo);
-        return null;
+        return this.enviroment.insertarVariable(simbolo);
+        //for (Simbolo i : tabla) {
+        //    if (i.getNombre().equalsIgnoreCase(simbolo.getNombre()) && i.getAmbito().equalsIgnoreCase(simbolo.getAmbito())) {
+        //        return "La variable " + simbolo.getNombre() + " ya ha sido declarada.";
+        //    }
+        //}
+        //tabla.add(simbolo);
+        //return null;
     }
 
     public String InsertarFuncion(Simbolo simbolo) {
-        for (Simbolo i : tabla) {
-            if (i.getNombre().equalsIgnoreCase(simbolo.getNombre()) && i.getAmbito().equalsIgnoreCase(simbolo.getAmbito())) {
-                return "La funcion " + simbolo.getNombre() + " ya ha sido declarada.";
-            }
-        }
-        tabla.add(simbolo);
-        return null;
+        return this.enviroment.insertarFuncion(simbolo);
+        //for (Simbolo i : tabla) {
+        //    if (i.getNombre().equalsIgnoreCase(simbolo.getNombre()) && i.getAmbito().equalsIgnoreCase(simbolo.getAmbito())) {
+        //        return "La funcion " + simbolo.getNombre() + " ya ha sido declarada.";
+        //    }
+        //}
+        //tabla.add(simbolo);
+        //return null;
+    }
+
+    public String InsertarProcedimiento(Simbolo simbolo) {
+        return this.enviroment.insertarProcedimiento(simbolo);
     }
 
     public Object getVariable(String identificador) {
-        for (Simbolo i : tabla) {
-            for (Object env : listaAmbitos) {
-                if (i.getNombre().equalsIgnoreCase(identificador) && i.getAmbito().equalsIgnoreCase((String) env)) {
-                    return i;
-                }
-            }
-        }
-        return "No se ha encontrado la variable " + identificador + ".";
+        return this.enviroment.getVariable(identificador);
+        //for (Simbolo i : tabla) {
+        //    for (Object env : listaAmbitos) {
+        //        if (i.getNombre().equalsIgnoreCase(identificador) && i.getAmbito().equalsIgnoreCase((String) env)) {
+        //            return i;
+        //        }
+        //    }
+        //}
+        //return "No se ha encontrado la variable " + identificador + ".";
+    }
+
+    public Object getFuncion(String identificador) {
+        return this.enviroment.getFuncion(identificador);
+        //for (Simbolo i : tabla) {
+        //    for (Object env : listaAmbitos) {
+        //        if (i.getNombre().equalsIgnoreCase(identificador) && i.getAmbito().equalsIgnoreCase((String) env)) {
+        //            return i;
+        //        }
+        //    }
+        //}
+        //return "No se ha encontrado la variable " + identificador + ".";
+    }
+
+    public Object getProcedimiento(String identificador) {
+        return this.enviroment.getProcedimiento(identificador);
     }
 
     public String insertarType(UserType usertype) {
-        for (UserType ut : listaTipos) {
-            if (ut.getNombre().equalsIgnoreCase(usertype.getNombre())) {
-                return "El type " + usertype.getNombre() + " ya existe.";
-            }
-        }
-        this.listaTipos.add(usertype);
-        return null;
+        return this.enviroment.insertarType(usertype);
+        //for (UserType ut : listaTipos) {
+        //    if (ut.getNombre().equalsIgnoreCase(usertype.getNombre())) {
+        //        return "El type " + usertype.getNombre() + " ya existe.";
+        //    }
+        //}
+        //this.listaTipos.add(usertype);
+        //return null;
     }
 
     public void generarTablaHTML() {
+        this.enviroment.concatenarTablas(this.tabla);
         String HTML = "<html>\n"
                 + "\n"
                 + "<head>\n"
@@ -105,8 +131,10 @@ public class Tabla {
         encabezado += "<th scope=\"col\">Tipo Generado</th>";
         encabezado += "<th scope=\"col\">Ambito</th>";
         encabezado += "<th scope=\"col\">Constante</th>";
+        encabezado += "<th scope=\"col\">Rol</th>";
         encabezado += "<th scope=\"col\">Parametros</th>";
         encabezado += "<th scope=\"col\">Apuntador</th>";
+        encabezado += "<th scope=\"col\">Tamaño</th>";
 
         for (int i = 0; i < tabla.size(); i++) {
             Simbolo sim = tabla.get(i);
@@ -118,7 +146,7 @@ public class Tabla {
                 filas += "<td scope=\"row\">" + sim.getTipo().getNombreEnum() + "</td>";
             } else if (sim.getTipo().getType() == Tipo.tipo.OBJETO || sim.getTipo().getType() == Tipo.tipo.RECORD) {
                 filas += "<td scope=\"row\">" + sim.getTipo().getTipoObjeto() + "</td>";
-            }else if (sim.getTipo().getType() == Tipo.tipo.RANGE) {
+            } else if (sim.getTipo().getType() == Tipo.tipo.RANGE) {
                 filas += "<td scope=\"row\">" + sim.getTipo().getTipoRange() + "</td>";
             } else if (sim.getTipo().getType() == Tipo.tipo.ARREGLO) {
                 if (sim.getTipo().getTipoObjeto() != null) {
@@ -131,8 +159,10 @@ public class Tabla {
             }
             filas += "<td scope=\"row\">" + sim.getAmbito() + "</td>";
             filas += "<td scope=\"row\">" + sim.isConstante() + "</td>";
+            filas += "<td scope=\"row\">" + sim.getRol() + "</td>";
             filas += "<td scope=\"row\"> - </td>";
             filas += "<td scope=\"row\">" + sim.getApuntador() + "</td>";
+            filas += "<td scope=\"row\">" + sim.getTamaño() + "</td>";
             filas += "</tr>";
         }
         encabezado += "</tr>";
@@ -202,10 +232,26 @@ public class Tabla {
     }
 
     public ArrayList<UserType> getListaTipos() {
-        return listaTipos;
+        return this.enviroment.getUserTypes();
     }
 
     public void setListaTipos(ArrayList<UserType> listaTipos) {
-        this.listaTipos = listaTipos;
+        this.enviroment.setListaTipos(listaTipos);
+    }
+
+    public Ambito getEnviroment() {
+        return enviroment;
+    }
+
+    public void setEnviroment(Ambito enviroment) {
+        this.enviroment = enviroment;
+    }
+
+    public Stack getTamañoActualFuncion() {
+        return tamañoActualFuncion;
+    }
+
+    public void setTamañoActualFuncion(Stack tamañoActualFuncion) {
+        this.tamañoActualFuncion = tamañoActualFuncion;
     }
 }

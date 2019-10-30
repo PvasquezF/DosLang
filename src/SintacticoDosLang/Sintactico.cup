@@ -43,28 +43,29 @@ terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
 non terminal ENUM_TYPE, ARRAY_TYPE;
-non terminal PARAMETROS;
-non terminal LISTA_PARAMETROS, CUERPO_FUNCION, BLOQUE_INSTRUCCIONES;
-non terminal FUNCION, WITH, PROCEDURE;
-non terminal METHOD_LIST, SI, LISTAIF, INSTRUCCIONESIF;
+non terminal CUERPO_FUNCION;
+non terminal WITH;
+non terminal SI, LISTAIF, INSTRUCCIONESIF;
 non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, READ;
 non terminal CASE, CASELIST, DEFECTO, SWITCH;
 non terminal INSIF;
 
 
-non terminal ArrayList<AST> PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
+non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
+non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST SUBRANGE_TYPE, MAIN, WRITE;
+non terminal AST FUNCION, SUBRANGE_TYPE, MAIN, WRITE, PROCEDURE;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
 non terminal Dimension RANGO_ARRAY;
 non terminal Registro RECORDS;
+non terminal ArrayList<Parametro> PARAMETROS, LISTA_PARAMETROS;
 
 //precedence left then;
 precedence left sino;
@@ -218,34 +219,36 @@ VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RE
       //| LISTA_IDENTIFICADORES dosPuntos REGISTRO pComa
       ;
 
-SECCION_FUNCION ::= METHOD_LIST MAIN
+SECCION_FUNCION ::= METHOD_LIST:e MAIN:e1 {:RESULT = e; RESULT.add(e1);:}
                   | MAIN:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                   ;
 
-METHOD_LIST ::= METHOD_LIST FUNCION
-              | METHOD_LIST PROCEDURE
-              | FUNCION
-              | PROCEDURE
+METHOD_LIST ::= METHOD_LIST:e FUNCION:e1 {: RESULT = e; RESULT.add(e1); :}
+              | METHOD_LIST:e PROCEDURE:e1 {: RESULT = e; RESULT.add(e1); :}
+              | FUNCION:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
+              | PROCEDURE:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
               ;
 
-FUNCION ::= function identificador PARAMETROS dosPuntos TIPO pComa CUERPO_FUNCION
+FUNCION ::= function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 BLOQUE_INSTRUCCIONES:e4 {: RESULT = new Funcion(e, e1, e2, e4, e3, eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa BLOQUE_INSTRUCCIONES:e4 {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), eleft, eright); :}
           ;
 
-PROCEDURE ::= procedure identificador PARAMETROS pComa CUERPO_FUNCION
+PROCEDURE ::= procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 BLOQUE_INSTRUCCIONES:e3 {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa BLOQUE_INSTRUCCIONES:e2 {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e2, new ArrayList<AST>(), eleft, eright); :}
             ;
 
-PARAMETROS ::= parenI LISTA_PARAMETROS parenD
-             | parenI parenD
+PARAMETROS ::= parenI LISTA_PARAMETROS:e parenD {:RESULT = e;:}
+             | parenI parenD {:RESULT = new ArrayList<Parametro>();:}
              ;
 
-LISTA_PARAMETROS ::= LISTA_PARAMETROS pComa LISTA_IDENTIFICADORES dosPuntos TIPO
-                   | LISTA_PARAMETROS pComa var LISTA_IDENTIFICADORES dosPuntos TIPO
-                   | LISTA_IDENTIFICADORES dosPuntos TIPO
-                   | var LISTA_IDENTIFICADORES dosPuntos TIPO
+LISTA_PARAMETROS ::= LISTA_PARAMETROS:e pComa LISTA_IDENTIFICADORES:e1 dosPuntos TIPO:e2 {: RESULT = e; RESULT.add(new Parametro(e2, e1, false, eleft, eright)); :}
+                   | LISTA_PARAMETROS:e pComa var LISTA_IDENTIFICADORES:e1 dosPuntos TIPO:e2 {: RESULT = e; RESULT.add(new Parametro(e2, e1, true, eleft, eright)); :}
+                   | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 {: RESULT = new ArrayList<Parametro>(); RESULT.add(new Parametro(e1, e, false, eleft, eright)); :}
+                   | var LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 {: RESULT = new ArrayList<Parametro>(); RESULT.add(new Parametro(e1, e, true, eleft, eright)); :}
                    ;
 
 CUERPO_FUNCION ::= VARINIT BLOQUE_INSTRUCCIONES
-                 | BLOQUE_INSTRUCCIONES
+                 | BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
                  ;
 
 REGISTRO ::= record LISTA_RECORDS:e end {:RESULT = e;:}
@@ -283,7 +286,7 @@ INSTRUCCION ::= WITH
               | READ
               | SWITCH
               | free parenI EXPRESION parenD pComa
-              | LLAMADA pComa
+              | LLAMADA:e pComa {:RESULT = e;:}
               ;
 
 WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES 
@@ -354,15 +357,17 @@ EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}
            |   parenI EXPRESION:e parenD    {: RESULT = e; :}
            |   ACCESO:e                     {: RESULT = new Acceso(e, eleft, eright); :}
            |   MEMORIA_VIRTUAL:e            {: RESULT = e; :}
+           |   LLAMADA:e                    {: RESULT = e; :}
            ;
 
 ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, true, eleft,eright));:}
            | ACCESO:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
-           | ACCESO parenI LISTA_EXPRESION parenD
+           //| ACCESO parenI LISTA_EXPRESION parenD
            | ACCESO:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, true, eleft, eright)); :}
            ;
 
-LLAMADA ::= identificador parenI LISTA_EXPRESION parenD
+LLAMADA ::= identificador:e parenI LISTA_EXPRESION:e1 parenD {:RESULT = new Llamada(e, e1, eleft, eright);:}
+          | identificador:e parenI parenD {:RESULT = new Llamada(e, new ArrayList<Expresion>(), eleft, eright);:}
           ;
 
 ARITMETICA ::= menos  EXPRESION:e                 {: RESULT = new Operacion(e, Operador.MENOS_UNARIO, eleft, eright); :} %prec UMENOS 

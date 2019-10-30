@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class Simbolo {
 
     private String nombre;
+    private String nombreCompleto;
     private Tipo tipo;
     private String ambito;
     private String rol;
@@ -27,8 +28,10 @@ public class Simbolo {
     private boolean constante;
     private Expresion valor;
     private boolean primitivo;
+    private boolean referencia;
+    private Ambito entorno;
     private ArrayList<AST> instrucciones;
-    private ArrayList<AST> parametros;
+    private ArrayList<Parametro> parametros;
 
     public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador) {
         this.nombre = nombre;
@@ -38,6 +41,18 @@ public class Simbolo {
         this.nivel = nivel;
         this.apuntador = apuntador;
         this.constante = constante;
+        this.apuntadorRef = -1;
+    }
+
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, Expresion valor, boolean constante, int apuntador, boolean referencia) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ambito = ambito;
+        this.rol = rol;
+        this.nivel = nivel;
+        this.apuntador = apuntador;
+        this.constante = constante;
+        this.referencia = referencia;
         this.apuntadorRef = -1;
     }
     
@@ -76,7 +91,7 @@ public class Simbolo {
         this.apuntadorRef = apuntadorRef;
     }
 
-    public Simbolo(String nombre, ArrayList<AST> parametros, Tipo tipo, String ambito, String rol, String nivel, ArrayList<AST> instrucciones, boolean constante, int apuntador, int tamaño) {
+    public Simbolo(String nombre, ArrayList<Parametro> parametros, Tipo tipo, String ambito, String rol, String nivel, ArrayList<AST> instrucciones, boolean constante, int apuntador, int tamaño) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ambito = ambito;
@@ -87,6 +102,16 @@ public class Simbolo {
         this.constante = constante;
         this.tamaño = tamaño;
         this.parametros = parametros;
+        this.apuntadorRef = -1;
+    }
+
+    public Simbolo(String nombre, String nombreCompleto, ArrayList<Parametro> parametros, Tipo tipo, int tamaño, Ambito entorno) {
+        this.nombre = nombre;
+        this.nombreCompleto = nombreCompleto;
+        this.tipo = tipo;
+        this.tamaño = tamaño;
+        this.parametros = parametros;
+        this.entorno = entorno;
         this.apuntadorRef = -1;
     }
 
@@ -185,5 +210,41 @@ public class Simbolo {
 
     public void setApuntadorRef(int apuntadorRef) {
         this.apuntadorRef = apuntadorRef;
+    }
+
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    public ArrayList<Parametro> getParametros() {
+        return parametros;
+    }
+
+    public void setParametros(ArrayList<Parametro> parametros) {
+        this.parametros = parametros;
+    }
+
+    public void setValor(Expresion valor) {
+        this.valor = valor;
+    }
+
+    public Ambito getEntorno() {
+        return entorno;
+    }
+
+    public void setEntorno(Ambito entorno) {
+        this.entorno = entorno;
+    }
+
+    public boolean isReferencia() {
+        return referencia;
+    }
+
+    public void setReferencia(boolean referencia) {
+        this.referencia = referencia;
     }
 }
