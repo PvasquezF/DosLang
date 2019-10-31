@@ -180,7 +180,16 @@ public class Operacion implements Expresion {
                 codigo += "^," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
                 break;
             case MENOR_QUE:
-                codigo += "jl," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                String temp1 = tabla.getTemporal();
+                String label1 = tabla.getEtiqueta();
+                String label2 = tabla.getEtiqueta();
+                codigo += "jl," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                codigo += "=,0,," + temp1 + "\n";
+                codigo += "jmp,,," + label2 + "\n";
+                codigo += label1 + ":\n";
+                codigo += "=,1,," + temp1 + "\n";
+                codigo += label2 + ":\n";
+                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
                 break;
             case MENOR_IGUAL:
                 codigo += "jle," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
