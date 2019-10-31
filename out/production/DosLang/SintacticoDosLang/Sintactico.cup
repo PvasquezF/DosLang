@@ -272,7 +272,7 @@ ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacio
              ;
 
 TRANSFERENCIA ::= detener:e pComa {:RESULT = new Break(eleft, eright);:}
-                | continuar pComa
+                | continuar:e pComa {:RESULT = new Continue(eleft, eright);:}
                 | salir pComa
                 ;
 

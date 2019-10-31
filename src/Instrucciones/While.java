@@ -41,6 +41,7 @@ public class While implements Instruccion {
             }
         }
         tabla.getSentenciasBreakActivas().clear();
+        tabla.getSentenciasContinueActivas().clear();
         return null;
     }
 
@@ -51,7 +52,7 @@ public class While implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Iniciando While\n";
         String temp1 = tabla.getTemporal();
         String label1 = tabla.getEtiqueta();
         String label2 = tabla.getEtiqueta();
@@ -62,12 +63,17 @@ public class While implements Instruccion {
         for (int i = 0; i < this.instrucciones.size(); i++) {
             codigo += this.instrucciones.get(i).get4D(tabla, arbol);
         }
+        for (Object o : tabla.getEtiquetasContinue()) {
+            codigo += (String) o + ": // Continue\n";
+        }
         codigo += "jmp,,," + label2 + "\n";
         codigo += label1 + ":\n";
         for (Object o : tabla.getEtiquetasBreak()) {
             codigo += (String) o + ": // Break\n";
         }
         tabla.getEtiquetasBreak().clear();
+        tabla.getEtiquetasContinue().clear();
+        codigo += "// Fin WHILE\n";
         return codigo;
     }
 }

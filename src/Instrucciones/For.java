@@ -71,6 +71,7 @@ public class For implements Instruccion {
         }
         Aumento = new Asignacion(a.variable, op, fila, columna);
         tabla.getSentenciasBreakActivas().clear();
+        tabla.getSentenciasContinueActivas().clear();
         return null;
     }
 
@@ -98,12 +99,16 @@ public class For implements Instruccion {
             codigo += ast.get4D(tabla, arbol);
         }
         codigo += Aumento.get4D(tabla, arbol);
+        for (Object o : tabla.getEtiquetasContinue()) {
+            codigo += (String) o + ": // Continue\n";
+        }
         codigo += "jmp,,," + label1 + "\n";
         codigo += label2 + ":\n";
         for (Object o : tabla.getEtiquetasBreak()) {
             codigo += (String) o + ": // Break\n";
         }
         tabla.getEtiquetasBreak().clear();
+        tabla.getEtiquetasContinue().clear();
         return codigo;
     }
 }

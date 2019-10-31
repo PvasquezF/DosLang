@@ -41,6 +41,7 @@ public class Repeat implements Instruccion {
             }
         }
         tabla.getSentenciasBreakActivas().clear();
+        tabla.getSentenciasContinueActivas().clear();
         return null;
     }
 
@@ -58,6 +59,9 @@ public class Repeat implements Instruccion {
         for (int i = 0; i < this.instrucciones.size(); i++) {
             codigo += this.instrucciones.get(i).get4D(tabla, arbol);
         }
+        for (Object o : tabla.getEtiquetasContinue()) {
+            codigo += (String) o + ": // Continue\n";
+        }
         codigo += this.condicion.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
         codigo += "je," + temp1 + ",1," + label1 + "\n";
@@ -65,6 +69,7 @@ public class Repeat implements Instruccion {
             codigo += (String) o + ": // Break\n";
         }
         tabla.getEtiquetasBreak().clear();
+        tabla.getEtiquetasContinue().clear();
         return codigo;
     }
 }

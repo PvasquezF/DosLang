@@ -98,6 +98,16 @@ public class Procedimiento extends Simbolo implements Instruccion {
             }
             tabla.getSentenciasBreakActivas().clear();
         }
+
+        if (tabla.getSentenciasContinueActivas().size() > 0) {
+            for (Object o : tabla.getSentenciasContinueActivas()) {
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        "Sentencia continue fuera de ciclo.",
+                        ((Continue) o).getFila(), ((Continue) o).getColumna());
+                arbol.getErrores().add(exc);
+            }
+            tabla.getSentenciasContinueActivas().clear();
+        }
         return null;
     }
 
