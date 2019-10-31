@@ -43,7 +43,7 @@ terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
 non terminal WITH;
-non terminal TRANSFERENCIA, READ;
+non terminal READ;
 
 non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
@@ -53,7 +53,7 @@ non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH, WHILE, REPEAT, FOR;
+non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH, WHILE, REPEAT, FOR, TRANSFERENCIA;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -252,7 +252,7 @@ LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESUL
 
 INSTRUCCION ::= WITH
               | ASIGNACION:e pComa {:RESULT = e;:}
-              | TRANSFERENCIA
+              | TRANSFERENCIA:e {:RESULT = e;:}
               | SI:e {:RESULT = e;:}
               | WHILE:e {:RESULT = e;:}
               | REPEAT:e {:RESULT = e;:}
@@ -271,7 +271,7 @@ WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES
 ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}
              ;
 
-TRANSFERENCIA ::= detener pComa
+TRANSFERENCIA ::= detener:e pComa {:RESULT = new Break(eleft, eright);:}
                 | continuar pComa
                 | salir pComa
                 ;

@@ -70,6 +70,7 @@ public class For implements Instruccion {
             this.condicion = new Operacion(acceso, condicion, Operacion.Operador.MAYOR_IGUAL, fila, columna);
         }
         Aumento = new Asignacion(a.variable, op, fila, columna);
+        tabla.getSentenciasBreakActivas().clear();
         return null;
     }
 
@@ -93,11 +94,16 @@ public class For implements Instruccion {
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
         codigo += "je," + temp1 + ",0," + label2 + "\n";
         for (int i = 0; i < this.instrucciones.size(); i++) {
-            codigo += this.instrucciones.get(i).get4D(tabla, arbol);
+            AST ast = this.instrucciones.get(i);
+            codigo += ast.get4D(tabla, arbol);
         }
         codigo += Aumento.get4D(tabla, arbol);
         codigo += "jmp,,," + label1 + "\n";
         codigo += label2 + ":\n";
+        for (Object o : tabla.getEtiquetasBreak()) {
+            codigo += (String) o + ": // Break\n";
+        }
+        tabla.getEtiquetasBreak().clear();
         return codigo;
     }
 }

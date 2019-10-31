@@ -40,6 +40,7 @@ public class Repeat implements Instruccion {
                 return result;
             }
         }
+        tabla.getSentenciasBreakActivas().clear();
         return null;
     }
 
@@ -60,6 +61,10 @@ public class Repeat implements Instruccion {
         codigo += this.condicion.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
         codigo += "je," + temp1 + ",1," + label1 + "\n";
+        for (Object o : tabla.getEtiquetasBreak()) {
+            codigo += (String) o + ": // Break\n";
+        }
+        tabla.getEtiquetasBreak().clear();
         return codigo;
     }
 }

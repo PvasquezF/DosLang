@@ -40,6 +40,7 @@ public class While implements Instruccion {
                 return result;
             }
         }
+        tabla.getSentenciasBreakActivas().clear();
         return null;
     }
 
@@ -63,6 +64,10 @@ public class While implements Instruccion {
         }
         codigo += "jmp,,," + label2 + "\n";
         codigo += label1 + ":\n";
+        for (Object o : tabla.getEtiquetasBreak()) {
+            codigo += (String) o + ": // Break\n";
+        }
+        tabla.getEtiquetasBreak().clear();
         return codigo;
     }
 }

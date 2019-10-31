@@ -51,6 +51,15 @@ public class Main extends Simbolo implements Instruccion {
         }
         tabla.setAmbito(nombreAmbitoAnterior);
         tabla.setEnviroment(entorno.getAnterior());
+        if (tabla.getSentenciasBreakActivas().size() > 0) {
+            for (Object o : tabla.getSentenciasBreakActivas()) {
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        "Sentencia break fuera de ciclo.",
+                        ((Break) o).getFila(), ((Break) o).getColumna());
+                arbol.getErrores().add(exc);
+            }
+            tabla.getSentenciasBreakActivas().clear();
+        }
         return null;
     }
 

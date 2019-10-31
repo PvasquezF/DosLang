@@ -33,12 +33,17 @@ public class Tabla {
     private int funcionSizeActual;
     private Ambito enviroment;
     private Stack tamañoActualFuncion;
+    private Stack etiquetasBreak;
+    private Stack sentenciasBreakActivas;
+
     public Tabla() {
         this.enviroment = new Ambito(null);
         tabla = new ArrayList<>();
         listaAmbitos = new Stack();
         funcionSizeActual = 0;
         this.tamañoActualFuncion = new Stack();
+        this.etiquetasBreak = new Stack();
+        this.sentenciasBreakActivas = new Stack();
     }
 
     public String InsertarVariable(Simbolo simbolo) {
@@ -253,5 +258,21 @@ public class Tabla {
 
     public void setTamañoActualFuncion(Stack tamañoActualFuncion) {
         this.tamañoActualFuncion = tamañoActualFuncion;
+    }
+
+    public Stack getEtiquetasBreak() {
+        return etiquetasBreak;
+    }
+
+    public void setEtiquetasBreak(Stack etiquetasBreak) {
+        this.etiquetasBreak = etiquetasBreak;
+    }
+
+    public Stack getSentenciasBreakActivas() {
+        return sentenciasBreakActivas;
+    }
+
+    public void setSentenciasBreakActivas(Stack sentenciasBreakActivas) {
+        this.sentenciasBreakActivas = sentenciasBreakActivas;
     }
 }
