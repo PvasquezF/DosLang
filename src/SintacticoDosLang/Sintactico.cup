@@ -43,7 +43,7 @@ terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
 non terminal WITH;
-non terminal TRANSFERENCIA, REPEAT, FOR, READ;
+non terminal TRANSFERENCIA, READ;
 
 non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
@@ -53,7 +53,7 @@ non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH, WHILE;
+non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH, WHILE, REPEAT, FOR;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -255,8 +255,8 @@ INSTRUCCION ::= WITH
               | TRANSFERENCIA
               | SI:e {:RESULT = e;:}
               | WHILE:e {:RESULT = e;:}
-              | REPEAT
-              | FOR
+              | REPEAT:e {:RESULT = e;:}
+              | FOR:e {:RESULT = e;:}
               | WRITE:e {:RESULT = e;:}
               | READ
               | SWITCH:e {:RESULT = e;:}
@@ -309,13 +309,13 @@ WHILE ::= mientras EXPRESION:e hacer BLOQUE_INSTRUCCIONES:e1 {: RESULT = new Whi
         | mientras EXPRESION:e hacer INSTRUCCION:e1 {: ArrayList<AST> insWhile = new ArrayList<>(); insWhile.add(e1); RESULT = new While(e, insWhile, eleft, eright);:}
         ;
 
-REPEAT ::= repeat LISTA_INSTRUCCIONES until EXPRESION pComa
+REPEAT ::= repeat LISTA_INSTRUCCIONES:e until EXPRESION:e1 pComa {:RESULT = new Repeat(e1, e, eleft, eright);:}
          ;
 
-FOR ::= para ASIGNACION to EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
-      | para ASIGNACION downto EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
-      | para ASIGNACION to EXPRESION hacer INSTRUCCION
-      | para ASIGNACION downto EXPRESION hacer INSTRUCCION
+FOR ::= para ASIGNACION:e to EXPRESION:e1 hacer BLOQUE_INSTRUCCIONES:e2 {: RESULT = new For(e, e1, e2, true, eleft, eright);:}
+      | para ASIGNACION:e downto EXPRESION:e1 hacer BLOQUE_INSTRUCCIONES:e2 {: RESULT = new For(e, e1, e2, false, eleft, eright);:}
+      | para ASIGNACION:e to EXPRESION:e1 hacer INSTRUCCION:e2 {: ArrayList<AST> insFor = new ArrayList<>(); insFor.add(e2); RESULT = new For(e, e1, insFor, true, eleft, eright);:}
+      | para ASIGNACION:e downto EXPRESION:e1 hacer INSTRUCCION:e2 {: ArrayList<AST> insFor = new ArrayList<>(); insFor.add(e2); RESULT = new For(e, e1, insFor, false, eleft, eright);:}
       ;
 
 WRITE ::= escribir parenI LISTA_EXPRESION:e parenD pComa {: RESULT = new Write(e, eleft, eright); :}
