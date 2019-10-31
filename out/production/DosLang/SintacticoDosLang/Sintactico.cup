@@ -273,7 +273,7 @@ ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacio
 
 TRANSFERENCIA ::= detener:e pComa {:RESULT = new Break(eleft, eright);:}
                 | continuar:e pComa {:RESULT = new Continue(eleft, eright);:}
-                | salir pComa
+                | salir:e pComa {:RESULT = new Salir(eleft, eright);:}
                 ;
 
 SI ::= si EXPRESION:e then INSIF:e1 sino INSIF:e2 {: RESULT = new If(e, e1, e2, eleft, eright); :}

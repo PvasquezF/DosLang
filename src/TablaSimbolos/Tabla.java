@@ -37,6 +37,8 @@ public class Tabla {
     private Stack sentenciasBreakActivas;
     private Stack etiquetasContinue;
     private Stack sentenciasContinueActivas;
+    private Stack etiquetasExit;
+    private Stack sentenciasExitActivas;
 
     public Tabla() {
         this.enviroment = new Ambito(null);
@@ -48,6 +50,8 @@ public class Tabla {
         this.sentenciasBreakActivas = new Stack();
         this.etiquetasContinue = new Stack();
         this.sentenciasContinueActivas = new Stack();
+        this.etiquetasExit = new Stack();
+        this.sentenciasExitActivas = new Stack();
     }
 
     public String InsertarVariable(Simbolo simbolo) {
@@ -294,5 +298,21 @@ public class Tabla {
 
     public void setSentenciasContinueActivas(Stack sentenciasContinueActivas) {
         this.sentenciasContinueActivas = sentenciasContinueActivas;
+    }
+
+    public Stack getEtiquetasExit() {
+        return etiquetasExit;
+    }
+
+    public void setEtiquetasExit(Stack etiquetasExit) {
+        this.etiquetasExit = etiquetasExit;
+    }
+
+    public Stack getSentenciasExitActivas() {
+        return sentenciasExitActivas;
+    }
+
+    public void setSentenciasExitActivas(Stack sentenciasExitActivas) {
+        this.sentenciasExitActivas = sentenciasExitActivas;
     }
 }

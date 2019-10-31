@@ -86,6 +86,10 @@ public class Main extends Simbolo implements Instruccion {
         for (AST ins : this.instrucciones) {
             codigo += ins.get4D(tabla, arbol);
         }
+        for (Object o : tabla.getEtiquetasExit()) {
+            codigo += (String) o + ": // Exit\n";
+        }
+        tabla.getEtiquetasExit().clear();
         codigo += "end,,,main\n";
         //codigo += "=," + this.instrucciones.size() + ",," + temp1 + "\n";
         //codigo += "+,p," + temp1 + ",p\n";

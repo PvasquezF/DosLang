@@ -4,19 +4,19 @@ import Interfaces.Instruccion;
 import TablaSimbolos.Tabla;
 import TablaSimbolos.Tree;
 
-public class Continue implements Instruccion {
+public class Salir implements Instruccion {
 
     private int fila;
     private int columna;
 
-    public Continue(int fila, int columna) {
+    public Salir(int fila, int columna) {
         this.fila = fila;
         this.columna = columna;
     }
 
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
-        tabla.getSentenciasContinueActivas().push(this);
+        tabla.getSentenciasExitActivas().push(this);
         return this;
     }
 
@@ -29,7 +29,7 @@ public class Continue implements Instruccion {
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "";
         codigo += "jmp,,," + tabla.getEtiqueta() + "\n";
-        tabla.getEtiquetasContinue().push(tabla.getEtiquetaActual());
+        tabla.getEtiquetasExit().push(tabla.getEtiquetaActual());
         return codigo;
     }
 

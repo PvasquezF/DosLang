@@ -137,6 +137,10 @@ public class Procedimiento extends Simbolo implements Instruccion {
             AST instruccion = instrucciones.get(i);
             codigo += instruccion.get4D(tabla, arbol);
         }
+        for (Object o : tabla.getEtiquetasExit()) {
+            codigo += (String) o + ": // Exit\n";
+        }
+        tabla.getEtiquetasExit().clear();
         codigo += "end,,," + this.getNombreCompleto() + "\n";
         tabla.setEnviroment(this.getEntorno().getAnterior());
         tabla.getTamañoActualFuncion().pop();
