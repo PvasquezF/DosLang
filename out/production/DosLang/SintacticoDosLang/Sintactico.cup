@@ -44,24 +44,24 @@ terminal char caracter;
 non terminal INICIO;
 non terminal WITH;
 non terminal TRANSFERENCIA, WHILE, REPEAT, FOR, READ;
-non terminal CASE, CASELIST, DEFECTO, SWITCH;
-
 
 non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
-non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES, INSIF, INSTRUCCIONESIF;
+non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES, INSIF, INSTRUCCIONESIF, DEFECTO;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI;
+non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
 non terminal Dimension RANGO_ARRAY;
 non terminal Registro RECORDS;
+non terminal Case CASE;
 non terminal ArrayList<Parametro> PARAMETROS, LISTA_PARAMETROS;
+non terminal ArrayList<Case> CASELIST;
 
 //precedence left then;
 precedence left sino;
@@ -259,7 +259,7 @@ INSTRUCCION ::= WITH
               | FOR
               | WRITE:e {:RESULT = e;:}
               | READ
-              | SWITCH
+              | SWITCH:e {:RESULT = e;:}
               | free parenI EXPRESION parenD pComa
               | LLAMADA:e pComa {:RESULT = e;:}
               ;
@@ -289,20 +289,20 @@ INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES:e end {:RESULT = e; :}
                   | begin end {:RESULT = new ArrayList<AST>();:}
                   ;
 
-SWITCH ::= caso EXPRESION of CASELIST end pComa
-       | caso EXPRESION of CASELIST DEFECTO end pComa
+SWITCH ::= caso EXPRESION:e of CASELIST:e1 end pComa {:RESULT = new SwitchCase(e, e1, new ArrayList<AST>(), eleft, eright);:}
+       |   caso EXPRESION:e of CASELIST:e1 DEFECTO:e2 end pComa {:RESULT = new SwitchCase(e, e1, e2, eleft, eright);:}
        ;
 
-CASELIST ::= CASELIST CASE
-           | CASE
+CASELIST ::= CASELIST:e CASE:e1 {:RESULT = e; RESULT.add(e1);:}
+           | CASE:e {:RESULT = new ArrayList<Case>(); RESULT.add(e);:}
            ;
 
-CASE ::= EXPRESION dosPuntos INSTRUCCION
-       | EXPRESION dosPuntos BLOQUE_INSTRUCCIONES
+CASE ::= LISTA_EXPRESION:e dosPuntos INSTRUCCION:e1 {: ArrayList<AST> insSwitch = new ArrayList<>(); insSwitch.add(e1); RESULT = new Case(e, insSwitch);:}
+       | LISTA_EXPRESION:e dosPuntos BLOQUE_INSTRUCCIONES:e1 {:RESULT = new Case(e, e1);:}
        ;
 
-DEFECTO ::= sino INSTRUCCION
-          | sino BLOQUE_INSTRUCCIONES
+DEFECTO ::= sino INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+          | sino BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
           ;
 
 WHILE ::= mientras EXPRESION hacer BLOQUE_INSTRUCCIONES pComa
