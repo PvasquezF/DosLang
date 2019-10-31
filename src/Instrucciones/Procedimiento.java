@@ -65,8 +65,6 @@ public class Procedimiento extends Simbolo implements Instruccion {
             parametro.ejecutar(tabla, arbol);
             tamaño += parametro.getIdentificador().size();
         }
-        this.setNombreCompleto(generarNombreCompleto());
-        this.setAmbito(generarNombreCompleto());
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
             declaracion.setStack(true);

@@ -56,16 +56,6 @@ public class DosLang extends Thread {
 
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof DeclaracionConstante
-                    || ins instanceof DeclaracionVar
-                    || ins instanceof DeclaracionType
-                    || ins instanceof Program) {
-                ins.ejecutar(tabla, t);
-            }
-        }
-
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof Funcion) {
                 Funcion f = (Funcion) ins;
                 tabla.InsertarFuncion(f);
@@ -85,13 +75,21 @@ public class DosLang extends Thread {
             }
         }
 
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+        /*for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof Funcion || ins instanceof Procedimiento || ins instanceof Asignacion) {
                 ins.ejecutar(tabla, t);
             }
+        }*/
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            AST ins = t.getInstrucciones().get(i);
+            Object respuesta = null;
+            if (ins instanceof Instruccion) {
+                ((Instruccion) ins).ejecutar(tabla, t);
+            } else {
+                ((Expresion) ins).getTipo(tabla, t);
+            }
         }
-
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof DeclaracionConstante || ins instanceof DeclaracionVar || ins instanceof DeclaracionType) {
@@ -99,7 +97,7 @@ public class DosLang extends Thread {
             }
         }
 
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+        /*for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof Main) {
                 Main m = (Main) ins;
@@ -112,12 +110,12 @@ public class DosLang extends Thread {
                 }
                 break;
             }
-        }
+        }*/
 
         Cuadruplos += ReservarMemoria.Reservar(tabla, espaciosReservaHeap);
         errores.addAll(t.getErrores());
         if (errores.size() == 0) {
-            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            /*for (int i = 0; i < t.getInstrucciones().size(); i++) {
                 Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
                 if (ins instanceof DeclaracionConstante
                         || ins instanceof DeclaracionVar
@@ -133,8 +131,11 @@ public class DosLang extends Thread {
                 if (ins instanceof Main) {
                     Cuadruplos += ins.get4D(tabla, t);
                 }
+            }*/
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                AST ins = t.getInstrucciones().get(i);
+                Cuadruplos += ins.get4D(tabla, t);
             }
-
             GenerarNativas4D gn4D = new GenerarNativas4D();
             Cuadruplos += gn4D.generarConcatenacion(tabla);
             Cuadruplos += gn4D.generarPrint(tabla);
@@ -144,7 +145,7 @@ public class DosLang extends Thread {
             Cuadruplos += gn4D.generarLenght(tabla);
             Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
             System.out.println(Cuadruplos);
-        }else{
+        } else {
             errores.forEach(m -> {
                 System.err.println(m.ToString());
             });

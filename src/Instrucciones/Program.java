@@ -10,7 +10,6 @@ import TablaSimbolos.Tabla;
 import TablaSimbolos.Tree;
 
 /**
- *
  * @author Pavel
  */
 public class Program implements Instruccion {
@@ -33,11 +32,12 @@ public class Program implements Instruccion {
 
     @Override
     public String get4D(Tabla tabla, Tree arbol) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String codigo = "";
+        return codigo;
     }
 
     @Override
     public int getEspacios(int espacios) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return 0;
     }
 }

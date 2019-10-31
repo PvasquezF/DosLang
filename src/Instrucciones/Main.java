@@ -4,10 +4,7 @@ import Excepciones.Excepcion;
 import Interfaces.AST;
 import Interfaces.Expresion;
 import Interfaces.Instruccion;
-import TablaSimbolos.Simbolo;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tipo;
-import TablaSimbolos.Tree;
+import TablaSimbolos.*;
 
 import java.util.ArrayList;
 
@@ -17,7 +14,7 @@ public class Main extends Simbolo implements Instruccion {
     private int columna;
 
     public Main(ArrayList<AST> instrucciones, int fila, int columna) {
-        super("main", new ArrayList<>(), new Tipo(Tipo.tipo.VOID), "", "Clase principal", "Global", instrucciones, false, -1, instrucciones.size());
+        super("main", new ArrayList<>(), new Tipo(Tipo.tipo.VOID), "", "Clase principal", "Global", instrucciones, false, 0, instrucciones.size());
         this.instrucciones = instrucciones;
         this.fila = fila;
         this.columna = columna;
@@ -26,6 +23,13 @@ public class Main extends Simbolo implements Instruccion {
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
         String result = tabla.InsertarFuncion(this);
+        Ambito entorno = new Ambito(tabla.getEnviroment());
+        String nombreAmbitoAnterior = tabla.getAmbito();
+        this.setEntorno(entorno);
+        this.setAmbito(nombreAmbitoAnterior);
+        this.setNombreCompleto("main");
+        tabla.setEnviroment(entorno);
+        tabla.setAmbito(this.getNombreCompleto());
         if (result != null) {
             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                     (String) result,
@@ -45,6 +49,8 @@ public class Main extends Simbolo implements Instruccion {
                 return respuesta;
             }
         }
+        tabla.setAmbito(nombreAmbitoAnterior);
+        tabla.setEnviroment(entorno.getAnterior());
         return null;
     }
 

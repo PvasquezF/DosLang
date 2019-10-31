@@ -42,24 +42,20 @@ terminal String detener, continuar, salir, escribir, escribirln;
 terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
-non terminal ENUM_TYPE, ARRAY_TYPE;
-non terminal CUERPO_FUNCION;
 non terminal WITH;
-non terminal SI, LISTAIF, INSTRUCCIONESIF;
-non terminal TRANSFERENCIA, LISTAIFFINAL, WHILE, REPEAT, FOR, READ;
+non terminal TRANSFERENCIA, WHILE, REPEAT, FOR, READ;
 non terminal CASE, CASELIST, DEFECTO, SWITCH;
-non terminal INSIF;
 
 
 non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
-non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES;
+non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES, INSIF, INSTRUCCIONESIF;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST FUNCION, SUBRANGE_TYPE, MAIN, WRITE, PROCEDURE;
+non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -102,30 +98,16 @@ LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS:e DECLARACION_TIPOS:e1 {:RES
                           ;
 
 DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
-                    //| ENUM_TYPE pComa
-                    //| SUBRANGE_TYPE:e pComa {:RESULT = e;:}
-                    //| ARRAY_TYPE pComa
                     ;
 
 TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igual TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
-                   //| LISTA_IDENTIFICADORES igual REGISTRO
                    ;
-
-//ENUM_TYPE ::= LISTA_IDENTIFICADORES igual parenI LISTA_EXPRESION parenD {: RESULT = new; :}
-//            ;
-
-//SUBRANGE_TYPE ::= LISTA_IDENTIFICADORES:e igual LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {: RESULT = new DeclaracionType(new Tipo(Tipo.tipo.RANGE, null, e1, e2), e, eleft, eright); :}
-//                ;
 
 LOWER_LIMIT ::= EXPRESION:e {:RESULT = e;:}
             ; 
 
 UPPER_LIMIT ::= EXPRESION:e {:RESULT = e;:} 
             ; 
-
-ARRAY_TYPE ::= LISTA_IDENTIFICADORES igual ARRAY_DECLARATION
-             | LISTA_IDENTIFICADORES igual ARRAY_DECLARATION_MULTI
-             ;
 
 ARRAY_DECLARATION ::= array corI RANGO_ARRAY:e corD of ARRAY_DECLARATION:e1 {:
                                 RESULT = e1;
@@ -216,7 +198,6 @@ DECLARACION_VAR ::= DECLARACION_VAR:e VAR:e1 {:RESULT = e; RESULT.add(e1);:}
 
 VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright);:}
       | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 pComa {: RESULT = new DeclaracionVar(e1, e, eleft, eright); :}
-      //| LISTA_IDENTIFICADORES dosPuntos REGISTRO pComa
       ;
 
 SECCION_FUNCION ::= METHOD_LIST:e MAIN:e1 {:RESULT = e; RESULT.add(e1);:}
@@ -247,10 +228,6 @@ LISTA_PARAMETROS ::= LISTA_PARAMETROS:e pComa LISTA_IDENTIFICADORES:e1 dosPuntos
                    | var LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 {: RESULT = new ArrayList<Parametro>(); RESULT.add(new Parametro(e1, e, true, eleft, eright)); :}
                    ;
 
-CUERPO_FUNCION ::= VARINIT BLOQUE_INSTRUCCIONES
-                 | BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
-                 ;
-
 REGISTRO ::= record LISTA_RECORDS:e end {:RESULT = e;:}
            ;
 
@@ -259,8 +236,6 @@ LISTA_RECORDS ::= LISTA_RECORDS:e RECORDS:e1 {:RESULT = e; RESULT.add(e1);:}
                 ;
 
 RECORDS ::= identificador:e dosPuntos TIPO:e1 pComa {: RESULT = new Registro(e1, e); :}
-          //| LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION pComa
-          //| LISTA_IDENTIFICADORES dosPuntos ARRAY_DECLARATION_MULTI pComa
           ;
 
 MAIN ::= begin LISTA_INSTRUCCIONES:e end punto {:RESULT = new Main(e, eleft, eright);:}
@@ -278,7 +253,7 @@ LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESUL
 INSTRUCCION ::= WITH
               | ASIGNACION:e pComa {:RESULT = e;:}
               | TRANSFERENCIA
-              | SI
+              | SI:e {:RESULT = e;:}
               | WHILE
               | REPEAT
               | FOR
@@ -301,17 +276,17 @@ TRANSFERENCIA ::= detener pComa
                 | salir pComa
                 ;
 
-SI ::= si EXPRESION then INSIF sino INSIF
-     | si EXPRESION then INSIF
+SI ::= si EXPRESION:e then INSIF:e1 sino INSIF:e2 {: RESULT = new If(e, e1, e2, eleft, eright); :}
+     | si EXPRESION:e then INSIF:e1 {: RESULT = new If(e, e1, new ArrayList<AST>(), eleft, eright); :}
      ;
 
-INSIF ::= INSTRUCCIONESIF
-        | INSTRUCCIONESIF pComa
-        | INSTRUCCION
+INSIF ::= INSTRUCCIONESIF:e  {:RESULT = e; :}
+        | INSTRUCCIONESIF:e pComa  {:RESULT = e; :} 
+        | INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e); :}
         ;
 
-INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES end
-                  | begin end
+INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES:e end {:RESULT = e; :} 
+                  | begin end {:RESULT = new ArrayList<AST>();:}
                   ;
 
 SWITCH ::= caso EXPRESION of CASELIST end pComa

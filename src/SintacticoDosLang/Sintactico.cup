@@ -43,21 +43,19 @@ terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
 non terminal WITH;
-non terminal SI, INSTRUCCIONESIF;
 non terminal TRANSFERENCIA, WHILE, REPEAT, FOR, READ;
 non terminal CASE, CASELIST, DEFECTO, SWITCH;
-non terminal INSIF;
 
 
 non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
 non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
-non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES;
+non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES, INSIF, INSTRUCCIONESIF;
 non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
 non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
-non terminal AST FUNCION, MAIN, WRITE, PROCEDURE;
+non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
 non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
@@ -255,7 +253,7 @@ LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESUL
 INSTRUCCION ::= WITH
               | ASIGNACION:e pComa {:RESULT = e;:}
               | TRANSFERENCIA
-              | SI
+              | SI:e {:RESULT = e;:}
               | WHILE
               | REPEAT
               | FOR
@@ -278,17 +276,17 @@ TRANSFERENCIA ::= detener pComa
                 | salir pComa
                 ;
 
-SI ::= si EXPRESION then INSIF sino INSIF
-     | si EXPRESION then INSIF
+SI ::= si EXPRESION:e then INSIF:e1 sino INSIF:e2 {: RESULT = new If(e, e1, e2, eleft, eright); :}
+     | si EXPRESION:e then INSIF:e1 {: RESULT = new If(e, e1, new ArrayList<AST>(), eleft, eright); :}
      ;
 
-INSIF ::= INSTRUCCIONESIF
-        | INSTRUCCIONESIF pComa
-        | INSTRUCCION
+INSIF ::= INSTRUCCIONESIF:e  {:RESULT = e; :}
+        | INSTRUCCIONESIF:e pComa  {:RESULT = e; :} 
+        | INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e); :}
         ;
 
-INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES end
-                  | begin end
+INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES:e end {:RESULT = e; :} 
+                  | begin end {:RESULT = new ArrayList<AST>();:}
                   ;
 
 SWITCH ::= caso EXPRESION of CASELIST end pComa
