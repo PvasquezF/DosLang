@@ -42,7 +42,6 @@ terminal String detener, continuar, salir, escribir, escribirln;
 terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
-non terminal WITH;
 non terminal READ;
 
 non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
@@ -52,7 +51,7 @@ non terminal ArrayList<String> LISTA_IDENTIFICADORES;
 non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
 non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
 non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
-non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION;
+non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION, WITH;
 non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH, WHILE, REPEAT, FOR, TRANSFERENCIA;
 non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
 non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
@@ -250,7 +249,7 @@ LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESUL
                       | INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                       ;
 
-INSTRUCCION ::= WITH
+INSTRUCCION ::= WITH:e {:RESULT = e;:}
               | ASIGNACION:e pComa {:RESULT = e;:}
               | TRANSFERENCIA:e {:RESULT = e;:}
               | SI:e {:RESULT = e;:}
@@ -264,8 +263,12 @@ INSTRUCCION ::= WITH
               | LLAMADA:e pComa {:RESULT = e;:}
               ;
 
-WITH ::= con identificador hacer BLOQUE_INSTRUCCIONES 
-       | con identificador hacer INSTRUCCION
+WITH ::= con identificador:e hacer BLOQUE_INSTRUCCIONES:e1 {:
+                                                ArrayList<Expresion> listaExp = new ArrayList<>();
+                                                listaExp.add(new Identificador(e, eleft, eright));
+                                                RESULT = new With(new AccesoVariable(listaExp, eleft, eright), e1, eleft, eright);
+                                                        :}
+       | con identificador:e hacer INSTRUCCION:e1
        ;
 
 ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}

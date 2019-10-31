@@ -120,6 +120,22 @@ public class Acceso implements Expresion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
+        // Bloque para variables with
+        Identificador identificadorAux = (Identificador) accesos.get(0);
+        Simbolo simAux = (Simbolo) tabla.getVariable(identificadorAux.getIdentificador());
+        if (simAux != null && simAux.isWith()) {
+            ArrayList<Expresion> listaNueva = new ArrayList<>();
+            for (Expresion e : simAux.getAccesoVariable().getAccesos()) {
+                listaNueva.add(e);
+            }
+            listaNueva.addAll(this.getAccesos());
+            Identificador iden = (Identificador) listaNueva.get(0);
+            Identificador NuevoIden = new Identificador(iden.getIdentificador(), true, iden.getFila(), iden.getColumna());
+            listaNueva.set(0, NuevoIden);
+            this.setAccesos(listaNueva);
+        }
+        // Fin Bloque para variables with
+
         String codigo = "// Inicio acceso linea: " + fila + ", columna: " + columna + "\n";
         Tipo tipoResultado = null;
         String temp7 = tabla.getTemporal();

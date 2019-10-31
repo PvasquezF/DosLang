@@ -100,4 +100,11 @@ public class Identificador implements Expresion {
         return identificador;
     }
 
+    public int getFila() {
+        return fila;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
 }

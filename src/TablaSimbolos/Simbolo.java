@@ -5,6 +5,8 @@
  */
 package TablaSimbolos;
 
+import Expresiones.Acceso;
+import Instrucciones.AccesoVariable;
 import Interfaces.AST;
 import Interfaces.Expresion;
 
@@ -32,6 +34,9 @@ public class Simbolo {
     private Ambito entorno;
     private ArrayList<AST> instrucciones;
     private ArrayList<Parametro> parametros;
+    private boolean isWith;
+    private AccesoVariable accesoVariable;
+    private Acceso acceso;
 
     public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, boolean constante, int apuntador) {
         this.nombre = nombre;
@@ -50,6 +55,7 @@ public class Simbolo {
         this.ambito = ambito;
         this.rol = rol;
         this.nivel = nivel;
+        this.valor = valor;
         this.apuntador = apuntador;
         this.constante = constante;
         this.referencia = referencia;
@@ -112,6 +118,20 @@ public class Simbolo {
         this.tamaño = tamaño;
         this.parametros = parametros;
         this.entorno = entorno;
+        this.apuntadorRef = -1;
+    }
+
+    public Simbolo(String nombre, Tipo tipo, String ambito, String rol, String nivel, Expresion valor, boolean constante, int apuntador, boolean isWith, AccesoVariable accesoVariable) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ambito = ambito;
+        this.rol = rol;
+        this.nivel = nivel;
+        this.valor = valor;
+        this.apuntador = apuntador;
+        this.constante = constante;
+        this.isWith = isWith;
+        this.accesoVariable = accesoVariable;
         this.apuntadorRef = -1;
     }
 
@@ -246,5 +266,29 @@ public class Simbolo {
 
     public void setReferencia(boolean referencia) {
         this.referencia = referencia;
+    }
+
+    public boolean isWith() {
+        return isWith;
+    }
+
+    public void setWith(boolean with) {
+        isWith = with;
+    }
+
+    public AccesoVariable getAccesoVariable() {
+        return accesoVariable;
+    }
+
+    public void setAccesoVariable(AccesoVariable accesoVariable) {
+        this.accesoVariable = accesoVariable;
+    }
+
+    public Acceso getAcceso() {
+        return acceso;
+    }
+
+    public void setAcceso(Acceso acceso) {
+        this.acceso = acceso;
     }
 }
