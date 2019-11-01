@@ -263,12 +263,11 @@ INSTRUCCION ::= WITH:e {:RESULT = e;:}
               | LLAMADA:e pComa {:RESULT = e;:}
               ;
 
-WITH ::= con identificador:e hacer BLOQUE_INSTRUCCIONES:e1 {:
+WITH ::= con identificador:e hacer LISTA_INSTRUCCIONES:e1 end pComa {:
                                                 ArrayList<Expresion> listaExp = new ArrayList<>();
                                                 listaExp.add(new Identificador(e, eleft, eright));
                                                 RESULT = new With(new AccesoVariable(listaExp, eleft, eright), e1, eleft, eright);
                                                         :}
-       | con identificador:e hacer INSTRUCCION:e1
        ;
 
 ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}
