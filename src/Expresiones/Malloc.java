@@ -49,16 +49,25 @@ public class Malloc implements Expresion {
         String label2 = tabla.getEtiqueta();
         codigo += cantidad.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         codigo += "=,0,," + temp2 + "\n";
+        tabla.AgregarTemporal(temp2);
         codigo += "=,h,," + temp3 + "\n";
+        tabla.AgregarTemporal(temp3);
         codigo += label1 + ":\n";
         codigo += "jge," + temp2 + "," + temp1 + "," + label2 + "\n";
+        tabla.QuitarTemporal(temp2);
+        tabla.QuitarTemporal(temp1);
         codigo += "=,h,-1,heap\n";
         codigo += "+,h,1,h\n";
         codigo += "+," + temp2 + ",1," + temp2 + "\n";
+        tabla.AgregarTemporal(temp2);
         codigo += "jmp,,," + label1 + "\n";
         codigo += label2 + ":\n";
         codigo += "=," + temp3 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp3);
         return codigo;
     }
 }

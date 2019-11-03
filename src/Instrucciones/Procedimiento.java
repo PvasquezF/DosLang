@@ -127,7 +127,9 @@ public class Procedimiento extends Simbolo implements Instruccion {
         String temp1 = tabla.getTemporal();
         codigo += "begin,,," + this.getNombreCompleto() + "\n";
         codigo += "+,p,0," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
         codigo += "=," + temp1 + ",-1,stack\n";
+        tabla.QuitarTemporal(temp1);
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
             declaracion.setStack(true);

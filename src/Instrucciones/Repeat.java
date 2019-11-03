@@ -64,7 +64,10 @@ public class Repeat implements Instruccion {
         }
         codigo += this.condicion.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         codigo += "je," + temp1 + ",1," + label1 + "\n";
+        tabla.QuitarTemporal(temp1);
         for (Object o : tabla.getEtiquetasBreak()) {
             codigo += (String) o + ": // Break\n";
         }

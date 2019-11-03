@@ -15,6 +15,8 @@ public class Funcion extends Simbolo implements Instruccion {
     private ArrayList<AST> variables;
     private int fila;
     private int columna;
+    private int TemporalInicio;
+    private int TemporalFin;
 
     public Funcion(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, int fila, int columna) {
         super(nombre, nombre, parametros, tipo, 0, null);
@@ -123,7 +125,9 @@ public class Funcion extends Simbolo implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
+         //tabla.getTempNoUsados().clear();
         tabla.getTamañoActualFuncion().push(this.getTamaño());
+        tabla.getTempNoUsados().clear();
         String codigo = "";
         int indiceInicio = 0;
         int indiceFinal = 0;
@@ -132,7 +136,9 @@ public class Funcion extends Simbolo implements Instruccion {
         String temp1 = tabla.getTemporal();
         codigo += "begin,,," + this.getNombreCompleto() + "\n";
         codigo += "+,p,0," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
         codigo += "=," + temp1 + ",-1,stack\n";
+        tabla.QuitarTemporal(temp1);
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
             declaracion.setStack(true);

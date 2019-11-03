@@ -143,6 +143,8 @@ public class Acceso implements Expresion {
         Identificador identificador = (Identificador) accesos.get(0);
         codigo += identificador.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp7 + "\n";
+        tabla.AgregarTemporal(temp7);
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         Object result = tabla.getVariable(identificador.getIdentificador());
         if (result instanceof String) {
             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -170,27 +172,49 @@ public class Acceso implements Expresion {
                         String label1 = tabla.getEtiqueta();
                         String label2 = tabla.getEtiqueta();
                         codigo += "=,-1,," + temp4 + "\n";
+                        tabla.AgregarTemporal(temp4);
                         for (int j = 0; j < cantidadDimensiones; j++) {
                             Dimension dimension = tipoResultado.getDimensiones().get(j);
                             codigo += dimension.getLimiteInferior().get4D(tabla, arbol);
                             codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + " // Limite inferior, dimension " + j + "\n";
+                            tabla.AgregarTemporal(temp1);
+                            tabla.QuitarTemporal(tabla.getTemporalActual());
                             codigo += dimension.getLimiteSuperior().get4D(tabla, arbol);
                             codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + " // Limite superior, dimension " + j + "\n";
+                            tabla.AgregarTemporal(temp2);
+                            tabla.QuitarTemporal(tabla.getTemporalActual());
                             codigo += ((AccesoArreglo) acceso).getIndices().get(j).get4D(tabla, arbol);
                             codigo += "=," + tabla.getTemporalActual() + ",," + temp3 + " // indice dimension " + j + "\n";
+                            tabla.AgregarTemporal(temp3);
+                            tabla.QuitarTemporal(tabla.getTemporalActual());
                             codigo += "jl," + temp3 + "," + temp1 + "," + label1 + "\n";
+                            tabla.QuitarTemporal(temp3);
+                            tabla.QuitarTemporal(temp1);
                             codigo += "jge," + temp3 + "," + temp2 + "," + label2 + "\n";
                             if (j > 0) {
                                 codigo += "-," + temp2 + "," + temp1 + "," + temp5 + "// n" + j + "\n";
+                                tabla.AgregarTemporal(temp5);
+                                tabla.QuitarTemporal(temp2);
+                                tabla.QuitarTemporal(temp1);
                                 codigo += "*," + temp4 + "," + temp5 + "," + temp6 + "//(i-inf1)*n" + j + "\n";
+                                tabla.AgregarTemporal(temp6);
+                                tabla.QuitarTemporal(temp5);
+                                tabla.QuitarTemporal(temp4);
                             } else {
                                 codigo += "=,0,," + temp6 + "\n";
+                                tabla.AgregarTemporal(temp6);
                             }
                             codigo += "-," + temp3 + "," + temp1 + "," + temp4 + "\n";
+                            tabla.AgregarTemporal(temp4);
+                            tabla.QuitarTemporal(temp3);
+                            tabla.QuitarTemporal(temp1);
                             codigo += "+," + temp4 + "," + temp6 + "," + temp4 + "\n";
+                            tabla.AgregarTemporal(temp4);
+                            tabla.QuitarTemporal(temp6);
                         }
                         //codigo += "=," + temp4 + ",," + tabla.getTemporal() + "//Valor que se tiene que accesar\n";
                         codigo += "+," + temp4 + "," + temp7 + "," + temp7 + "\n";
+                        tabla.QuitarTemporal(temp4);
                         if (identificador.accesoGlobal) {
                             codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
                             //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",heap //Fin acceso\n";
@@ -256,6 +280,8 @@ public class Acceso implements Expresion {
             }
         }
         codigo += "=," + temp7 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp7);
         codigo += "// fin acceso\n";
         return codigo;
     }

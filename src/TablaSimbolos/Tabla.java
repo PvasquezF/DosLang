@@ -39,7 +39,11 @@ public class Tabla {
     private Stack sentenciasContinueActivas;
     private Stack etiquetasExit;
     private Stack sentenciasExitActivas;
-
+    private Stack indicesGuardar;
+    private int TemporalInicio;
+    private int TemporalFin;
+    private ArrayList<String> TempUsados;
+    private ArrayList<String> TempNoUsados;
     public Tabla() {
         this.enviroment = new Ambito(null);
         tabla = new ArrayList<>();
@@ -52,6 +56,9 @@ public class Tabla {
         this.sentenciasContinueActivas = new Stack();
         this.etiquetasExit = new Stack();
         this.sentenciasExitActivas = new Stack();
+        this.indicesGuardar = new Stack();
+        this.TempUsados = new ArrayList<>();
+        this.TempNoUsados = new ArrayList<>();
     }
 
     public String InsertarVariable(Simbolo simbolo) {
@@ -199,6 +206,19 @@ public class Tabla {
         }
     }
 
+    public void AgregarTemporal(String temp){
+        if(this.getTempNoUsados().indexOf(temp) == -1){
+            this.getTempNoUsados().add(temp);
+        }
+    }
+
+
+    public void QuitarTemporal(String temp){
+        if(this.getTempNoUsados().indexOf(temp) > -1){
+            this.getTempNoUsados().remove(temp);
+        }
+    }
+
     public String getAmbito() {
         //ambito = this.listaAmbitos.firstElement().toString();
         return ambito;
@@ -314,5 +334,53 @@ public class Tabla {
 
     public void setSentenciasExitActivas(Stack sentenciasExitActivas) {
         this.sentenciasExitActivas = sentenciasExitActivas;
+    }
+
+    public int getTemporalInicio() {
+        return TemporalInicio;
+    }
+
+    public void setTemporalInicio(int temporalInicio) {
+        TemporalInicio = temporalInicio;
+    }
+
+    public int getTemporalFin() {
+        return TemporalFin;
+    }
+
+    public void setTemporalFin(int temporalFin) {
+        TemporalFin = temporalFin;
+    }
+
+    public int getIndiceTemporal() {
+        return indiceTemporal;
+    }
+
+    public void setIndiceTemporal(int indiceTemporal) {
+        this.indiceTemporal = indiceTemporal;
+    }
+
+    public Stack getIndicesGuardar() {
+        return indicesGuardar;
+    }
+
+    public void setIndicesGuardar(Stack indicesGuardar) {
+        this.indicesGuardar = indicesGuardar;
+    }
+
+    public ArrayList<String> getTempUsados() {
+        return TempUsados;
+    }
+
+    public void setTempUsados(ArrayList<String> tempUsados) {
+        TempUsados = tempUsados;
+    }
+
+    public ArrayList<String> getTempNoUsados() {
+        return TempNoUsados;
+    }
+
+    public void setTempNoUsados(ArrayList<String> tempNoUsados) {
+        TempNoUsados = tempNoUsados;
     }
 }

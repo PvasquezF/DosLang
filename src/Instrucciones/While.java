@@ -59,7 +59,10 @@ public class While implements Instruccion {
         codigo += label2 + ":\n";
         codigo += this.condicion.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
+        tabla.QuitarTemporal(tabla.getTemporalActual());
+        tabla.AgregarTemporal(temp1);
         codigo += "je," + temp1 + ",0," + label1 + "\n";
+        tabla.QuitarTemporal(temp1);
         for (int i = 0; i < this.instrucciones.size(); i++) {
             codigo += this.instrucciones.get(i).get4D(tabla, arbol);
         }

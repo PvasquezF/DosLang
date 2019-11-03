@@ -70,6 +70,7 @@ public class If implements Instruccion {
 
         codigo += this.condicion.get4D(tabla, arbol);
         codigo += "je," + tabla.getTemporalActual() + ",1," + label1 + "\n";
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         codigo += "jmp,,," + label2 + "\n";
         codigo += label1 + ": // Condicion verdadera\n";
         for (int i = 0; i < this.instruccionesIF.size(); i++) {

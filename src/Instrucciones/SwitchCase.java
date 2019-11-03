@@ -74,6 +74,8 @@ public class SwitchCase implements Instruccion {
         String temp1 = tabla.getTemporal();
         codigo += condicion.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + " // Condicion switch\n";
+        tabla.AgregarTemporal(temp1);
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         ArrayList<String> tagsFinal = new ArrayList<>();
         for (Case caso : casos) {
             ArrayList<String> tagsTrue = new ArrayList<>();
@@ -84,7 +86,11 @@ public class SwitchCase implements Instruccion {
                 String temp2 = tabla.getTemporal();
                 codigo += exp.get4D(tabla, arbol);
                 codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + "\n";
+                tabla.AgregarTemporal(temp2);
+                tabla.QuitarTemporal(tabla.getTemporalActual());
                 codigo += "je," + temp1 + "," + temp2 + "," + label1 + "\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.QuitarTemporal(temp2);
                 tagsTrue.add(label1);
                 tagsFalse.add(label2);
             }

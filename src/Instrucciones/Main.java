@@ -81,6 +81,8 @@ public class Main extends Simbolo implements Instruccion {
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         tabla.getTamañoActualFuncion().push(0);
+        tabla.getTempNoUsados().clear();
+        //tabla.getIndicesGuardar().push(tabla.getIndiceTemporal());
         String codigo = "// Inicio main linea: " + fila + ", columna: " + columna + "\n";
         codigo += "begin,,,main\n";
         for (AST ins : this.instrucciones) {
@@ -96,6 +98,7 @@ public class Main extends Simbolo implements Instruccion {
         codigo += "call,,,main\n";
         //codigo += "-,p," + temp1 + ",p\n";
         codigo += "//Fin main\n";
+        //tabla.getIndicesGuardar().pop();
         return codigo;
     }
 }

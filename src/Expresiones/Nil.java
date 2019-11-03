@@ -31,6 +31,7 @@ public class Nil implements Expresion {
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "// Inicio nil linea\n";
         codigo += "=, -1,, " + tabla.getTemporal()+"\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
         codigo += " // Fin nil\n";
         return codigo;
     }

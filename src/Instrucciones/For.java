@@ -90,10 +90,15 @@ public class For implements Instruccion {
         codigo += asignacion.get4D(tabla, arbol);
         codigo += ((Asignacion) asignacion).valor.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + "\n";
+        tabla.AgregarTemporal(temp2);
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         codigo += label1 + ":\n";
         codigo += condicion.get4D(tabla, arbol);
         codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        tabla.QuitarTemporal(tabla.getTemporalActual());
         codigo += "je," + temp1 + ",0," + label2 + "\n";
+        tabla.QuitarTemporal(temp1);
         for (int i = 0; i < this.instrucciones.size(); i++) {
             AST ast = this.instrucciones.get(i);
             codigo += ast.get4D(tabla, arbol);

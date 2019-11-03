@@ -54,6 +54,7 @@ public class Primitivo implements Expresion {
             //String heapTemp = "" + tabla.getHeap();
             //String temporalSize = tabla.getTemporal();
             codigo += "=,h,," + temporalInicio + "\n";
+            tabla.AgregarTemporal(temporalInicio);
             //codigo += "+,h,1,h\n";
             String str = (String) valor;
             //codigo += "=," + tabla.getHeap() + "," + str.length() + ",heap\n"; //size
@@ -70,17 +71,24 @@ public class Primitivo implements Expresion {
                 }
             }
             codigo += "=," + temporalInicio + ",," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temporalInicio);
         } else if (valor instanceof Integer) {
             codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
         } else if (valor instanceof Character) {
             codigo += "=," + (int) ((Character) valor).charValue() + ",," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
         } else if (valor instanceof Double) {
             codigo += "=," + valor + ",," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
         } else if (valor instanceof Boolean) {
             if ((boolean) valor) {
                 codigo += "=,1,," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
             } else {
                 codigo += "=,0,," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
             }
         } else if (valor instanceof Nil) {
             codigo += new Nil().get4D(tabla, arbol);

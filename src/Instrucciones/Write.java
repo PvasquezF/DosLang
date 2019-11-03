@@ -34,7 +34,7 @@ public class Write implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "// Inicio write linea: " + fila + ", columna: " + columna + "\n";
+        String codigo = "// Inicio Write linea: " + fila + ", columna: " + columna + "\n";
         for (Expresion valor : valores) {
             Object result = valor.getTipo(tabla, arbol);
             if (result instanceof Excepcion) {
@@ -51,6 +51,7 @@ public class Write implements Instruccion {
                 String label1 = tabla.getEtiqueta();
                 String label2 = tabla.getEtiqueta();
                 codigo += "je,0," + temp + "," + label1 + "\n";
+                tabla.QuitarTemporal(temp);
                 codigo += "print(%c,116)\n";
                 codigo += "print(%c,114)\n";
                 codigo += "print(%c,117)\n";
@@ -80,6 +81,7 @@ public class Write implements Instruccion {
                     String label1 = tabla.getEtiqueta();
                     Identificador id = (Identificador) ((Acceso) ids.get(i)).getAccesos().get(0);
                     codigo += "jne," + temp + "," + i + "," + label1 + "\n";
+                    tabla.QuitarTemporal(temp);
                     for (int j = 0; j < id.getIdentificador().length(); j++) {
                         codigo += "print(%c," + ((int) id.getIdentificador().charAt(j)) + ")\n";
                     }
@@ -89,15 +91,20 @@ public class Write implements Instruccion {
                 codigo += labelSalida + ":\n";
             } else if (tipo.getType() == Tipo.tipo.STRING || tipo.getType() == Tipo.tipo.WORD) {
                 String temp3 = tabla.getTemporal();
-                String temp4 = tabla.getTemporal();
+                //String temp4 = tabla.getTemporal();
                 String label1 = tabla.getEtiqueta();
                 String label2 = tabla.getEtiqueta();
-                codigo += "=,heap," + temp + "," + temp3 + "\n";
+                //codigo += "=,heap," + temp + "," + temp3 + "\n";
+                //codigo += "=,heap," + temp3 + "," + temp3 + "\n";
                 codigo += label2 + ":\n";
-                codigo += "=,heap," + temp3 + "," + temp4 + "\n";
-                codigo += "je," + temp4 + ",0," + label1 + "\n";
-                codigo += "print(%c," + temp4 + ")\n";
-                codigo += "+,1," + temp3 + "," + temp3 + "\n";
+                codigo += "=,heap," + temp + "," + temp3 + "\n";
+                tabla.QuitarTemporal(temp);
+                tabla.AgregarTemporal(temp3);
+                codigo += "je," + temp3 + ",0," + label1 + "\n";
+                tabla.QuitarTemporal(temp3);
+                codigo += "print(%c," + temp3 + ")\n";
+                codigo += "+,1," + temp + "," + temp + "\n";
+                tabla.AgregarTemporal(temp);
                 codigo += "jmp,,," + label2 + "\n";
                 codigo += label1 + ":\n";
                 //codigo += "print(%c,13)\n";
@@ -120,7 +127,7 @@ public class Write implements Instruccion {
                 }
             }
         }
-        codigo += "// Fin write\n";
+        codigo += "// Fin Write\n";
         return codigo;
     }
 }

@@ -201,6 +201,7 @@ public class DeclaracionConstante implements Instruccion {
                     String label2 = tabla.getEtiqueta();
                     String label3 = tabla.getEtiqueta();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    tabla.AgregarTemporal(temp1);
                     codigo += sim.getValor().get4D(tabla, arbol);
                     temp2 = tabla.getTemporalActual();
 
@@ -210,8 +211,14 @@ public class DeclaracionConstante implements Instruccion {
                     codigo += tipoAux.getUpperLimit().get4D(tabla, arbol);
                     temp4 = tabla.getTemporalActual();
                     codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
+                    tabla.QuitarTemporal(temp2);
+                    tabla.QuitarTemporal(temp3);
                     codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
+                    tabla.QuitarTemporal(temp2);
+                    tabla.QuitarTemporal(temp4);
                     codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                    tabla.QuitarTemporal(temp1);
+                    tabla.QuitarTemporal(temp2);
                     codigo += "jmp,,," + label3 + "\n";
                     codigo += label1 + ":\n";
                     codigo += label2 + ":\n";
@@ -234,15 +241,21 @@ public class DeclaracionConstante implements Instruccion {
                                 Simbolo simEnum = (Simbolo) resultEnum;
                                 String temp1 = tabla.getTemporal();
                                 codigo += "=," + simEnum.getApuntador() + ",," + temp1 + "\n";
+                                tabla.AgregarTemporal(temp1);
                                 codigo += simEnum.getValor().get4D(tabla, arbol);
                                 codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                                tabla.QuitarTemporal(temp1);
+                                tabla.QuitarTemporal(tabla.getTemporalActual());
                             }
                         }
                     }
                     String temp1 = tabla.getTemporal();
                     codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    tabla.AgregarTemporal(temp1);
                     codigo += sim.getValor().get4D(tabla, arbol);
                     codigo += "=, " + temp1 + ", " + tabla.getTemporalActual() + ", heap\n";
+                    tabla.QuitarTemporal(temp1);
+                    tabla.QuitarTemporal(tabla.getTemporalActual());
                 } else if (tipoAux.getType() == Tipo.tipo.ARREGLO) {
                     String temp1 = tabla.getTemporal();
                     String temp2 = tabla.getTemporal();

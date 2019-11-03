@@ -74,14 +74,21 @@ public class Identificador implements Expresion {
             accesoGlobal = ((Simbolo) sim).getNivel().equalsIgnoreCase("global");
             String temp1 = tabla.getTemporal();
             codigo += "=," + ((Simbolo) sim).getApuntador() + ",," + temp1 + "// Id = " + this.identificador + "\n";
+            tabla.AgregarTemporal(temp1);
             if (asExpresion) {
                 String temp2 = tabla.getTemporal();
                 if (accesoGlobal) {
                     codigo += "=,heap," + temp1 + "," + temp2 + "\n";
+                    tabla.AgregarTemporal(temp2);
+                    tabla.QuitarTemporal(temp1);
                 } else {
                     String temp3 = tabla.getTemporal();
                     codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                    tabla.AgregarTemporal(temp2);
+                    tabla.QuitarTemporal(temp1);
                     codigo += "=,stack," + temp2 + "," + temp3 + "\n";
+                    tabla.AgregarTemporal(temp3);
+                    tabla.QuitarTemporal(temp2);
                 }
             }
 

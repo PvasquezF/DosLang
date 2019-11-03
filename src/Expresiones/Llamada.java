@@ -5,6 +5,7 @@ import Interfaces.Expresion;
 import TablaSimbolos.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Llamada implements Expresion {
     private String nombre;
@@ -48,7 +49,10 @@ public class Llamada implements Expresion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-        String codigo = "";
+        String codigo = "// Llamada\n";
+        ArrayList<String> valorParametros = new ArrayList<>();
+        ArrayList<String> temporalesRecuperar = new ArrayList<>();
+        ArrayList<String> temporalesAux = new ArrayList<>();
         Object result = tabla.getFuncion(this.nombreFuncion);
         if (result instanceof String) {
             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -58,30 +62,50 @@ public class Llamada implements Expresion {
             return exc;
         }
         Simbolo sim = (Simbolo) result;
-        String temp3 = tabla.getTemporal();
         for (int i = 0; i < parametros.size(); i++) {
-            int contador = i + 1;
-            String temp1 = tabla.getTemporal();
-            String temp2 = tabla.getTemporal();
-            Parametro param = sim.getParametros().get(i);
-            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
-            codigo += "+," + temp1 + "," + contador + "," + temp2 + "\n";
-            /*if (param.isReferencia()) {
-                if (param.getTipo().getType() == Tipo.tipo.INTEGER) {
-                    codigo += parametros.get(i).get4D(tabla, arbol);
-                }
-            } else { // por valor
-                if (param.getTipo().getType() == Tipo.tipo.INTEGER) {
-                }
-            }*/
             codigo += parametros.get(i).get4D(tabla, arbol);
-            codigo += "=," + temp2 + "," + tabla.getTemporalActual() + ",stack\n";
+            valorParametros.add(tabla.getTemporalActual());
+            tabla.AgregarTemporal(tabla.getTemporalActual());
         }
-        codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p // Cambio de ambito\n";
+        codigo += "// Cambio de ambito\n";
+        codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+        codigo += "// FIN Cambio de ambito\n";
+
+        temporalesRecuperar.addAll(tabla.getTempNoUsados());
+        String temp3 = tabla.getTemporal();
+        codigo += "// Guardando temp\n";
+        for (int i = 0; i < tabla.getTempNoUsados().size(); i++) {
+            codigo += "+,p," + i + "," + temp3 + "\n";
+            codigo += "=," + temp3 + "," + tabla.getTempNoUsados().get(i) + ",stack\n";
+        }
+        codigo += "+,p," + tabla.getTempNoUsados().size() + ",p\n";
+        codigo += "// Fin Guardando temp\n";
+
+        String temp2 = tabla.getTemporal();
+        for (int i = 0; i < valorParametros.size(); i++) {
+            codigo += "+,p," + (i + 1) + "," + temp2 + "\n";
+            codigo += "=," + temp2 + "," + valorParametros.get(i) + ",stack\n";
+        }
+
+        //codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p // Cambio de ambito\n";
+        //tabla.getTempNoUsados().clear();
         codigo += "call,,," + sim.getNombreCompleto() + "\n";
-        codigo += "+,p,0," + temp3 + "// Retorno\n";
+        String temp4 = tabla.getTemporal();
+        codigo += "+,p,0," + temp4 + "// Retorno\n";
+        codigo += "-,p," + temporalesRecuperar.size() + ",p\n";
+        codigo += "// Recuperando temp\n";
+        String temp5 = tabla.getTemporal();
+        for (int i = 0; i < temporalesRecuperar.size(); i++) {
+            codigo += "+,p," + i + "," + temp5 + "\n";
+            codigo += "=,stack," + temp5 + "," + temporalesRecuperar.get(i) + "\n";
+        }
         codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p // Cambio de ambito\n";
-        codigo += "=,stack," + temp3 + "," + tabla.getTemporal() + "\n";
+        codigo += "// Fin Recuperando temp\n";
+        codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+        // tabla.getIndicesGuardar().push(tamañoInicio);
+        //tabla.getIndicesGuardar().pop();
+        tabla.getTempNoUsados().clear();
+        codigo += "// Fin Llamada\n";
         return codigo;
     }
 

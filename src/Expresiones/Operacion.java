@@ -123,6 +123,7 @@ public class Operacion implements Expresion {
             }
             codigo += op1;
             op1Actual = tabla.getTemporalActual();
+            tabla.AgregarTemporal(op1Actual);
             tipo1 = (Tipo) tipoOP1;
             tipo1 = tipo1.verificarUserType(tabla);
 
@@ -137,6 +138,7 @@ public class Operacion implements Expresion {
             }
             codigo += op2;
             op2Actual = tabla.getTemporalActual();
+            tabla.AgregarTemporal(op2Actual);
             tipo2 = (Tipo) tipoOP2;
             tipo2 = tipo2.verificarUserType(tabla);
         } else {
@@ -151,6 +153,7 @@ public class Operacion implements Expresion {
             }
             codigo += opU;
             opUActual = tabla.getTemporalActual();
+            tabla.AgregarTemporal(opUActual);
             tipoU = (Tipo) tipoOPU;
             tipoU = tipoU.verificarUserType(tabla);
         }
@@ -166,77 +169,159 @@ public class Operacion implements Expresion {
                 break;
             case RESTA:
                 codigo += "-," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 break;
             case MULTIPLICACION:
                 codigo += "*," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 break;
             case DIVISION:
                 codigo += "/," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 break;
             case MODULO:
                 codigo += "%," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 break;
             case POTENCIA:
                 codigo += "^," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 break;
             case MENOR_QUE:
                 String temp1 = tabla.getTemporal();
                 String label1 = tabla.getEtiqueta();
                 String label2 = tabla.getEtiqueta();
                 codigo += "jl," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "=,0,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
                 codigo += "jmp,,," + label2 + "\n";
                 codigo += label1 + ":\n";
                 codigo += "=,1,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
                 codigo += label2 + ":\n";
                 codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
                 break;
             case MENOR_IGUAL:
                 temp1 = tabla.getTemporal();
                 label1 = tabla.getEtiqueta();
                 label2 = tabla.getEtiqueta();
                 codigo += "jle," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "=,0,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
                 codigo += "jmp,,," + label2 + "\n";
                 codigo += label1 + ":\n";
                 codigo += "=,1,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
                 codigo += label2 + ":\n";
                 codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
                 break;
             case MAYOR_QUE:
-                codigo += "jg," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                temp1 = tabla.getTemporal();
+                label1 = tabla.getEtiqueta();
+                label2 = tabla.getEtiqueta();
+                codigo += "jg," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
+                codigo += "=,0,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+                codigo += "jmp,,," + label2 + "\n";
+                codigo += label1 + ":\n";
+                codigo += "=,1,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+                codigo += label2 + ":\n";
+                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
                 break;
             case MAYOR_IGUAL:
                 temp1 = tabla.getTemporal();
                 label1 = tabla.getEtiqueta();
                 label2 = tabla.getEtiqueta();
                 codigo += "jge," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "=,0,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
                 codigo += "jmp,,," + label2 + "\n";
                 codigo += label1 + ":\n";
                 codigo += "=,1,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
                 codigo += label2 + ":\n";
                 codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
                 break;
             case IGUAL_IGUAL:
-                codigo += "je," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                temp1 = tabla.getTemporal();
+                label1 = tabla.getEtiqueta();
+                label2 = tabla.getEtiqueta();
+                codigo += "je," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
+                codigo += "=,0,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+                codigo += "jmp,,," + label2 + "\n";
+                codigo += label1 + ":\n";
+                codigo += "=,1,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+                codigo += label2 + ":\n";
+                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
                 break;
             case DIFERENTE_QUE:
-                codigo += "jne," + op1Actual + "," + op2Actual + "," + tabla.getEtiqueta() + "\n";
+                temp1 = tabla.getTemporal();
+                label1 = tabla.getEtiqueta();
+                label2 = tabla.getEtiqueta();
+                codigo += "jne," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
+                tabla.QuitarTemporal(op2Actual);
+                codigo += "=,0,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+                codigo += "jmp,,," + label2 + "\n";
+                codigo += label1 + ":\n";
+                codigo += "=,1,," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+                codigo += label2 + ":\n";
+                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+                tabla.AgregarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
                 break;
             case AND:
                 etiquetaVerdadera1 = tabla.getEtiqueta();
                 etiquetaFalsa1 = tabla.getEtiqueta();
                 etiquetaVerdadera2 = tabla.getEtiqueta();
                 etiquetaFalsa2 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
                 codigo += "jmp,,," + etiquetaFalsa1 + "\n";
                 codigo += etiquetaVerdadera1 + ":\n";
                 codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "jmp,,," + etiquetaFalsa2 + "\n";
                 codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += etiquetaFalsa1 + ":\n";
                 codigo += etiquetaFalsa2 + ":\n";
                 break;
@@ -244,15 +329,19 @@ public class Operacion implements Expresion {
                 etiquetaVerdadera1 = tabla.getEtiqueta();
                 etiquetaVerdadera2 = tabla.getEtiqueta();
                 etiquetaFalsa1 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
 
                 codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "jmp,,," + etiquetaFalsa1 + "\n";
 
                 codigo += etiquetaVerdadera1 + ":\n";
                 codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true
+                tabla.AgregarTemporal(tabla.getTemporalActual());
 
                 codigo += etiquetaFalsa1 + ":\n";
                 break;
@@ -261,14 +350,18 @@ public class Operacion implements Expresion {
                 etiquetaFalsa1 = tabla.getEtiqueta();
                 etiquetaVerdadera2 = tabla.getEtiqueta();
                 etiquetaFalsa2 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
                 codigo += "jmp,,," + etiquetaFalsa1 + "\n";
                 codigo += etiquetaVerdadera1 + ":\n";
                 codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "jmp,,," + etiquetaFalsa2 + "\n";
                 codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
+                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += etiquetaFalsa1 + ":\n";
                 codigo += etiquetaFalsa2 + ":\n";
                 break;
@@ -276,31 +369,39 @@ public class Operacion implements Expresion {
                 etiquetaVerdadera1 = tabla.getEtiqueta();
                 etiquetaVerdadera2 = tabla.getEtiqueta();
                 etiquetaFalsa1 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso 
+                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
+                tabla.QuitarTemporal(op1Actual);
 
                 codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
+                tabla.QuitarTemporal(op2Actual);
                 codigo += "jmp,,," + etiquetaFalsa1 + "\n";
 
                 codigo += etiquetaVerdadera1 + ":\n";
                 codigo += etiquetaVerdadera2 + ":\n";
                 codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
-
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += etiquetaFalsa1 + ":\n";
                 break;
             case NOT:
                 etiquetaVerdadera1 = tabla.getEtiqueta();
                 etiquetaFalsa1 = tabla.getEtiqueta();
                 codigo += "je," + opUActual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporal() + "\n"; //Asignar true 
+                tabla.QuitarTemporal(opUActual);
+                codigo += "=," + 1 + ",," + tabla.getTemporal() + "\n"; //Asignar true
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += "jmp,,," + etiquetaFalsa1 + "\n";
                 codigo += etiquetaVerdadera1 + ":\n";
-                codigo += "=," + 0 + ",," + tabla.getTemporalActual() + "\n"; //Asignar false 
+                codigo += "=," + 0 + ",," + tabla.getTemporalActual() + "\n"; //Asignar false
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 codigo += etiquetaFalsa1 + ":\n";
                 break;
 
             case MENOS_UNARIO:
                 codigo += "*," + opUActual + ",-1," + tabla.getTemporal() + "\n";
+                tabla.QuitarTemporal(opUActual);
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 break;
         }
         codigo += "// Fin operacion\n";
@@ -628,17 +729,31 @@ public class Operacion implements Expresion {
             String temp3 = tabla.getTemporal();
             String temp4 = tabla.getTemporal();
             codigo += "+,p," + tabla.getFuncionSizeActual() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
             codigo += "+," + temp1 + ",0," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
             codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
             codigo += "+," + temp1 + ",1," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
             codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
             codigo += "+,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
             codigo += "call,,,concatenar_cadenas" + "\n";
             codigo += "+,p,2," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
             codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
             codigo += "-,p," + tabla.getFuncionSizeActual() + ",p" + "\n";
         } else {
             codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(op1Actual);
+            tabla.QuitarTemporal(op2Actual);
         }
         return codigo;
     }

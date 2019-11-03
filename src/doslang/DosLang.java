@@ -134,7 +134,22 @@ public class DosLang extends Thread {
             }*/
             for (int i = 0; i < t.getInstrucciones().size(); i++) {
                 AST ins = t.getInstrucciones().get(i);
-                Cuadruplos += ins.get4D(tabla, t);
+                if (ins instanceof DeclaracionType ||
+                        ins instanceof DeclaracionConstante ||
+                        ins instanceof DeclaracionVar)
+                    Cuadruplos += ins.get4D(tabla, t);
+            }
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                AST ins = t.getInstrucciones().get(i);
+                if (ins instanceof Main) {
+                    Cuadruplos += ins.get4D(tabla, t);
+                }
+            }
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                AST ins = t.getInstrucciones().get(i);
+                if (ins instanceof Funcion
+                        || ins instanceof Procedimiento)
+                    Cuadruplos += ins.get4D(tabla, t);
             }
             GenerarNativas4D gn4D = new GenerarNativas4D();
             Cuadruplos += gn4D.generarConcatenacion(tabla);

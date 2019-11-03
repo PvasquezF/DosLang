@@ -95,11 +95,17 @@ public class Asignacion implements Instruccion {
             if (variable.accesoGlobal) {
                 codigo += valor.get4D(tabla, arbol);
                 codigo += "=," + temp1 + "," + tabla.getTemporalActual() + ",heap\n";
+                tabla.QuitarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
             } else {
                 String temp2 = tabla.getTemporal();
                 codigo += valor.get4D(tabla, arbol);
                 codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                tabla.AgregarTemporal(temp2);
+                tabla.QuitarTemporal(temp1);
                 codigo += "=," + temp2 + "," + tabla.getTemporalActual() + ",stack\n";
+                tabla.QuitarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp2);
             }
         } else if (tipoVariable.getType() == Tipo.tipo.STRING) {
             codigo += variable.get4D(tabla, arbol);
@@ -107,11 +113,17 @@ public class Asignacion implements Instruccion {
             if (variable.accesoGlobal) {
                 codigo += valor.get4D(tabla, arbol);
                 codigo += "=," + temp1 + "," + tabla.getTemporalActual() + ",heap\n";
+                tabla.QuitarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
             } else {
                 String temp2 = tabla.getTemporal();
                 codigo += valor.get4D(tabla, arbol);
                 codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                tabla.AgregarTemporal(temp2);
+                tabla.QuitarTemporal(temp1);
                 codigo += "=," + temp2 + "," + tabla.getTemporalActual() + ",stack\n";
+                tabla.QuitarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp2);
             }
         } else if (tipoVariable.getType() == Tipo.tipo.RANGE) {
             codigo += variable.get4D(tabla, arbol);
@@ -131,14 +143,24 @@ public class Asignacion implements Instruccion {
             codigo += tipoVariable.getUpperLimit().get4D(tabla, arbol);
             temp4 = tabla.getTemporalActual();
             codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(temp3);
             codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(temp4);
             if (variable.accesoGlobal) {
                 codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.QuitarTemporal(temp2);
             } else {
                 String temp5 = tabla.getTemporal();
                 codigo += valor.get4D(tabla, arbol);
                 codigo += "+,p," + temp1 + "," + temp5 + "\n";
+                tabla.AgregarTemporal(temp5);
+                tabla.QuitarTemporal(temp1);
                 codigo += "=," + temp5 + "," + temp2 + ",stack\n";
+                tabla.QuitarTemporal(temp2);
+                tabla.QuitarTemporal(temp5);
             }
             codigo += "jmp,,," + label3 + "\n";
             codigo += label1 + ":\n";
@@ -152,10 +174,16 @@ public class Asignacion implements Instruccion {
             String temp2 = tabla.getTemporalActual();
             if (variable.accesoGlobal) {
                 codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                tabla.QuitarTemporal(temp2);
+                tabla.QuitarTemporal(temp1);
             } else {
                 String temp3 = tabla.getTemporal();
                 codigo += "+,p," + temp1 + "," + temp3 + "\n";
+                tabla.AgregarTemporal(temp3);
+                tabla.QuitarTemporal(temp1);
                 codigo += "=," + temp3 + "," + temp2 + ",stack\n";
+                tabla.QuitarTemporal(temp2);
+                tabla.QuitarTemporal(temp3);
             }
         } else if (tipoVariable.getType() == Tipo.tipo.ARREGLO) {
             codigo += variable.get4D(tabla, arbol);
@@ -164,10 +192,16 @@ public class Asignacion implements Instruccion {
             String temp2 = tabla.getTemporalActual();
             if (variable.accesoGlobal) {
                 codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.QuitarTemporal(temp2);
             } else {
                 String temp3 = tabla.getTemporal();
                 codigo += "+,p," + temp1 + "," + temp3 + "\n";
+                tabla.AgregarTemporal(temp3);
+                tabla.QuitarTemporal(temp1);
                 codigo += "=," + temp3 + "," + temp2 + ",stack\n";
+                tabla.QuitarTemporal(temp2);
+                tabla.QuitarTemporal(temp3);
             }
         } else if (tipoVariable.getType() == Tipo.tipo.RECORD) {
             codigo += variable.get4D(tabla, arbol);
@@ -176,10 +210,16 @@ public class Asignacion implements Instruccion {
             String temp2 = tabla.getTemporalActual();
             if (variable.accesoGlobal) {
                 codigo += "=, " + temp1 + ", " + temp2 + ", heap\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.QuitarTemporal(temp2);
             } else {
                 String temp3 = tabla.getTemporal();
                 codigo += "+,p," + temp1 + "," + temp3 + "\n";
+                tabla.AgregarTemporal(temp3);
+                tabla.QuitarTemporal(temp1);
                 codigo += "=," + temp3 + "," + temp2 + ",stack\n";
+                tabla.QuitarTemporal(temp2);
+                tabla.QuitarTemporal(temp3);
             }
             if(valor instanceof Malloc) {
                 for (int k = 0; k < tipoVariable.getAtributos().size(); k++) {
@@ -197,35 +237,61 @@ public class Asignacion implements Instruccion {
                         String label10 = tabla.getEtiqueta();
                         String label20 = tabla.getEtiqueta();
                         codigo += "+," + temp2 + "," + k + "," + temp80 + "\n";
+                        tabla.AgregarTemporal(temp80);
+                        tabla.QuitarTemporal(temp2);
                         codigo += "=," + temp80 + ",," + temp10 + "// Inicio declaracion array\n";
+                        tabla.AgregarTemporal(temp10);
+                        tabla.QuitarTemporal(temp80);
                         ArrayList<Dimension> dimension = tipoAtr.getDimensiones();
                         codigo += "=,h,," + temp60 + "\n";
+                        tabla.AgregarTemporal(temp60);
                         codigo += "=,1,," + temp50 + "\n";
+                        tabla.AgregarTemporal(temp50);
                         for (int m = 0; m < dimension.size(); m++) {
                             Dimension dim = dimension.get(m);
                             codigo += dim.getLimiteInferior().get4D(tabla, arbol);
                             codigo += "=," + tabla.getTemporalActual() + ",," + temp20 + "\n";
+                            tabla.AgregarTemporal(temp20);
+                            tabla.QuitarTemporal(tabla.getTemporalActual());
                             codigo += dim.getLimiteSuperior().get4D(tabla, arbol);
                             codigo += "=," + tabla.getTemporalActual() + ",," + temp30 + "\n";
+                            tabla.AgregarTemporal(temp30);
+                            tabla.QuitarTemporal(tabla.getTemporalActual());
                             codigo += "-," + temp30 + "," + temp20 + "," + temp40 + "// Tamaño dimension " + m + "\n";
+                            tabla.AgregarTemporal(temp40);
+                            tabla.QuitarTemporal(temp30);
+                            tabla.QuitarTemporal(temp20);
                             codigo += "*," + temp50 + "," + temp40 + "," + temp50 + "\n";
+                            tabla.AgregarTemporal(temp50);
+                            tabla.QuitarTemporal(temp40);
                         }
                         codigo += label10 + ":\n";
                         codigo += "je," + temp50 + ",0," + label20 + "\n";
+                        tabla.QuitarTemporal(temp50);
                         codigo += "-," + temp50 + ",1," + temp50 + "\n";
+                        tabla.AgregarTemporal(temp50);
                         codigo += Tipo.valorPredeterminado(tipoAtr).get4D(tabla, arbol);
                         codigo += "=," + tabla.getTemporalActual() + ",," + temp70 + "\n";
+                        tabla.QuitarTemporal(tabla.getTemporalActual());
+                        tabla.AgregarTemporal(temp70);
                         codigo += "=,h," + temp70 + ",heap\n";
+                        tabla.QuitarTemporal(temp70);
                         codigo += "+,h,1,h\n";
                         codigo += "jmp,,," + label10 + "\n";
                         codigo += label20 + ":\n";
 
                         codigo += "=, " + temp10 + ", " + temp60 + ", heap // Fin declaracion Array " + "\n";
+                        tabla.QuitarTemporal(temp10);
+                        tabla.QuitarTemporal(temp60);
                     } else {
                         String temp10 = tabla.getTemporal();
                         codigo += "+," + temp2 + "," + k + "," + temp10 + "\n";
+                        tabla.AgregarTemporal(temp10);
+                        tabla.QuitarTemporal(temp2);
                         codigo += Tipo.valorPredeterminado(tipoAtr).get4D(tabla, arbol);
                         codigo += "=, " + temp10 + ", " + tabla.getTemporalActual() + ", heap\n";
+                        tabla.QuitarTemporal(temp10);
+                        tabla.QuitarTemporal(tabla.getTemporalActual());
                     }
                 }
             }
