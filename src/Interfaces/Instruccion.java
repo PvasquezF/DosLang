@@ -8,6 +8,9 @@ package Interfaces;
 import TablaSimbolos.Tabla;
 import TablaSimbolos.Tree;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
  *
  * @author Pavel

@@ -62,7 +62,9 @@ non terminal ArrayList<Parametro> PARAMETROS, LISTA_PARAMETROS;
 non terminal ArrayList<Case> CASELIST;
 
 //precedence left then;
+//precedence right tresP;
 precedence left sino;
+precedence right igual;
 precedence left or;
 precedence left nand, nor;
 precedence left and;
@@ -73,7 +75,7 @@ precedence left por, division, potencia, modulo;
 precedence left potencia;
 precedence left not;
 precedence left UMENOS;
-precedence left parenI, parenD;
+precedence left parenI, parenD, punto, corI, corD;
 
 start with INICIO;
 
@@ -83,7 +85,7 @@ INICIO ::= PROGRAM:e {: System.out.println("Termino Correctamente"); parser.tree
 PROGRAM ::= program identificador:e pComa USES:e1 {: RESULT = new ArrayList<AST>(); RESULT.add(new Program(e)); RESULT.addAll(e1);:}
           ;
 
-USES ::= uses LISTA_IDENTIFICADORES:e pComa SECCION_TIPO:e1 {:RESULT = e1;:}
+USES ::= uses LISTA_IDENTIFICADORES:e pComa SECCION_TIPO:e1 {:RESULT = e1; RESULT.add(0, new Uses(e, eleft, eright));:}
        | SECCION_TIPO:e {:RESULT = e;:}
        ;
 
@@ -98,7 +100,7 @@ LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS:e DECLARACION_TIPOS:e1 {:RES
 DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
                     ;
 
-TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igual TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
+TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igualacion TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
                    ;
 
 LOWER_LIMIT ::= EXPRESION:e {:RESULT = e;:}
@@ -162,8 +164,8 @@ TIPO_PRIMITIVO ::= integer   {:RESULT = new Tipo(Tipo.tipo.INTEGER);:}
                  | record    {:RESULT = new Tipo(Tipo.tipo.RECORD);:}
                  ;
 
-TIPO ::= identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
-       | LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {:RESULT = new Tipo(Tipo.tipo.RANGE, null, e1, e2);:}
+TIPO ::= //LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {:RESULT = new Tipo(Tipo.tipo.RANGE, null, e1, e2);:}
+        identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
        | parenI LISTA_EXPRESION:e parenD {:RESULT = new Tipo(Tipo.tipo.ENUMERADO, null, e);:}
        | TIPO_PRIMITIVO:e {:RESULT = e;:}
        | ARRAY_DECLARATION:e {:RESULT = e; 
@@ -180,7 +182,7 @@ DECLARACION_CONST ::= DECLARACION_CONST:e CONST:e1 {:RESULT = e; RESULT.add(e1);
                    | CONST:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                    ;
 
-CONST ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionConstante(e1, e, e2, eleft, eright); :}
+CONST ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igualacion EXPRESION:e2 pComa {: RESULT = new DeclaracionConstante(e1, e, e2, eleft, eright); :}
         ;
 
 SECCION_VAR ::= VARINIT:e SECCION_FUNCION:e1 {:RESULT = e; RESULT.addAll(e1);:}
@@ -194,7 +196,7 @@ DECLARACION_VAR ::= DECLARACION_VAR:e VAR:e1 {:RESULT = e; RESULT.add(e1);:}
                   | VAR:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
                   ;
 
-VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igual EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright);:}
+VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igualacion EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright);:}
       | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 pComa {: RESULT = new DeclaracionVar(e1, e, eleft, eright); :}
       ;
 
@@ -269,7 +271,7 @@ WITH ::= con identificador:e hacer LISTA_INSTRUCCIONES:e1 end pComa {:
                                                         :}
        ;
 
-ASIGNACION ::= VARIABLE:e dosPuntos igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}
+ASIGNACION ::= VARIABLE:e igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}
              ;
 
 TRANSFERENCIA ::= detener:e pComa {:RESULT = new Break(eleft, eright);:}

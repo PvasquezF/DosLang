@@ -1,0 +1,8 @@
+program importedFile;
+uses 
+    import2;
+var
+    cat : integer = 589;
+begin
+    writeln(cat);
+end.

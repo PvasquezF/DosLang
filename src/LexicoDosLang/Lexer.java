@@ -40,8 +40,8 @@ public class Lexer implements java_cup.runtime.Scanner {
    */
   private static final String ZZ_CMAP_PACKED = 
     "\11\0\1\3\1\2\1\66\1\67\1\1\22\0\1\3\1\0\1\64"+
-    "\2\0\1\61\1\0\1\65\1\7\1\11\1\10\1\50\1\57\1\51"+
-    "\1\5\1\52\1\72\11\4\1\54\1\53\1\62\1\47\1\63\1\71"+
+    "\2\0\1\61\1\0\1\65\1\7\1\11\1\10\1\51\1\57\1\52"+
+    "\1\5\1\53\1\72\11\4\1\47\1\54\1\62\1\50\1\63\1\71"+
     "\1\0\1\23\1\27\1\25\1\32\1\20\1\37\1\21\1\26\1\15"+
     "\1\6\1\45\1\24\1\41\1\16\1\30\1\36\1\6\1\22\1\34"+
     "\1\17\1\42\1\43\1\31\1\46\1\35\1\40\1\55\1\70\1\56"+
@@ -223,8 +223,8 @@ public class Lexer implements java_cup.runtime.Scanner {
     "\1\11\1\0\1\11\6\0\1\11\1\152\14\11\1\153"+
     "\1\154\7\11\1\0\2\11\23\0\1\11\4\0\1\11"+
     "\1\0\1\11\6\0\6\11\1\155\7\11\1\0\10\11"+
-    "\1\0\2\11\23\0\1\11\47\0\1\156\72\0\1\157"+
-    "\13\0\1\160\56\0\1\161\25\0\1\62\106\0\1\162"+
+    "\1\0\2\11\23\0\1\11\50\0\1\156\72\0\1\157"+
+    "\12\0\1\160\57\0\1\161\24\0\1\62\106\0\1\162"+
     "\1\163\2\0\1\164\1\165\3\0\1\166\7\0\1\167"+
     "\3\0\1\170\20\0\1\171\1\172\4\0\1\173\2\0"+
     "\1\70\106\0\1\174\1\175\2\0\1\176\41\0\1\177"+
@@ -996,27 +996,27 @@ public class Lexer implements java_cup.runtime.Scanner {
             }
           case 109: break;
           case 9: 
-            { return symbol(sym.igual, "=");
+            { return symbol(sym.dosPuntos, ":");
             }
           case 110: break;
           case 10: 
-            { return symbol(sym.mas, "+");
+            { return symbol(sym.igualacion, "=");
             }
           case 111: break;
           case 11: 
-            { return symbol(sym.menos, "-");
+            { return symbol(sym.mas, "+");
             }
           case 112: break;
           case 12: 
-            { return symbol(sym.division, "/");
+            { return symbol(sym.menos, "-");
             }
           case 113: break;
           case 13: 
-            { return symbol(sym.pComa, ";");
+            { return symbol(sym.division, "/");
             }
           case 114: break;
           case 14: 
-            { return symbol(sym.dosPuntos, ":");
+            { return symbol(sym.pComa, ";");
             }
           case 115: break;
           case 15: 
@@ -1129,7 +1129,7 @@ public class Lexer implements java_cup.runtime.Scanner {
             }
           case 140: break;
           case 40: 
-            { return symbol(sym.igualacion, "==");
+            { return symbol(sym.igual, ":=");
             }
           case 141: break;
           case 41: 

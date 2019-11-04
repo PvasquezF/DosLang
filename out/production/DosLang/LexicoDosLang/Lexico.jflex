@@ -88,7 +88,7 @@ ComentarioMulti =   "{" ~"}"
     "writeln"           { return symbol(sym.escribirln, yytext().toLowerCase()); }
     "read"              { return symbol(sym.leer, yytext().toLowerCase()); }
     
-    "="                 { return symbol(sym.igual, "="); }
+    ":="                { return symbol(sym.igual, ":="); }
     "+"                 { return symbol(sym.mas, "+"); }
     "-"                 { return symbol(sym.menos, "-"); }
     "*"                 { return symbol(sym.por, "*"); }
@@ -109,7 +109,7 @@ ComentarioMulti =   "{" ~"}"
     "<="                { return symbol(sym.menorigual, "<="); }
     ">"                 { return symbol(sym.mayorque, ">"); }
     ">="                { return symbol(sym.mayorigual, ">="); }
-    "=="                { return symbol(sym.igualacion, "=="); }
+    "="                 { return symbol(sym.igualacion, "="); }
     "<>"                { return symbol(sym.diferente, "<>"); }
     \"                  { yybegin(STRING); NuevoString.setLength(0);}
     \'                  { yybegin(CHARACTER); NuevoChar = ' ';}
