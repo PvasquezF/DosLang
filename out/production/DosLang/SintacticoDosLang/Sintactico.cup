@@ -260,7 +260,7 @@ INSTRUCCION ::= WITH:e {:RESULT = e;:}
               | WRITE:e {:RESULT = e;:}
               | READ:e {:RESULT = e;:}
               | SWITCH:e {:RESULT = e;:}
-              | free parenI EXPRESION parenD pComa
+              | free parenI VARIABLE:e parenD pComa {:RESULT = new Free(new AccesoVariable(e, eleft, eright), eleft, eright);:}
               | LLAMADA:e pComa {:RESULT = e;:}
               ;
 
