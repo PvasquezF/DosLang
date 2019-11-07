@@ -53,7 +53,12 @@ public class DosLang extends Thread {
         Tabla tabla = new Tabla();
         String Cuadruplos = "";
         int espaciosReservaHeap = 0;
-
+        for (int i = 0; i < t.getInstrucciones().size(); i++) {
+            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+            if (ins instanceof DeclaracionType) {
+                ins.ejecutar(tabla, t);
+            }
+        }
         for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
             if (ins instanceof Funcion) {
@@ -85,7 +90,9 @@ public class DosLang extends Thread {
             AST ins = t.getInstrucciones().get(i);
             Object respuesta = null;
             if (ins instanceof Instruccion) {
-                ((Instruccion) ins).ejecutar(tabla, t);
+                if (!(ins instanceof DeclaracionType)) {
+                    ((Instruccion) ins).ejecutar(tabla, t);
+                }
             } else {
                 ((Expresion) ins).getTipo(tabla, t);
             }
@@ -152,14 +159,14 @@ public class DosLang extends Thread {
                         || ins instanceof Procedimiento)
                     Cuadruplos += ins.get4D(tabla, t);
             }*/
-            GenerarNativas4D gn4D = new GenerarNativas4D();
+            /*GenerarNativas4D gn4D = new GenerarNativas4D();
             Cuadruplos += gn4D.generarConcatenacion(tabla);
             Cuadruplos += gn4D.generarPrint(tabla);
             Cuadruplos += gn4D.generarTrunk(tabla);
             Cuadruplos += gn4D.generarRound(tabla);
             Cuadruplos += gn4D.generarChartAt(tabla);
             Cuadruplos += gn4D.generarLenght(tabla);
-            Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
+            Cuadruplos += gn4D.generarRangoFueraLimites(tabla);*/
             System.out.println(Cuadruplos);
         } else {
             errores.forEach(m -> {

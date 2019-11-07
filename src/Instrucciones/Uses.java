@@ -37,6 +37,12 @@ public class Uses implements Instruccion {
                 t = s.getArbol();
                 for (int i = 0; i < t.getInstrucciones().size(); i++) {
                     Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+                    if (ins instanceof DeclaracionType) {
+                        ins.ejecutar(tabla, t);
+                    }
+                }
+                for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                    Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
                     if (ins instanceof Funcion) {
                         Funcion f = (Funcion) ins;
                         tabla.InsertarFuncion(f);
@@ -60,7 +66,9 @@ public class Uses implements Instruccion {
                     AST ins = t.getInstrucciones().get(i);
                     if (!(ins instanceof Main)) {
                         if (ins instanceof Instruccion) {
-                            ((Instruccion) ins).ejecutar(tabla, t);
+                            if(!(ins instanceof DeclaracionType)) {
+                                ((Instruccion) ins).ejecutar(tabla, t);
+                            }
                         } else {
                             ((Expresion) ins).getTipo(tabla, t);
                         }

@@ -51,6 +51,7 @@ public class Parametro implements Instruccion {
             String nombre = identificador.get(i);
             Tipo tipoAux = tipo.verificarUserType(tabla);
             simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "parametro", "local", Tipo.valorPredeterminado(tipoAux), false, tabla.getEnviroment().getPosicionStack(), referencia);
+            tabla.getEnviroment().getPosicionStack();
             Object result = tabla.InsertarVariable(simbolo);
             if (result != null) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -72,5 +73,21 @@ public class Parametro implements Instruccion {
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         return null;
+    }
+
+    public int getFila() {
+        return fila;
+    }
+
+    public void setFila(int fila) {
+        this.fila = fila;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
+
+    public void setColumna(int columna) {
+        this.columna = columna;
     }
 }

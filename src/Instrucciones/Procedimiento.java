@@ -57,6 +57,7 @@ public class Procedimiento extends Simbolo implements Instruccion {
         String nombre = this.getNombre();
         Tipo tipoAux = this.getTipo().verificarUserType(tabla);
         tabla.setAmbito(this.getNombreCompleto());
+
         simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false,tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
         for (int i = 0; i < this.getParametros().size(); i++) {
@@ -64,6 +65,7 @@ public class Procedimiento extends Simbolo implements Instruccion {
             parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
             parametro.ejecutar(tabla, arbol);
             tamaño += parametro.getIdentificador().size();
+            tamaño += 1;
         }
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
@@ -120,9 +122,6 @@ public class Procedimiento extends Simbolo implements Instruccion {
     public Object get4D(Tabla tabla, Tree arbol) {
         tabla.getTamañoActualFuncion().push(this.getTamaño());
         String codigo = "";
-        int indiceInicio = 0;
-        int indiceFinal = 0;
-        indiceInicio = tabla.indiceTemporal;
         tabla.setEnviroment(this.getEntorno());
         String temp1 = tabla.getTemporal();
         codigo += "begin,,," + this.getNombreCompleto() + "\n";

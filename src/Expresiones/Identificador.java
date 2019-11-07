@@ -9,10 +9,10 @@ import Excepciones.Excepcion;
 import Interfaces.Expresion;
 import TablaSimbolos.Simbolo;
 import TablaSimbolos.Tabla;
+import TablaSimbolos.Tipo;
 import TablaSimbolos.Tree;
 
 /**
- *
  * @author Pavel
  */
 public class Identificador implements Expresion {
@@ -77,7 +77,49 @@ public class Identificador implements Expresion {
             tabla.AgregarTemporal(temp1);
             if (asExpresion) {
                 String temp2 = tabla.getTemporal();
-                if (accesoGlobal) {
+                if (((Simbolo) sim).isReferencia() && (((Simbolo) sim).getTipo().getType() == Tipo.tipo.INTEGER
+                        || ((Simbolo) sim).getTipo().getType() == Tipo.tipo.REAL
+                        || ((Simbolo) sim).getTipo().getType() == Tipo.tipo.BOOLEAN
+                        || ((Simbolo) sim).getTipo().getType() == Tipo.tipo.CHAR
+                        || ((Simbolo) sim).getTipo().getType() == Tipo.tipo.WORD
+                        || ((Simbolo) sim).getTipo().getType() == Tipo.tipo.STRING)) {
+                    String label1 = tabla.getEtiqueta();
+                    String label2 = tabla.getEtiqueta();
+                    String temp4 = tabla.getTemporal();
+                    String temp3 = tabla.getTemporal();
+                    codigo += "+,p," + temp1 + "," + temp1 + "\n";
+                    tabla.AgregarTemporal(temp1);
+
+                    codigo += "+," + temp1 + ",1," + temp2 + "\n";
+                    tabla.AgregarTemporal(temp2);
+                    tabla.QuitarTemporal(temp1);
+
+                    codigo += "=,stack," + temp2 + "," + temp4 + "\n";
+                    tabla.AgregarTemporal(temp4);
+                    tabla.QuitarTemporal(temp2);
+
+                    codigo += "je," + temp4 + ",1," + label1 + "\n";
+                    tabla.QuitarTemporal(temp4);
+
+                    codigo += "=,stack," + temp1 + "," + temp3 + "\n";
+                    tabla.AgregarTemporal(temp3);
+                    tabla.QuitarTemporal(temp1);
+
+                    codigo += "=,stack," + temp3 + "," + temp3 + "\n";
+                    tabla.AgregarTemporal(temp3);
+
+                    codigo += "jmp,,," + label2 + "\n";
+                    codigo += label1 + ":\n";
+
+                    codigo += "=,stack," + temp1 + "," + temp1 + "\n";
+                    tabla.QuitarTemporal(temp1);
+                    tabla.AgregarTemporal(temp1);
+
+                    codigo += "=,heap," + temp1 + "," + temp3 + "\n";
+                    tabla.AgregarTemporal(temp3);
+                    tabla.QuitarTemporal(temp1);
+                    codigo += label2 + ":\n";
+                } else if (accesoGlobal) {
                     codigo += "=,heap," + temp1 + "," + temp2 + "\n";
                     tabla.AgregarTemporal(temp2);
                     tabla.QuitarTemporal(temp1);

@@ -70,6 +70,7 @@ public class Funcion extends Simbolo implements Instruccion {
             Parametro parametro = this.getParametros().get(i);
             parametro.ejecutar(tabla, arbol);
             tamaño += parametro.getIdentificador().size();
+            tamaño += 1;
         }
 
         for (int i = 0; i < this.variables.size(); i++) {

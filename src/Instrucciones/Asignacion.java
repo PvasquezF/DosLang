@@ -6,7 +6,7 @@
 package Instrucciones;
 
 import Excepciones.Excepcion;
-import Expresiones.Acceso;
+import Expresiones.Identificador;
 import Expresiones.Malloc;
 import Interfaces.Expresion;
 import Interfaces.Instruccion;
@@ -21,6 +21,7 @@ public class Asignacion implements Instruccion {
 
     AccesoVariable variable;
     Expresion valor;
+    Simbolo simbolo;
     int fila;
     int columna;
 
@@ -37,12 +38,24 @@ public class Asignacion implements Instruccion {
         if (result instanceof Excepcion) {
             return result;
         }
-
+        Tipo t = (Tipo)result;
+        if (variable.getAccesos() != null && variable.getAccesos().size() > 0) {
+            Identificador id = (Identificador) variable.getAccesos().get(0);
+            result = tabla.getVariable(id.getIdentificador());
+            if (result instanceof String) {
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        (String) result,
+                        fila, columna);
+                arbol.getErrores().add(exc);
+                return exc;
+            }
+            simbolo = (Simbolo) result;
+        }
         Object resultValor = valor.getTipo(tabla, arbol);
         if (resultValor instanceof Excepcion) {
             return resultValor;
         }
-        Tipo tipoVariable = (Tipo) result;
+        Tipo tipoVariable = (Tipo) t;
         Tipo tipoValor = (Tipo) resultValor;
         if (tipoVariable.getType() == Tipo.tipo.RANGE) {
             Object lower = tipoVariable.getLowerLimit().getTipo(tabla, arbol);
@@ -89,28 +102,59 @@ public class Asignacion implements Instruccion {
                 || tipoVariable.getType() == Tipo.tipo.REAL
                 || tipoVariable.getType() == Tipo.tipo.BOOLEAN
                 || tipoVariable.getType() == Tipo.tipo.CHAR
-                || tipoVariable.getType() == Tipo.tipo.WORD) {
+                || tipoVariable.getType() == Tipo.tipo.WORD
+                || tipoVariable.getType() == Tipo.tipo.STRING) {
             codigo += variable.get4D(tabla, arbol);
             String temp1 = tabla.getTemporalActual();
-            if (variable.accesoGlobal) {
+            if (simbolo.isReferencia()
+                    && (simbolo.getTipo().getType() == Tipo.tipo.INTEGER
+                    || simbolo.getTipo().getType() == Tipo.tipo.REAL
+                    || simbolo.getTipo().getType() == Tipo.tipo.BOOLEAN
+                    || simbolo.getTipo().getType() == Tipo.tipo.CHAR
+                    || simbolo.getTipo().getType() == Tipo.tipo.WORD
+                    || simbolo.getTipo().getType() == Tipo.tipo.STRING)) {
                 codigo += valor.get4D(tabla, arbol);
-                codigo += "=," + temp1 + "," + tabla.getTemporalActual() + ",heap\n";
-                tabla.QuitarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
-            } else {
+                String temp5 = tabla.getTemporalActual();
+                String label1 = tabla.getEtiqueta();
+                String label2 = tabla.getEtiqueta();
                 String temp2 = tabla.getTemporal();
-                codigo += valor.get4D(tabla, arbol);
-                codigo += "+,p," + temp1 + "," + temp2 + "\n";
+                String temp4 = tabla.getTemporal();
+                codigo += "+,p," + temp1 + "," + temp1 + "\n";
+                tabla.AgregarTemporal(temp1);
+
+                codigo += "+," + temp1 + ",1," + temp2 + "\n";
                 tabla.AgregarTemporal(temp2);
                 tabla.QuitarTemporal(temp1);
-                codigo += "=," + temp2 + "," + tabla.getTemporalActual() + ",stack\n";
-                tabla.QuitarTemporal(tabla.getTemporalActual());
+
+                codigo += "=,stack," + temp2 + "," + temp4 + "\n";
+                tabla.AgregarTemporal(temp4);
                 tabla.QuitarTemporal(temp2);
-            }
-        } else if (tipoVariable.getType() == Tipo.tipo.STRING) {
-            codigo += variable.get4D(tabla, arbol);
-            String temp1 = tabla.getTemporalActual();
-            if (variable.accesoGlobal) {
+
+                codigo += "je," + temp4 + ",1," + label1 + "\n";
+                tabla.QuitarTemporal(temp4);
+
+                codigo += "=,stack," + temp1 + "," + temp1 + "\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.AgregarTemporal(temp1);
+
+                codigo += "=," + temp1 + "," + temp5 + ",stack\n";
+                tabla.QuitarTemporal(tabla.getTemporalActual());
+                tabla.QuitarTemporal(temp1);
+                codigo += "jmp,,," + label2 + "\n";
+                codigo += label1 + ":\n";
+
+                codigo += "=,stack," + temp1 + "," + temp1 + "\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.AgregarTemporal(temp1);
+
+                codigo += "=," + temp1 + "," + temp5 + ",heap\n";
+                tabla.QuitarTemporal(temp1);
+                tabla.QuitarTemporal(temp5);
+
+                codigo += label2 + ":\n";
+
+
+            } else if (variable.accesoGlobal) {
                 codigo += valor.get4D(tabla, arbol);
                 codigo += "=," + temp1 + "," + tabla.getTemporalActual() + ",heap\n";
                 tabla.QuitarTemporal(tabla.getTemporalActual());
@@ -221,7 +265,7 @@ public class Asignacion implements Instruccion {
                 tabla.QuitarTemporal(temp2);
                 tabla.QuitarTemporal(temp3);
             }
-            if(valor instanceof Malloc) {
+            if (valor instanceof Malloc) {
                 for (int k = 0; k < tipoVariable.getAtributos().size(); k++) {
                     Registro r = tipoVariable.getAtributos().get(k);
                     Tipo tipoAtr = r.getTipo();

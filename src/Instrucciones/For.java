@@ -12,7 +12,6 @@ import TablaSimbolos.Tabla;
 import TablaSimbolos.Tree;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class For implements Instruccion {
     private AST asignacion;
@@ -70,6 +69,10 @@ public class For implements Instruccion {
             this.condicion = new Operacion(acceso, condicion, Operacion.Operador.MAYOR_IGUAL, fila, columna);
         }
         Aumento = new Asignacion(a.variable, op, fila, columna);
+        result = Aumento.ejecutar(tabla, arbol);
+        if (result instanceof Excepcion) {
+            return result;
+        }
         tabla.getSentenciasBreakActivas().clear();
         tabla.getSentenciasContinueActivas().clear();
         return null;
