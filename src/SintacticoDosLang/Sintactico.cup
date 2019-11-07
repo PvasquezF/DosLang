@@ -150,7 +150,7 @@ LISTA_EXPRESION ::= LISTA_EXPRESION:e coma EXPRESION:e1 {:RESULT = e; RESULT.add
                   | EXPRESION:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(e); :}
                   ;
 
-MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION parenD
+MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION:e parenD {: RESULT = new Sizeof(e, eleft, eright); :}
                   | malloc parenI EXPRESION:e parenD {: RESULT = new Malloc(e, eleft, eright); :}
                   //| free parenI EXPRESION parenD
                   ;

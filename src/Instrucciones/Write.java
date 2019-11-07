@@ -24,6 +24,12 @@ public class Write implements Instruccion {
 
     @Override
     public Object ejecutar(Tabla tabla, Tree arbol) {
+        for (Expresion valor : valores) {
+            Object result = valor.getTipo(tabla, arbol);
+            if (result instanceof Excepcion) {
+                return result;
+            }
+        }
         return null;
     }
 
