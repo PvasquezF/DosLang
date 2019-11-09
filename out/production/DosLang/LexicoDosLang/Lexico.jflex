@@ -87,6 +87,15 @@ ComentarioMulti =   "{" ~"}"
     "write"             { return symbol(sym.escribir, yytext().toLowerCase()); }
     "writeln"           { return symbol(sym.escribirln, yytext().toLowerCase()); }
     "read"              { return symbol(sym.leer, yytext().toLowerCase()); }
+    "charAt"            { return symbol(sym.chartEn, yytext().toLowerCase()); }
+    "length"            { return symbol(sym.longitud, yytext().toLowerCase()); }
+    "replace"           { return symbol(sym.reemplazar, yytext().toLowerCase()); }
+    "toCharArray"       { return symbol(sym.toCharArreglo, yytext().toLowerCase()); }
+    "toLowercase"       { return symbol(sym.aMinusculas, yytext().toLowerCase()); }
+    "toUpperCase"       { return symbol(sym.aMayusculas, yytext().toLowerCase()); }
+    "Equals"            { return symbol(sym.Equals, yytext().toLowerCase()); }
+    "trunk"             { return symbol(sym.Truncar, yytext().toLowerCase()); }
+    "round"             { return symbol(sym.Redondear, yytext().toLowerCase()); }
     
     ":="                { return symbol(sym.igual, ":="); }
     "+"                 { return symbol(sym.mas, "+"); }

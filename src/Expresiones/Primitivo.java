@@ -59,10 +59,7 @@ public class Primitivo implements Expresion {
             String str = (String) valor;
             //codigo += "=," + tabla.getHeap() + "," + str.length() + ",heap\n"; //size
             for (int i = 0; i <= str.length(); i++) {
-                if (i == 0) {
-                    codigo += "=,h," + ((int) str.charAt(i)) + ",heap\n";
-                    codigo += "+,h,1,h\n";
-                } else if (i == str.length()) {
+                if (i == str.length()) {
                     codigo += "=,h," + 0 + ",heap\n";
                     codigo += "+,h,1,h\n";
                 } else {

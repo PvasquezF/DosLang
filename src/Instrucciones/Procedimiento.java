@@ -70,7 +70,7 @@ public class Procedimiento extends Simbolo implements Instruccion {
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
             declaracion.setStack(true);
-            tamaño += declaracion.getIdentificadores().size();
+            tamaño = declaracion.getIdentificadores().size();
             declaracion.ejecutar(tabla, arbol);
         }
 

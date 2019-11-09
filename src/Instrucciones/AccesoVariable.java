@@ -177,7 +177,7 @@ public class AccesoVariable implements Expresion {
                         String temp4 = tabla.getTemporal();
                         String temp5 = tabla.getTemporal();
                         String temp6 = tabla.getTemporal();
-                        String temp8 = tabla.getTemporal();
+                        //String temp8 = tabla.getTemporal();
                         String label1 = tabla.getEtiqueta();
                         String label2 = tabla.getEtiqueta();
                         codigo += "=,-1,," + temp4 + "\n";

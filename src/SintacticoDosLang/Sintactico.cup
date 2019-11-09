@@ -39,6 +39,7 @@ terminal String potencia, modulo, menorque, menorigual, mayorque, mayorigual;
 terminal String igualacion, diferente, nand, nor, falso, verdadero;
 terminal String mas, menos, por, division, UMENOS, leer;
 terminal String detener, continuar, salir, escribir, escribirln;
+terminal String chartEn, longitud, reemplazar, toCharArreglo, aMinusculas, aMayusculas, Equals, Truncar, Redondear; 
 terminal char caracter;
 /* Non terminals */
 non terminal INICIO;
@@ -344,7 +345,16 @@ ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(n
            | ACCESO:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, true, eleft, eright)); :}
            ;
 
-LLAMADA ::= identificador:e parenI LISTA_EXPRESION:e1 parenD {:RESULT = new Llamada(e, e1, eleft, eright);:}
+LLAMADA ::= chartEn parenI EXPRESION:e coma EXPRESION:e1 parenD {:RESULT = new CharAt(e, e1, eleft, eright);:}
+          | longitud parenI EXPRESION:e parenD {:RESULT = new Longitud(e, eleft, eright);:}
+          | reemplazar parenI EXPRESION:e coma EXPRESION:e1 parenD {:RESULT = new Reemplazar(e, e1, eleft, eright);:}
+          | toCharArreglo parenI EXPRESION parenD
+          | aMinusculas parenI EXPRESION parenD
+          | aMayusculas parenI EXPRESION parenD
+          | Equals parenI EXPRESION coma EXPRESION parenD
+          | Truncar parenI EXPRESION parenD
+          | Redondear parenI EXPRESION parenD
+          | identificador:e parenI LISTA_EXPRESION:e1 parenD {:RESULT = new Llamada(e, e1, eleft, eright);:}
           | identificador:e parenI parenD {:RESULT = new Llamada(e, new ArrayList<Expresion>(), eleft, eright);:}
           ;
 

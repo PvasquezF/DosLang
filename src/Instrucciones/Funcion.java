@@ -76,7 +76,7 @@ public class Funcion extends Simbolo implements Instruccion {
         for (int i = 0; i < this.variables.size(); i++) {
             DeclaracionVar declaracion = (DeclaracionVar) this.variables.get(i);
             declaracion.setStack(true);
-            tamaño += declaracion.getEspacios(tamaño);
+            tamaño = declaracion.getEspacios(tamaño);
             declaracion.ejecutar(tabla, arbol);
         }
 
