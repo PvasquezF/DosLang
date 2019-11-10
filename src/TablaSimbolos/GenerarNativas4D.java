@@ -170,11 +170,11 @@ public class GenerarNativas4D {
         String temp3 = tabla.getTemporal();
         String temp4 = tabla.getTemporal();
         String temp5 = tabla.getTemporal();
-        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "+,p,1," + temp1 + "\n";
         codigo += "=,stack," + temp1 + "," + temp2 + "\n";
         codigo += "%," + temp2 + ",1," + temp3 + "\n";
         codigo += "-," + temp2 + "," + temp3 + "," + temp4 + "\n";
-        codigo += "+,p,1," + temp5 + "\n";
+        codigo += "+,p,0," + temp5 + "\n";
         codigo += "=," + temp5 + "," + temp4 + ",stack\n";
         codigo += "end,,,trunk_primitiva\n";
         return codigo;
@@ -189,14 +189,14 @@ public class GenerarNativas4D {
         String temp4 = tabla.getTemporal();
         String temp5 = tabla.getTemporal();
         String label1 = tabla.getEtiqueta();
-        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "+,p,1," + temp1 + "\n";
         codigo += "=,stack," + temp1 + "," + temp2 + "\n";
         codigo += "%," + temp2 + ",1," + temp3 + "\n";
         codigo += "-," + temp2 + "," + temp3 + "," + temp4 + "\n";
         codigo += "jl," + temp3 + ",0.5," + label1 + "\n";
         codigo += "+," + temp4 + ",1," + temp4 + "\n";
         codigo += label1 + ":\n";
-        codigo += "+,p,1," + temp5 + "\n";
+        codigo += "+,p,0," + temp5 + "\n";
         codigo += "=," + temp5 + "," + temp4 + ",stack\n";
         codigo += "end,,,round_primitiva\n";
         return codigo;
@@ -1040,6 +1040,300 @@ public class GenerarNativas4D {
         codigo += "print(%c,46)\n";
         codigo += "print(%c,10)\n";
         codigo += "end,,,rango_sobrepasado\n";
+        return codigo;
+    }
+
+    public String generarUpperCase(Tabla tabla) {
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        String label3 = tabla.getEtiqueta();
+        String label4 = tabla.getEtiqueta();
+        String label5 = tabla.getEtiqueta();
+        String label6 = tabla.getEtiqueta();
+        String label7 = tabla.getEtiqueta();
+        String label8 = tabla.getEtiqueta();
+        String label9 = tabla.getEtiqueta();
+        String label10 = tabla.getEtiqueta();
+        String label11 = tabla.getEtiqueta();
+        String label12 = tabla.getEtiqueta();
+
+        String codigo = "begin,,,toUpperPrimitiva\n";
+        codigo += "=,0,h,stack\n";
+        codigo += "+,p,1," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "=,0,," + temp3 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,heap," + temp2 + "," + temp3 + "\n";
+        codigo += "je," + temp3 + ",0," + label2 + "\n";
+
+        codigo += "jne," + temp3 + ",164," + label7 + "\n";
+        // es ñ
+        codigo += "=,h,165,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label9 + "\n";
+        codigo += label7 + ":\n";
+
+        codigo += "jne," + temp3 + ",165," + label8 + "\n";
+        // es Ñ
+        codigo += "=,h,165,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label10 + "\n";
+        codigo += label8 + ":\n";
+
+        codigo += "jl," + temp3 + ",97," + label3 + "\n";
+        codigo += "jg," + temp3 + ",122," + label3 + "\n";
+        // Es minuscula
+        codigo += "-," + temp3 + ",32," + temp4 + "\n";
+        codigo += "=,h," + temp4 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label11 + "\n";
+        codigo += label3 + ":\n";
+        codigo += label4 + ":\n";
+
+        codigo += "jl," + temp3 + ",65," + label5 + "\n";
+        codigo += "jg," + temp3 + ",90," + label6 + "\n";
+        // Es mayuscula
+        codigo += "=,h," + temp3 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label11 + "\n";
+        codigo += "jmp,,," + label12 + "\n";
+        codigo += label5 + ":\n";
+        codigo += label6 + ":\n";
+
+        codigo += "=,h," + temp3 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+
+        codigo += label9 + ":\n";
+        codigo += label10 + ":\n";
+        codigo += label11 + ":\n";
+        codigo += label12 + ":\n";
+
+        codigo += "+," + temp2 + ",1," + temp2 + "\n";
+        codigo += "jmp,,," + label1 + "\n";
+
+        codigo += label2 + ":\n";
+        codigo += "=,h,0,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "end,,,toUpperPrimitiva\n";
+        return codigo;
+    }
+
+    public String generarLowerCase(Tabla tabla) {
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        String label3 = tabla.getEtiqueta();
+        String label4 = tabla.getEtiqueta();
+        String label5 = tabla.getEtiqueta();
+        String label6 = tabla.getEtiqueta();
+        String label7 = tabla.getEtiqueta();
+        String label8 = tabla.getEtiqueta();
+        String label9 = tabla.getEtiqueta();
+        String label10 = tabla.getEtiqueta();
+        String label11 = tabla.getEtiqueta();
+        String label12 = tabla.getEtiqueta();
+
+        String codigo = "begin,,,toLowerPrimitiva\n";
+        codigo += "=,0,h,stack\n";
+        codigo += "+,p,1," + temp1 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n";
+        codigo += "=,0,," + temp3 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,heap," + temp2 + "," + temp3 + "\n";
+        codigo += "je," + temp3 + ",0," + label2 + "\n";
+
+        codigo += "jne," + temp3 + ",164," + label7 + "\n";
+        // es ñ
+        codigo += "=,h,164,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label9 + "\n";
+        codigo += label7 + ":\n";
+
+        codigo += "jne," + temp3 + ",165," + label8 + "\n";
+        // es Ñ
+        codigo += "=,h,164,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label10 + "\n";
+        codigo += label8 + ":\n";
+
+        codigo += "jl," + temp3 + ",97," + label3 + "\n";
+        codigo += "jg," + temp3 + ",122," + label3 + "\n";
+        // Es minuscula
+        codigo += "=,h," + temp3 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label11 + "\n";
+        codigo += label3 + ":\n";
+        codigo += label4 + ":\n";
+
+        codigo += "jl," + temp3 + ",65," + label5 + "\n";
+        codigo += "jg," + temp3 + ",90," + label6 + "\n";
+        // Es mayuscula
+        codigo += "+," + temp3 + ",32," + temp4 + "\n";
+        codigo += "=,h," + temp4 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label11 + "\n";
+        codigo += "jmp,,," + label12 + "\n";
+        codigo += label5 + ":\n";
+        codigo += label6 + ":\n";
+
+        codigo += "=,h," + temp3 + ",heap" + "\n";
+        codigo += "+,h,1,h\n";
+
+        codigo += label9 + ":\n";
+        codigo += label10 + ":\n";
+        codigo += label11 + ":\n";
+        codigo += label12 + ":\n";
+
+        codigo += "+," + temp2 + ",1," + temp2 + "\n";
+        codigo += "jmp,,," + label1 + "\n";
+
+        codigo += label2 + ":\n";
+        codigo += "=,h,0,heap" + "\n";
+        codigo += "+,h,1,h\n";
+        codigo += "end,,,toLowerPrimitiva\n";
+        return codigo;
+    }
+
+    public String generarEquals(Tabla tabla) {
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String temp7 = tabla.getTemporal();
+        String temp8 = tabla.getTemporal();
+        String temp9 = tabla.getTemporal();
+        String temp10 = tabla.getTemporal();
+        String temp11 = tabla.getTemporal();
+        String temp12 = tabla.getTemporal();
+        String temp13 = tabla.getTemporal();
+        String temp14 = tabla.getTemporal();
+        String temp15 = tabla.getTemporal();
+        String temp16 = tabla.getTemporal();
+        String temp17 = tabla.getTemporal();
+        String temp18 = tabla.getTemporal();
+
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        String label3 = tabla.getEtiqueta();
+        String label4 = tabla.getEtiqueta();
+        String label5 = tabla.getEtiqueta();
+        String label6 = tabla.getEtiqueta();
+
+        String codigo = "";
+        codigo += "begin,,,equalsPrimitiva\n";
+        codigo += "+,p,1," + temp1 + "\n";
+        codigo += "+,p,2," + temp2 + "\n";
+        codigo += "=,stack," + temp1 + "," + temp3 + "\n";
+        codigo += "=,stack," + temp2 + "," + temp4 + "\n";
+
+        codigo += "+,p,3,p\n";
+        codigo += "+,p,0," + temp5 + "\n";
+        codigo += "+,p,1," + temp6 + "\n";
+        codigo += "=," + temp5 + ",-1,stack\n";
+        codigo += "=," + temp6 + "," + temp3 + ",stack\n";
+        codigo += "call,,,lenght_primitiva\n";
+        codigo += "+,p,0," + temp7 + "\n";
+        codigo += "-,p,3,p\n";
+        codigo += "=,stack," + temp7 + "," + temp8 + "\n";
+
+        codigo += "+,p,3,p\n";
+        codigo += "+,p,0," + temp9 + "\n";
+        codigo += "+,p,1," + temp10 + "\n";
+        codigo += "=," + temp9 + ",-1,stack\n";
+        codigo += "=," + temp10 + "," + temp4 + ",stack\n";
+        codigo += "call,,,lenght_primitiva\n";
+        codigo += "+,p,0," + temp11 + "\n";
+        codigo += "-,p,3,p\n";
+        codigo += "=,stack," + temp11 + "," + temp12 + "\n";
+
+        codigo += "je," + temp8 + "," + temp12 + "," + label1 + "\n";
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,0,," + temp13 + "\n";
+        codigo += "=," + temp3 + ",," + temp14 + "\n";
+        codigo += "=," + temp4 + ",," + temp15 + "\n";
+        codigo += "+,p,0," + temp18 + "\n";
+        codigo += label4 + ":\n";
+        codigo += "je," + temp13 + "," + temp8 + "," + label3 + "\n";
+        codigo += "=,heap," + temp14 + "," + temp16 + "\n";
+        codigo += "=,heap," + temp15 + "," + temp17 + "\n";
+
+        codigo += "je," + temp16 + "," + temp17 + "," + label5 + "\n";
+        codigo += "jmp,,," + label6 + "\n";
+        codigo += label5 + ":\n";
+
+        codigo += "+," + temp13 + ",1," + temp13 + "\n";
+        codigo += "+," + temp14 + ",1," + temp14 + "\n";
+        codigo += "+," + temp15 + ",1," + temp15 + "\n";
+        codigo += "=," + temp18 + ",1,stack\n";
+        codigo += "jmp,,," + label4 + "\n";
+
+        codigo += label2 + ":\n";
+        codigo += label6 + ":\n";
+        codigo += "=," + temp18 + ",0,stack\n";
+
+        codigo += label3 + ":\n";
+        codigo += "end,,,equalsPrimitiva\n";
+        return codigo;
+    }
+
+    public String generarToCharArray(Tabla tabla) {
+        String codigo = "";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String temp7 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        String label3 = tabla.getEtiqueta();
+        String label4 = tabla.getEtiqueta();
+        codigo += "begin,,,toCharArrayPrimitiva\n";
+        codigo += "+,p,0," + temp1 + "\n";
+        codigo += "+,p,1," + temp2 + "\n";
+        codigo += "=," + temp1 + ",h,stack\n";
+        codigo += "=,h,0,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,49,heap\n";
+        codigo += "+,h,1,h\n";
+
+        codigo += "=,0,," + temp2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "je," + temp2 + ",50," + label2 + "\n";
+        codigo += "+,1," + temp2 + "," + temp2 + "\n";
+        codigo += "=,h,0,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label1 + "\n";
+        codigo += label2 + ":\n";
+
+        codigo += "+,p,0," + temp3 + "\n";
+        codigo += "=,stack," + temp3 + "," + temp4 + "\n";
+        codigo += "+,p,1," + temp6 + "\n";
+        codigo += "=,stack," + temp6 + "," + temp7 + "\n";
+        codigo += "+," + temp4 + ",2," + temp4 + "\n";
+
+        codigo += label3 + ":\n";
+        codigo += "=,heap," + temp7 + "," + temp5 + "\n";
+        codigo += "je," + temp5 + ",0," + label4 + "\n";
+        codigo += "=," + temp4 + "," + temp5 + ",heap\n";
+        codigo += "+," + temp7 + ",1," + temp7 + "\n";
+        codigo += "+," + temp4 + ",1," + temp4 + "\n";
+        codigo += "jmp,,," + label3 + "\n";
+        codigo += label4 + ":\n";
+        codigo += "end,,,toCharArrayPrimitiva\n";
         return codigo;
     }
 }

@@ -348,12 +348,12 @@ ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(n
 LLAMADA ::= chartEn parenI EXPRESION:e coma EXPRESION:e1 parenD {:RESULT = new CharAt(e, e1, eleft, eright);:}
           | longitud parenI EXPRESION:e parenD {:RESULT = new Longitud(e, eleft, eright);:}
           | reemplazar parenI EXPRESION:e coma EXPRESION:e1 parenD {:RESULT = new Reemplazar(e, e1, eleft, eright);:}
-          | toCharArreglo parenI EXPRESION parenD
-          | aMinusculas parenI EXPRESION parenD
-          | aMayusculas parenI EXPRESION parenD
-          | Equals parenI EXPRESION coma EXPRESION parenD
-          | Truncar parenI EXPRESION parenD
-          | Redondear parenI EXPRESION parenD
+          | toCharArreglo parenI EXPRESION:e parenD {:RESULT = new toCharArray(e, eleft, eright);:}
+          | aMinusculas parenI EXPRESION:e parenD {:RESULT = new aMinusculas(e, eleft, eright);:}
+          | aMayusculas parenI EXPRESION:e parenD {:RESULT = new aMayusculas(e, eleft, eright);:}
+          | Equals parenI EXPRESION:e coma EXPRESION:e1 parenD  {:RESULT = new Iguals(e, e1, eleft, eright);:}
+          | Truncar parenI EXPRESION:e parenD {:RESULT = new Trunk(e, eleft, eright);:}
+          | Redondear parenI EXPRESION:e parenD {:RESULT = new Redondear(e, eleft, eright);:}
           | identificador:e parenI LISTA_EXPRESION:e1 parenD {:RESULT = new Llamada(e, e1, eleft, eright);:}
           | identificador:e parenI parenD {:RESULT = new Llamada(e, new ArrayList<Expresion>(), eleft, eright);:}
           ;

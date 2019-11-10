@@ -160,16 +160,20 @@ public class DosLang extends Thread {
                     Cuadruplos += ins.get4D(tabla, t);
             }*/
             GenerarNativas4D gn4D = new GenerarNativas4D();
-            Cuadruplos += gn4D.generarIndexOut(tabla);
             //Cuadruplos += gn4D.generarConcatenacion(tabla);
             //Cuadruplos += gn4D.generarChartAt(tabla);
             //Cuadruplos += gn4D.generarLenght(tabla);
             //Cuadruplos += gn4D.generarConcatenacionStringChar(tabla);
             //Cuadruplos += gn4D.generarConcatenacionCharString(tabla);
             //Cuadruplos += gn4D.generaReplace(tabla);
+            //Cuadruplos += gn4D.generarIndexOut(tabla);
+            //Cuadruplos += gn4D.generarLowerCase(tabla);
+            //Cuadruplos += gn4D.generarUpperCase(tabla);
+            //Cuadruplos += gn4D.generarEquals(tabla);
             //Cuadruplos += gn4D.generarPrint(tabla);
             //Cuadruplos += gn4D.generarTrunk(tabla);
             //Cuadruplos += gn4D.generarRound(tabla);
+            Cuadruplos += gn4D.generarToCharArray(tabla);
             //Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
             System.out.println(Cuadruplos);
         } else {
