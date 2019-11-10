@@ -51,6 +51,15 @@ public class Acceso implements Expresion {
                             tipoResultado = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());
                             tipoResultado = tipoResultado.verificarUserType(tabla);
                         }
+                    } else if (cantidadAccesos < cantidadDimensiones) {
+                        Tipo tipoRet = new Tipo(Tipo.tipo.ARREGLO);
+                        tipoRet.setTipoArreglo(tipoResultado.getTipoArreglo());
+                        tipoRet.setTipoObjeto(tipoResultado.getTipoObjeto());
+                        ArrayList<Dimension> dims = new ArrayList<>();
+                        for (int j = cantidadAccesos; j < cantidadDimensiones; j++) {
+                            dims.add(tipoResultado.getDimensiones().get(j));
+                        }
+                        tipoRet.setDimensiones(dims);
                     } else {
                         if (cantidadAccesos < cantidadDimensiones) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
@@ -161,83 +170,72 @@ public class Acceso implements Expresion {
                 if (acceso instanceof AccesoArreglo) {
                     int cantidadDimensiones = tipoResultado.getDimensiones().size(); // [2..4][5..8]
                     int cantidadAccesos = ((AccesoArreglo) acceso).getIndices().size(); // [2,7]
-                    if (cantidadAccesos == cantidadDimensiones) {
+                    if (cantidadAccesos <= cantidadDimensiones) {
                         String temp1 = tabla.getTemporal();
                         String temp2 = tabla.getTemporal();
                         String temp3 = tabla.getTemporal();
                         String temp4 = tabla.getTemporal();
                         String temp5 = tabla.getTemporal();
                         String temp6 = tabla.getTemporal();
-                        //String temp8 = tabla.getTemporal();
+                        String temp8 = tabla.getTemporal();
+                        tabla.AgregarTemporal(temp1);
+                        tabla.AgregarTemporal(temp2);
+                        tabla.AgregarTemporal(temp3);
+                        tabla.AgregarTemporal(temp4);
+                        tabla.AgregarTemporal(temp5);
+                        tabla.AgregarTemporal(temp6);
+                        tabla.AgregarTemporal(temp8);
                         String label1 = tabla.getEtiqueta();
                         String label2 = tabla.getEtiqueta();
-                        codigo += "=,-1,," + temp4 + "\n";
-                        tabla.AgregarTemporal(temp4);
-                        for (int j = 0; j < cantidadDimensiones; j++) {
-                            Dimension dimension = tipoResultado.getDimensiones().get(j);
-                            codigo += dimension.getLimiteInferior().get4D(tabla, arbol);
-                            codigo += "=," + tabla.getTemporalActual() + ",," + temp1 + " // Limite inferior, dimension " + j + "\n";
-                            tabla.AgregarTemporal(temp1);
-                            tabla.QuitarTemporal(tabla.getTemporalActual());
-                            codigo += dimension.getLimiteSuperior().get4D(tabla, arbol);
-                            codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + " // Limite superior, dimension " + j + "\n";
+                        String label3 = tabla.getEtiqueta();
+                        for (int j = 0; j < cantidadAccesos; j++) {
+                            codigo += "+," + temp7 + ",0," + temp2 + "\n";
+                            tabla.QuitarTemporal(temp7);
                             tabla.AgregarTemporal(temp2);
-                            tabla.QuitarTemporal(tabla.getTemporalActual());
-                            codigo += ((AccesoArreglo) acceso).getIndices().get(j).get4D(tabla, arbol);
-                            codigo += "=," + tabla.getTemporalActual() + ",," + temp3 + " // indice dimension " + j + "\n";
+                            codigo += "=,heap," + temp2 + "," + temp1 + " // lim inf dim" + j + "\n";
+                            tabla.AgregarTemporal(temp1);
+                            tabla.QuitarTemporal(temp2);
+                            codigo += "+," + temp7 + ",1," + temp3 + "\n";
                             tabla.AgregarTemporal(temp3);
+                            tabla.QuitarTemporal(temp7);
+                            codigo += "=,heap," + temp3 + "," + temp4 + " // lim sup dim" + j + "\n";
+                            tabla.QuitarTemporal(temp3);
+                            tabla.AgregarTemporal(temp4);
+                            codigo += ((AccesoArreglo) acceso).getIndices().get(j).get4D(tabla, arbol);
+                            codigo += "=," + tabla.getTemporalActual() + ",," + temp5 + "\n";
                             tabla.QuitarTemporal(tabla.getTemporalActual());
-                            codigo += "jl," + temp3 + "," + temp1 + "," + label1 + "\n";
-                            tabla.QuitarTemporal(temp3);
+                            tabla.AgregarTemporal(temp5);
+                            codigo += "jl," + temp5 + "," + temp1 + "," + label1 + "\n";
+                            tabla.QuitarTemporal(temp5);
                             tabla.QuitarTemporal(temp1);
-                            codigo += "jge," + temp3 + "," + temp2 + "," + label2 + "\n";
-                            if (j > 0) {
-                                codigo += "-," + temp2 + "," + temp1 + "," + temp5 + "// n" + j + "\n";
-                                tabla.AgregarTemporal(temp5);
-                                tabla.QuitarTemporal(temp2);
-                                tabla.QuitarTemporal(temp1);
-                                codigo += "*," + temp4 + "," + temp5 + "," + temp6 + "//(i-inf1)*n" + j + "\n";
-                                tabla.AgregarTemporal(temp6);
-                                tabla.QuitarTemporal(temp5);
-                                tabla.QuitarTemporal(temp4);
-                            } else {
-                                codigo += "=,0,," + temp6 + "\n";
-                                tabla.AgregarTemporal(temp6);
-                            }
-                            codigo += "-," + temp3 + "," + temp1 + "," + temp4 + "\n";
-                            tabla.AgregarTemporal(temp4);
-                            tabla.QuitarTemporal(temp3);
+                            codigo += "jge," + temp5 + "," + temp4 + "," + label2 + "\n";
+                            tabla.QuitarTemporal(temp5);
+                            tabla.QuitarTemporal(temp4);
+
+                            codigo += "+," + temp7 + ",2," + temp6 + "\n";
+                            tabla.QuitarTemporal(temp7);
+                            tabla.AgregarTemporal(temp6);
+                            codigo += "-," + temp5 + "," + temp1 + "," + temp7 + "\n";
+                            tabla.QuitarTemporal(temp5);
                             tabla.QuitarTemporal(temp1);
-                            codigo += "+," + temp4 + "," + temp6 + "," + temp4 + "\n";
-                            tabla.AgregarTemporal(temp4);
+                            tabla.AgregarTemporal(temp7);
+                            codigo += "+," + temp7 + "," + temp6 + "," + temp7 + "\n";
                             tabla.QuitarTemporal(temp6);
+                            tabla.AgregarTemporal(temp7);
+                            codigo += "=,heap," + temp7 + "," + temp7 + "\n";
+                            tabla.AgregarTemporal(temp7);
                         }
-                        //codigo += "=," + temp4 + ",," + tabla.getTemporal() + "//Valor que se tiene que accesar\n";
-                        codigo += "+," + temp4 + "," + temp7 + "," + temp7 + "\n";
-                        tabla.QuitarTemporal(temp4);
-                        if (identificador.accesoGlobal) {
-                            codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
-                            //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",heap //Fin acceso\n";
-                        } else {
-                            codigo += "=,heap," + temp7 + "," + temp7 + " //Fin acceso\\n\n";
-                            //codigo += "=," + temp8 + "," + tabla.getTemporalActual() + ",stack  //Fin acceso\n";
-                        }
+                        codigo += "jmp,,," + label3 + "\n";
                         codigo += label1 + ":\n";
                         codigo += label2 + ":\n";
+                        codigo += "call,,,indexOutException_primitiva\n";
+                        codigo += label3 + ":\n";
                     } else {
-                        if (cantidadAccesos < cantidadDimensiones) {
-                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                                    "La cantidad de dimensiones accesadas es menor a la que contiene el arreglo.",
-                                    fila, columna);
-                            arbol.getErrores().add(exc);
-                            return exc;
-                        } else {
-                            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                                    "La cantidad de dimensiones accesadas es mayor a la que contiene el arreglo.",
-                                    fila, columna);
-                            arbol.getErrores().add(exc);
-                            return exc;
-                        }
+                        Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                "La cantidad de dimensiones accesadas es mayor a la que contiene el arreglo.",
+                                fila, columna);
+                        arbol.getErrores().add(exc);
+                        return exc;
                     }
                     if (tipoResultado.getTipoArreglo() == Tipo.tipo.RECORD) {
                         Tipo tipoArAtr = new Tipo(tipoResultado.getTipoArreglo(), tipoResultado.getTipoObjeto());

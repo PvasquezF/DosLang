@@ -258,41 +258,103 @@ public class DeclaracionConstante implements Instruccion {
                     tabla.QuitarTemporal(tabla.getTemporalActual());
                 } else if (tipoAux.getType() == Tipo.tipo.ARREGLO) {
                     String temp1 = tabla.getTemporal();
-                    String temp2 = tabla.getTemporal();
-                    String temp3 = tabla.getTemporal();
-                    String temp4 = tabla.getTemporal();
-                    String temp5 = tabla.getTemporal();
                     String temp6 = tabla.getTemporal();
-                    String temp7 = tabla.getTemporal();
-                    String label1 = tabla.getEtiqueta();
-                    String label2 = tabla.getEtiqueta();
-                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "\n";
+                    String tempCont0 = tabla.getTemporal();
+                    String tempCont1 = tabla.getTemporal();
+                    String tempCont2 = tabla.getTemporal();
+                    codigo += "=," + sim.getApuntador() + ",," + temp1 + "// Inicio declaracion array\n";
                     ArrayList<Dimension> dimension = tipoAux.getDimensiones();
-                    codigo += "=,h," + dimension.size() + ",heap // Cantidad dimensiones arreglo\n";
                     codigo += "=,h,," + temp6 + "\n";
-                    codigo += "+,h,1,h\n";
-                    codigo += "=,1,," + temp5 + "\n";
+                    codigo += "=,1,," + tempCont0 + "\n";
+                    codigo += "=,1,," + tempCont1 + "\n";
+                    ArrayList<String> posicionesArray = new ArrayList<>();
                     for (int k = 0; k < dimension.size(); k++) {
+                        String temp2 = tabla.getTemporal();
+                        String temp3 = tabla.getTemporal();
+                        String temp4 = tabla.getTemporal();
                         Dimension dim = dimension.get(k);
                         codigo += dim.getLimiteInferior().get4D(tabla, arbol);
                         codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + "\n";
                         codigo += dim.getLimiteSuperior().get4D(tabla, arbol);
                         codigo += "=," + tabla.getTemporalActual() + ",," + temp3 + "\n";
-                        codigo += "-," + temp3 + "," + temp2 + "," + temp4 + "// Tamaño dimension " + k + "\n";
-                        codigo += "=,h," + temp4 + ",heap // dimension " + k + "\n";
-                        codigo += "+,h,1,h\n";
-                        codigo += "*," + temp5 + "," + temp4 + "," + temp5 + "\n";
-                    }
-                    codigo += label1 + ":\n";
-                    codigo += "je," + temp5 + ",0," + label2 + "\n";
-                    codigo += "-," + temp5 + ",1," + temp5 + "\n";
-                    codigo += Tipo.valorPredeterminado(tipoAux).get4D(tabla, arbol);
-                    codigo += "=," + tabla.getTemporalActual() + ",," + temp7 + "\n";
-                    codigo += "=,h," + temp7 + ",heap\n";
-                    codigo += "+,h,1,h\n";
-                    codigo += "jmp,,," + label1 + "\n";
-                    codigo += label2 + ":\n";
 
+                        codigo += "-," + temp3 + "," + temp2 + "," + temp4 + "// Tamaño dimension " + k + "\n";
+                        codigo += "+," + temp4 + ",2," + temp4 + "\n";
+                        if (posicionesArray.indexOf(temp4) == -1) {
+                            posicionesArray.add(temp4);
+                        }
+                    }
+                    if (posicionesArray.size() > 0) {
+                        codigo += "=," + posicionesArray.get(0) + ",," + tempCont2 + "\n";
+                    }
+                    String temp9 = tabla.getTemporal();
+                    String temp14 = tabla.getTemporal();
+                    codigo += "=,0,," + temp14 + "\n";
+                    for (int k = 0; k < dimension.size(); k++) {
+                        String temp2 = tabla.getTemporal();
+                        String temp3 = tabla.getTemporal();
+                        String temp4 = tabla.getTemporal();
+                        String temp5 = tabla.getTemporal();
+                        String temp7 = tabla.getTemporal();
+                        String temp8 = tabla.getTemporal();
+                        String temp10 = tabla.getTemporal();
+                        String temp11 = tabla.getTemporal();
+                        String temp12 = tabla.getTemporal();
+                        String temp13 = tabla.getTemporal();
+                        String label1 = tabla.getEtiqueta();
+                        String label2 = tabla.getEtiqueta();
+                        String labelCont0 = tabla.getEtiqueta();
+                        String labelCont1 = tabla.getEtiqueta();
+                        Dimension dim = dimension.get(k);
+
+                        codigo += labelCont0 + ":\n";
+                        codigo += "je," + tempCont0 + ",0," + labelCont1 + "\n";
+                        codigo += dim.getLimiteInferior().get4D(tabla, arbol);
+                        codigo += "=," + tabla.getTemporalActual() + ",," + temp2 + "\n";
+                        codigo += dim.getLimiteSuperior().get4D(tabla, arbol);
+                        codigo += "=," + tabla.getTemporalActual() + ",," + temp3 + "\n";
+
+                        if (k == 0) {
+                            codigo += "=,h,," + temp9 + "\n";
+                        }
+                        codigo += "=,h," + temp2 + ",heap // Dimension " + k + ", lim Sup\n";
+                        codigo += "+,h,1,h\n";
+                        codigo += "=,h," + temp3 + ",heap // Dimension " + k + ", lim Inf\n";
+                        codigo += "+,h,1,h\n";
+
+                        codigo += "-," + temp3 + "," + temp2 + "," + temp4 + "// Tamaño dimension " + k + "\n";
+                        codigo += "=," + temp4 + ",," + temp8 + "\n";
+
+                        codigo += label1 + ":\n";
+                        codigo += "je," + temp4 + ",0," + label2 + "\n";
+                        codigo += "=,h,," + temp5 + "\n";
+                        if (k + 1 == dimension.size()) {
+                            codigo += Tipo.valorPredeterminado(tipoAux).get4D(tabla, arbol);
+                            codigo += "=,h," + tabla.getTemporalActual() + ",heap\n";
+                            codigo += "=,0,," + temp13 + "\n";
+                        } else {
+                            codigo += "+," + temp9 + "," + posicionesArray.get(k) + "," + temp10 + "\n";
+                            //codigo += "-," + temp8 + "," + temp4 + "," + temp11 + "\n";
+                            //codigo += "-," + temp11 + ",1," + temp11 + "\n";
+                            codigo += "*," + posicionesArray.get(k + 1) + "," + temp14 + "," + temp12 + "\n";
+                            codigo += "+," + temp14 + ",1," + temp14 + "\n";
+                            codigo += "+," + temp10 + "," + temp12 + "," + temp13 + "\n";
+                            codigo += "=,h," + temp13 + ",heap\n";
+                        }
+                        codigo += "-," + temp4 + ",1," + temp4 + "\n";
+                        codigo += "+,h,1,h\n";
+                        codigo += "jmp,,," + label1 + "\n";
+                        codigo += label2 + ":\n";
+                        codigo += "-," + tempCont0 + ",1," + tempCont0 + "\n";
+                        codigo += "jmp,,," + labelCont0 + "\n";
+                        codigo += labelCont1 + ":\n";
+                        codigo += "=," + temp13 + ",," + temp9 + "\n";
+                        codigo += "=,0,," + temp14 + "\n";
+                        codigo += "-," + temp3 + "," + temp2 + "," + temp7 + "\n";
+                        codigo += "*," + tempCont1 + "," + temp7 + "," + tempCont1 + "// Actualizando contador\n";
+                        codigo += "=," + tempCont1 + ",," + tempCont0 + "\n";
+
+                    }
                     codigo += "=, " + temp1 + ", " + temp6 + ", heap // Fin declaracion Array " + identificador + "\n";
                 } else if (tipoAux.getType() == Tipo.tipo.RECORD) {
                     /*String temp1 = tabla.getTemporal();

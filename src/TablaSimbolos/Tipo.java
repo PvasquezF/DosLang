@@ -148,6 +148,11 @@ public class Tipo {
         return this;
     }
 
+    public void ReestructurarTipo(){
+
+    }
+
+
     public tipo getType() {
         return type;
     }
