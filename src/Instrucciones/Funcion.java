@@ -145,7 +145,7 @@ public class Funcion extends Simbolo implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-         //tabla.getTempNoUsados().clear();
+        //tabla.getTempNoUsados().clear();
         tabla.getTamañoActualFuncion().push(this.getTamaño());
         tabla.getTempNoUsados().clear();
         String codigo = "";
@@ -166,15 +166,27 @@ public class Funcion extends Simbolo implements Instruccion {
         }
         for (int i = 0; i < this.instrucciones.size(); i++) {
             AST instruccion = instrucciones.get(i);
-            codigo += instruccion.get4D(tabla, arbol);
+            if (instruccion instanceof Funcion || instruccion instanceof Procedimiento) {
+                continue;
+            } else {
+                codigo += instruccion.get4D(tabla, arbol);
+            }
         }
         for (Object o : tabla.getEtiquetasExit()) {
             codigo += (String) o + ": // Exit\n";
         }
         tabla.getEtiquetasExit().clear();
         codigo += "end,,," + this.getNombreCompleto() + "\n";
-        tabla.setEnviroment(this.getEntorno().getAnterior());
         tabla.getTamañoActualFuncion().pop();
+        for (int i = 0; i < this.instrucciones.size(); i++) {
+            AST instruccion = instrucciones.get(i);
+            if (instruccion instanceof Funcion || instruccion instanceof Procedimiento) {
+                codigo += instruccion.get4D(tabla, arbol);
+            } else {
+                continue;
+            }
+        }
+        tabla.setEnviroment(this.getEntorno().getAnterior());
         return codigo;
     }
 }

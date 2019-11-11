@@ -190,4 +190,13 @@ public class DosLang extends Thread {
         //socket.start();
 
     }
+
+    public String generarFunciones(AST proc) {
+        if (proc instanceof Funcion) {
+
+        } else if (proc instanceof Procedimiento) {
+
+        }
+        return null;
+    }
 }

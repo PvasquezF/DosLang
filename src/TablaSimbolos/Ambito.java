@@ -21,12 +21,12 @@ public class Ambito {
     public String insertarVariable(Simbolo simbolo) {
         Ambito aux = this;
         //while (aux != null) {
-            for (int i = 0; i < aux.getVariables().size(); i++) {
-                Simbolo sim = aux.getVariables().get(i);
-                if (sim.getNombre().equalsIgnoreCase(simbolo.getNombre())) {
-                    return "La variable " + simbolo.getNombre() + " ya ha sido declarada.";
-                }
+        for (int i = 0; i < aux.getVariables().size(); i++) {
+            Simbolo sim = aux.getVariables().get(i);
+            if (sim.getNombre().equalsIgnoreCase(simbolo.getNombre())) {
+                return "La variable " + simbolo.getNombre() + " ya ha sido declarada.";
             }
+        }
         //    aux = aux.getAnterior();
         //}
         this.variables.add(simbolo);
@@ -36,13 +36,13 @@ public class Ambito {
     public String insertarFuncion(Simbolo simbolo) {
         Ambito aux = this;
         //while (aux != null) {
-            for (int i = 0; i < aux.getFunciones().size(); i++) {
-                Simbolo sim = aux.getFunciones().get(i);
-                if (sim.getNombreCompleto().equalsIgnoreCase(simbolo.getNombreCompleto())) {
-                    return "La funcion " + simbolo.getNombre() + " ya ha sido declarada.";
-                }
+        for (int i = 0; i < aux.getFunciones().size(); i++) {
+            Simbolo sim = aux.getFunciones().get(i);
+            if (sim.getNombreCompleto().equalsIgnoreCase(simbolo.getNombreCompleto())) {
+                return "La funcion " + simbolo.getNombre() + " ya ha sido declarada.";
             }
-            //aux = aux.getAnterior();
+        }
+        //aux = aux.getAnterior();
         //}
         this.funciones.add(simbolo);
         return null;
@@ -51,12 +51,12 @@ public class Ambito {
     /*public String insertarProcedimiento(Simbolo simbolo) {
         Ambito aux = this;
         //while (aux != null) {
-            for (int i = 0; i < aux.getProcedimientos().size(); i++) {
-                Simbolo sim = aux.getProcedimientos().get(i);
-                if (sim.getNombreCompleto().equalsIgnoreCase(simbolo.getNombreCompleto())) {
-                    return "El procedimiento " + simbolo.getNombre() + " ya ha sido declarado.";
-                }
+        for (int i = 0; i < aux.getProcedimientos().size(); i++) {
+            Simbolo sim = aux.getProcedimientos().get(i);
+            if (sim.getNombreCompleto().equalsIgnoreCase(simbolo.getNombreCompleto())) {
+                return "El procedimiento " + simbolo.getNombre() + " ya ha sido declarado.";
             }
+        }
         //    aux = aux.getAnterior();
         //}
         this.procedimientos.add(simbolo);
@@ -139,7 +139,9 @@ public class Ambito {
         for (int i = 0; i < this.getFunciones().size(); i++) {
             Simbolo sim = this.getFunciones().get(i);
             tabla.add(sim);
-            sim.getEntorno().concatenarTablas(tabla);
+            if (sim.getEntorno() != null) {
+                sim.getEntorno().concatenarTablas(tabla);
+            }
         }
     }
 
