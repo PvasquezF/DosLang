@@ -271,6 +271,7 @@ INSTRUCCION ::= WITH:e {:RESULT = e;:}
               | SWITCH:e {:RESULT = e;:}
               | free parenI VARIABLE:e parenD pComa {:RESULT = new Free(new AccesoVariable(e, eleft, eright), eleft, eright);:}
               | LLAMADA:e pComa {:RESULT = e;:}
+              | FUNCION:e {:RESULT = e;:}
               ;
 
 WITH ::= con identificador:e hacer LISTA_INSTRUCCIONES:e1 end pComa {:

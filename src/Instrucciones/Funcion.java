@@ -66,6 +66,26 @@ public class Funcion extends Simbolo implements Instruccion {
         tabla.setAmbito(this.getNombreCompleto());
         simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false, tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
+        for (int i = 0; i < instrucciones.size(); i++) {
+            AST ins = instrucciones.get(i);
+            if (ins instanceof Funcion) {
+                Funcion f = (Funcion) ins;
+                tabla.InsertarFuncion(f);
+                for (int j = 0; j < f.getParametros().size(); j++) {
+                    Parametro parametro = f.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
+                }
+                f.setNombreCompleto(f.generarNombreCompleto());
+            } else if (ins instanceof Procedimiento) {
+                Procedimiento p = (Procedimiento) ins;
+                tabla.InsertarFuncion(p);
+                for (int j = 0; j < p.getParametros().size(); j++) {
+                    Parametro parametro = p.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
+                }
+                p.setNombreCompleto(p.generarNombreCompleto());
+            }
+        }
         for (int i = 0; i < this.getParametros().size(); i++) {
             Parametro parametro = this.getParametros().get(i);
             parametro.ejecutar(tabla, arbol);
@@ -126,7 +146,7 @@ public class Funcion extends Simbolo implements Instruccion {
 
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
-         //tabla.getTempNoUsados().clear();
+        //tabla.getTempNoUsados().clear();
         tabla.getTamañoActualFuncion().push(this.getTamaño());
         tabla.getTempNoUsados().clear();
         String codigo = "";
@@ -147,15 +167,27 @@ public class Funcion extends Simbolo implements Instruccion {
         }
         for (int i = 0; i < this.instrucciones.size(); i++) {
             AST instruccion = instrucciones.get(i);
-            codigo += instruccion.get4D(tabla, arbol);
+            if (instruccion instanceof Funcion || instruccion instanceof Procedimiento) {
+                continue;
+            } else {
+                codigo += instruccion.get4D(tabla, arbol);
+            }
         }
         for (Object o : tabla.getEtiquetasExit()) {
             codigo += (String) o + ": // Exit\n";
         }
         tabla.getEtiquetasExit().clear();
         codigo += "end,,," + this.getNombreCompleto() + "\n";
-        tabla.setEnviroment(this.getEntorno().getAnterior());
         tabla.getTamañoActualFuncion().pop();
+        for (int i = 0; i < this.instrucciones.size(); i++) {
+            AST instruccion = instrucciones.get(i);
+            if (instruccion instanceof Funcion || instruccion instanceof Procedimiento) {
+                codigo += instruccion.get4D(tabla, arbol);
+            } else {
+                continue;
+            }
+        }
+        tabla.setEnviroment(this.getEntorno().getAnterior());
         return codigo;
     }
 }
