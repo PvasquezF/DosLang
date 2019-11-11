@@ -723,11 +723,393 @@ public class Operacion implements Expresion {
 
     String get4DSuma(Tabla tabla, String op1Actual, String op2Actual, Tipo tipo1, Tipo tipo2) {
         String codigo = "";
-        if (tipo1.getType() == Tipo.tipo.STRING && tipo2.getType() == Tipo.tipo.STRING) {
+        if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && tipo2.getType() == tipo.INTEGER) {
+            String temp10 = tabla.getTemporal();
+            String temp11 = tabla.getTemporal();
+            String temp12 = tabla.getTemporal();
+            String temp13 = tabla.getTemporal();
             String temp1 = tabla.getTemporal();
             String temp2 = tabla.getTemporal();
             String temp3 = tabla.getTemporal();
             String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            tabla.AgregarTemporal(temp10);
+            tabla.AgregarTemporal(temp11);
+            tabla.AgregarTemporal(temp12);
+            tabla.AgregarTemporal(temp13);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+            codigo += "+,p,0," + temp10 + "\n";
+            tabla.AgregarTemporal(temp10);
+            codigo += "=," + temp10 + ",-1,stack\n";
+            tabla.QuitarTemporal(temp10);
+
+            codigo += "+,p,1," + temp11 + "\n";
+            tabla.AgregarTemporal(temp11);
+            codigo += "=," + temp11 + "," + op2Actual + ",stack\n";
+            tabla.QuitarTemporal(temp11);
+            tabla.QuitarTemporal(op2Actual);
+
+            codigo += "call,,,proc_intToString\n";
+            codigo += "+,p,0," + temp12 + "\n";
+            tabla.AgregarTemporal(temp12);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+
+            codigo += "=,stack," + temp12 + "," + temp13 + "\n";
+
+
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            codigo += "+," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+            codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
+            codigo += "+," + temp1 + ",2," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
+            codigo += "=," + temp3 + "," + temp13 + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,0," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+
+        } else if (tipo1.getType() == tipo.INTEGER && (tipo2.getType() == Tipo.tipo.STRING || tipo2.getType() == tipo.WORD)) {
+            String temp10 = tabla.getTemporal();
+            String temp11 = tabla.getTemporal();
+            String temp12 = tabla.getTemporal();
+            String temp13 = tabla.getTemporal();
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            tabla.AgregarTemporal(temp10);
+            tabla.AgregarTemporal(temp11);
+            tabla.AgregarTemporal(temp12);
+            tabla.AgregarTemporal(temp13);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+            codigo += "+,p,0," + temp10 + "\n";
+            tabla.AgregarTemporal(temp10);
+            codigo += "=," + temp10 + ",-1,stack\n";
+            tabla.QuitarTemporal(temp10);
+
+            codigo += "+,p,1," + temp11 + "\n";
+            tabla.AgregarTemporal(temp11);
+            codigo += "=," + temp11 + "," + op1Actual + ",stack\n";
+            tabla.QuitarTemporal(temp11);
+            tabla.QuitarTemporal(op1Actual);
+
+            codigo += "call,,,proc_intToString\n";
+            codigo += "+,p,0," + temp12 + "\n";
+            tabla.AgregarTemporal(temp12);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+
+            codigo += "=,stack," + temp12 + "," + temp13 + "\n";
+
+
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            codigo += "+," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+            codigo += "=," + temp2 + "," + temp13 + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
+            codigo += "+," + temp1 + ",2," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
+            codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,0," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+
+        } else if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && tipo2.getType() == tipo.REAL) {
+            String temp10 = tabla.getTemporal();
+            String temp11 = tabla.getTemporal();
+            String temp12 = tabla.getTemporal();
+            String temp13 = tabla.getTemporal();
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            tabla.AgregarTemporal(temp10);
+            tabla.AgregarTemporal(temp11);
+            tabla.AgregarTemporal(temp12);
+            tabla.AgregarTemporal(temp13);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+            codigo += "+,p,0," + temp10 + "\n";
+            tabla.AgregarTemporal(temp10);
+            codigo += "=," + temp10 + ",-1,stack\n";
+            tabla.QuitarTemporal(temp10);
+
+            codigo += "+,p,1," + temp11 + "\n";
+            tabla.AgregarTemporal(temp11);
+            codigo += "=," + temp11 + "," + op2Actual + ",stack\n";
+            tabla.QuitarTemporal(temp11);
+            tabla.QuitarTemporal(op2Actual);
+
+            codigo += "call,,,realToStringPrimitiva\n";
+            codigo += "+,p,0," + temp12 + "\n";
+            tabla.AgregarTemporal(temp12);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+
+            codigo += "=,stack," + temp12 + "," + temp13 + "\n";
+
+
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            codigo += "+," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+            codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
+            codigo += "+," + temp1 + ",2," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
+            codigo += "=," + temp3 + "," + temp13 + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,0," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+
+        } else if (tipo1.getType() == tipo.REAL && (tipo2.getType() == Tipo.tipo.STRING || tipo2.getType() == tipo.WORD)) {
+            String temp10 = tabla.getTemporal();
+            String temp11 = tabla.getTemporal();
+            String temp12 = tabla.getTemporal();
+            String temp13 = tabla.getTemporal();
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            tabla.AgregarTemporal(temp10);
+            tabla.AgregarTemporal(temp11);
+            tabla.AgregarTemporal(temp12);
+            tabla.AgregarTemporal(temp13);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+            codigo += "+,p,0," + temp10 + "\n";
+            tabla.AgregarTemporal(temp10);
+            codigo += "=," + temp10 + ",-1,stack\n";
+            tabla.QuitarTemporal(temp10);
+
+            codigo += "+,p,1," + temp11 + "\n";
+            tabla.AgregarTemporal(temp11);
+            codigo += "=," + temp11 + "," + op1Actual + ",stack\n";
+            tabla.QuitarTemporal(temp11);
+            tabla.QuitarTemporal(op1Actual);
+
+            codigo += "call,,,realToStringPrimitiva\n";
+            codigo += "+,p,0," + temp12 + "\n";
+            tabla.AgregarTemporal(temp12);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+
+            codigo += "=,stack," + temp12 + "," + temp13 + "\n";
+
+
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            codigo += "+," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+            codigo += "=," + temp2 + "," + temp13 + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
+            codigo += "+," + temp1 + ",2," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
+            codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,0," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+
+        } else if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && tipo2.getType() == tipo.BOOLEAN) {
+            String temp10 = tabla.getTemporal();
+            String temp11 = tabla.getTemporal();
+            String temp12 = tabla.getTemporal();
+            String temp13 = tabla.getTemporal();
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            tabla.AgregarTemporal(temp10);
+            tabla.AgregarTemporal(temp11);
+            tabla.AgregarTemporal(temp12);
+            tabla.AgregarTemporal(temp13);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+            codigo += "+,p,0," + temp10 + "\n";
+            tabla.AgregarTemporal(temp10);
+            codigo += "=," + temp10 + ",-1,stack\n";
+            tabla.QuitarTemporal(temp10);
+
+            codigo += "+,p,1," + temp11 + "\n";
+            tabla.AgregarTemporal(temp11);
+            codigo += "=," + temp11 + "," + op2Actual + ",stack\n";
+            tabla.QuitarTemporal(temp11);
+            tabla.QuitarTemporal(op2Actual);
+
+            codigo += "call,,,booleanToStringPrimitiva\n";
+            codigo += "+,p,0," + temp12 + "\n";
+            tabla.AgregarTemporal(temp12);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+
+            codigo += "=,stack," + temp12 + "," + temp13 + "\n";
+
+
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            codigo += "+," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+            codigo += "=," + temp2 + "," + op1Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
+            codigo += "+," + temp1 + ",2," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
+            codigo += "=," + temp3 + "," + temp13 + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,0," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+
+        } else if (tipo1.getType() == tipo.BOOLEAN && (tipo2.getType() == Tipo.tipo.STRING || tipo2.getType() == tipo.WORD)) {
+            String temp10 = tabla.getTemporal();
+            String temp11 = tabla.getTemporal();
+            String temp12 = tabla.getTemporal();
+            String temp13 = tabla.getTemporal();
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            tabla.AgregarTemporal(temp10);
+            tabla.AgregarTemporal(temp11);
+            tabla.AgregarTemporal(temp12);
+            tabla.AgregarTemporal(temp13);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+            codigo += "+,p,0," + temp10 + "\n";
+            tabla.AgregarTemporal(temp10);
+            codigo += "=," + temp10 + ",-1,stack\n";
+            tabla.QuitarTemporal(temp10);
+
+            codigo += "+,p,1," + temp11 + "\n";
+            tabla.AgregarTemporal(temp11);
+            codigo += "=," + temp11 + "," + op1Actual + ",stack\n";
+            tabla.QuitarTemporal(temp11);
+            tabla.QuitarTemporal(op1Actual);
+
+            codigo += "call,,,booleanToStringPrimitiva\n";
+            codigo += "+,p,0," + temp12 + "\n";
+            tabla.AgregarTemporal(temp12);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+
+            codigo += "=,stack," + temp12 + "," + temp13 + "\n";
+
+
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            codigo += "+," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+            codigo += "=," + temp2 + "," + temp13 + ",stack" + "\n";
+            tabla.QuitarTemporal(temp2);
+            tabla.QuitarTemporal(op1Actual);
+            codigo += "+," + temp1 + ",2," + temp3 + "\n";
+            tabla.AgregarTemporal(temp3);
+            codigo += "=," + temp3 + "," + op2Actual + ",stack" + "\n";
+            tabla.QuitarTemporal(temp3);
+            tabla.QuitarTemporal(op2Actual);
+            codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+            codigo += "call,,,concatenar_cadenas" + "\n";
+            codigo += "+,p,0," + temp4 + "\n";
+            tabla.AgregarTemporal(temp4);
+            codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp4);
+            codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
+
+        } else if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && (tipo2.getType() == Tipo.tipo.STRING || tipo2.getType() == tipo.WORD)) {
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            String temp3 = tabla.getTemporal();
+            String temp4 = tabla.getTemporal();
+            tabla.AgregarTemporal(temp1);
+            tabla.AgregarTemporal(temp2);
+            tabla.AgregarTemporal(temp3);
+            tabla.AgregarTemporal(temp4);
             codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + "," + temp1 + "\n";
             tabla.AgregarTemporal(temp1);
             codigo += "+," + temp1 + ",1," + temp2 + "\n";
@@ -749,7 +1131,7 @@ public class Operacion implements Expresion {
             tabla.AgregarTemporal(tabla.getTemporalActual());
             tabla.QuitarTemporal(temp4);
             codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
-        } else if (tipo1.getType() == Tipo.tipo.STRING && tipo2.getType() == Tipo.tipo.CHAR) {
+        } else if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && tipo2.getType() == Tipo.tipo.CHAR) {
             String temp1 = tabla.getTemporal();
             String temp2 = tabla.getTemporal();
             String temp3 = tabla.getTemporal();
@@ -775,7 +1157,7 @@ public class Operacion implements Expresion {
             tabla.AgregarTemporal(tabla.getTemporalActual());
             tabla.QuitarTemporal(temp4);
             codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
-        } else if (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.STRING) {
+        } else if (tipo1.getType() == tipo.CHAR && (tipo2.getType() == tipo.STRING || tipo2.getType() == tipo.WORD)) {
             String temp1 = tabla.getTemporal();
             String temp2 = tabla.getTemporal();
             String temp3 = tabla.getTemporal();

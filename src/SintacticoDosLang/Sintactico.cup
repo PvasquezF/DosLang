@@ -63,7 +63,7 @@ non terminal ArrayList<Parametro> PARAMETROS, LISTA_PARAMETROS;
 non terminal ArrayList<Case> CASELIST;
 
 //precedence left then;
-//precedence right tresP;
+//precedence left tresP;
 precedence left sino;
 precedence right igual;
 precedence left or;
@@ -104,10 +104,18 @@ DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
 TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igualacion TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
                    ;
 
-LOWER_LIMIT ::= EXPRESION:e {:RESULT = e;:}
-            ; 
+LOWER_LIMIT ::= caracter:e      {: RESULT = new Primitivo(e); :}
+              | numero:e        {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | decimal:e       {: RESULT = new Primitivo(new Double(e+"")); :}
+              | menos numero:e  {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | menos decimal:e {: RESULT = new Primitivo(new Double(e+"")); :}
+              ; 
 
-UPPER_LIMIT ::= EXPRESION:e {:RESULT = e;:} 
+UPPER_LIMIT ::= caracter:e      {: RESULT = new Primitivo(e); :}
+              | numero:e        {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | decimal:e       {: RESULT = new Primitivo(new Double(e+"")); :}
+              | menos numero:e  {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | menos decimal:e {: RESULT = new Primitivo(new Double(e+"")); :}
             ; 
 
 ARRAY_DECLARATION ::= array corI RANGO_ARRAY:e corD of ARRAY_DECLARATION:e1 {:
@@ -165,8 +173,8 @@ TIPO_PRIMITIVO ::= integer   {:RESULT = new Tipo(Tipo.tipo.INTEGER);:}
                  | record    {:RESULT = new Tipo(Tipo.tipo.RECORD);:}
                  ;
 
-TIPO ::= //LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {:RESULT = new Tipo(Tipo.tipo.RANGE, null, e1, e2);:}
-        identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
+TIPO ::= LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {:RESULT = new Tipo(Tipo.tipo.RANGE, null, e1, e2);:}
+       | identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
        | parenI LISTA_EXPRESION:e parenD {:RESULT = new Tipo(Tipo.tipo.ENUMERADO, null, e);:}
        | TIPO_PRIMITIVO:e {:RESULT = e;:}
        | ARRAY_DECLARATION:e {:RESULT = e; 
@@ -364,7 +372,7 @@ ARITMETICA ::= menos  EXPRESION:e                 {: RESULT = new Operacion(e, O
              | EXPRESION:e por EXPRESION:e1       {: RESULT = new Operacion(e, e1, Operador.MULTIPLICACION, eleft, eright); :}
              | EXPRESION:e division EXPRESION:e1  {: RESULT = new Operacion(e, e1, Operador.DIVISION, eleft, eright); :}
              | EXPRESION:e potencia EXPRESION:e1  {: RESULT = new Operacion(e, e1, Operador.POTENCIA, eleft, eright); :}
-             | EXPRESION:e modulo EXPRESION:e1    {: RESULT = new Operacion(e, e1, Operador.POTENCIA, eleft, eright); :}
+             | EXPRESION:e modulo EXPRESION:e1    {: RESULT = new Operacion(e, e1, Operador.MODULO, eleft, eright); :}
              ;
 
 RELACIONAL ::= EXPRESION:e mayorque EXPRESION:e1   {: RESULT = new Operacion(e, e1, Operador.MAYOR_QUE, eleft, eright); :}

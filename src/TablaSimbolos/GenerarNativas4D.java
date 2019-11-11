@@ -1336,5 +1336,203 @@ public class GenerarNativas4D {
         codigo += "end,,,toCharArrayPrimitiva\n";
         return codigo;
     }
+
+    public String generarIntToString(Tabla tabla) {
+        String codigo = "";
+        String temp0 = tabla.getTemporal();
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String temp7 = tabla.getTemporal();
+        String temp8 = tabla.getTemporal();
+        String temp10 = tabla.getTemporal();
+        String temp11 = tabla.getTemporal();
+        String temp12 = tabla.getTemporal();
+        String temp13 = tabla.getTemporal();
+        String temp14 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        String label3 = tabla.getEtiqueta();
+        String label4 = tabla.getEtiqueta();
+        String label5 = tabla.getEtiqueta();
+        String label6 = tabla.getEtiqueta();
+
+        codigo += "begin,,,proc_intToString\n";
+        codigo += "+,p,0," + temp0 + "\n";
+        codigo += "+,p,1," + temp1 + "\n";
+        // Valor de retorno
+        codigo += "=," + temp0 + ",h,stack\n";
+        codigo += "=,stack," + temp1 + "," + temp3 + "\n";
+        codigo += "=,h,," + temp2 + "\n";
+        codigo += "jge," + temp3 + ",0," + label1 + " // Valor a convertir > -1\n";
+        codigo += "*,-1," + temp3 + "," + temp3 + "\n";
+        codigo += "=,h,45,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,," + temp2 + "\n";
+        codigo += "jmp,,," + label1 + "\n";
+
+        codigo += label2 + ":\n";
+        codigo += "jge," + temp3 + ",1," + label1 + "\n";
+        codigo += "jmp,,," + label3 + "\n";
+
+        codigo += label1 + ":\n";
+        codigo += "%," + temp3 + ",10," + temp6 + "\n";
+        codigo += "+," + temp6 + ",48," + temp7 + "\n";
+        codigo += "=,h,," + temp8 + "\n";
+        codigo += "=,h," + temp7 + ",heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "/," + temp3 + ",10," + temp10 + "\n";
+        codigo += "%," + temp10 + ",1," + temp11 + "\n";
+        codigo += "-," + temp10 + "," + temp11 + "," + temp12 + "\n";
+        codigo += "=," + temp12 + ",," + temp3 + "\n";
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label3 + ":\n";
+
+        // Invirtiendo el numero
+        codigo += label6 + ":\n";
+        codigo += "jl," + temp2 + "," + temp8 + "," + label4 + "\n";
+        codigo += "jmp,,," + label5 + "\n";
+        codigo += label4 + ":\n";
+        codigo += "=,heap," + temp2 + "," + temp13 + "\n";
+        codigo += "=,heap," + temp8 + "," + temp14 + "\n";
+        codigo += "=," + temp2 + "," + temp14 + ",heap\n";
+        codigo += "=," + temp8 + "," + temp13 + ",heap\n";
+        codigo += "+," + temp2 + ",1," + temp2 + "\n";
+        codigo += "-," + temp8 + ",1," + temp8 + "\n";
+        codigo += "jmp,,," + label6 + "\n";
+        codigo += label5 + ":\n";
+
+        // Completando string
+        codigo += "=,h,0,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "end,,,proc_intToString\n";
+        return codigo;
+    }
+
+    public String generarRealToString(Tabla tabla) {
+        String codigo = "";
+        String temp0 = tabla.getTemporal();
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String temp7 = tabla.getTemporal();
+        String temp8 = tabla.getTemporal();
+        String temp9 = tabla.getTemporal();
+        String temp10 = tabla.getTemporal();
+        String temp11 = tabla.getTemporal();
+        String temp12 = tabla.getTemporal();
+        String temp13 = tabla.getTemporal();
+        String temp14 = tabla.getTemporal();
+        String temp15 = tabla.getTemporal();
+        String temp16 = tabla.getTemporal();
+        String temp17 = tabla.getTemporal();
+        String temp18 = tabla.getTemporal();
+        String temp19 = tabla.getTemporal();
+        String temp20 = tabla.getTemporal();
+        String temp21 = tabla.getTemporal();
+        codigo += "begin,,,realToStringPrimitiva\n";
+        codigo += "+,p,0," + temp0 + "\n"; // posicion del numero a convertir
+        codigo += "+,p,1," + temp1 + "\n"; // posicion del numero a convertir
+        codigo += "=,stack," + temp1 + "," + temp2 + "\n"; // valor del numero a convertir
+        codigo += "=," + temp0 + ",h,stack\n"; // Valor ret
+
+        codigo += "+,p,2,p\n";
+        codigo += "+,p,0," + temp13 + "\n";
+        codigo += "+,p,1," + temp14 + "\n";
+        codigo += "=," + temp13 + ",-1,stack\n";
+        codigo += "=," + temp14 + "," + temp2 + ",stack\n";
+        codigo += "call,,,trunk_primitiva\n";
+        codigo += "+,p,0," + temp15 + "\n";
+        codigo += "=,stack," + temp15 + "," + temp16 + "\n";
+        codigo += "-,p,2,p\n";
+
+        codigo += "-," + temp2 + "," + temp16 + "," + temp3 + "\n"; // decimales numero
+        codigo += "*," + temp3 + ",100," + temp3 + "\n"; // redondeo
+
+        codigo += "+,p,2,p\n";
+        codigo += "+,p,0," + temp17 + "\n";
+        codigo += "+,p,1," + temp18 + "\n";
+        codigo += "=," + temp17 + ",-1,stack\n";
+        codigo += "=," + temp18 + "," + temp3 + ",stack\n";
+        codigo += "call,,,trunk_primitiva\n";
+        codigo += "+,p,0," + temp19 + "\n";
+        codigo += "=,stack," + temp19 + "," + temp20 + "\n";
+        codigo += "-,p,2,p\n";
+
+        codigo += "=," + temp20 + ",," + temp3 + "\n"; // decimales numero
+
+        codigo += "+,p,2,p\n";
+        codigo += "+,p,0," + temp5 + "\n";
+        codigo += "+,p,1," + temp6 + "\n";
+        codigo += "=," + temp5 + ",-1,stack\n";
+        codigo += "=," + temp6 + "," + temp16 + ",stack\n";
+        codigo += "call,,,proc_intToString\n";
+        codigo += "+,p,0," + temp7 + "\n";
+        codigo += "=,stack," + temp7 + "," + temp8 + "\n";
+        codigo += "-,p,2,p\n";
+
+        codigo += "-,h,1,"+temp21+"\n";
+        codigo += "=,"+temp21+",46,heap\n";
+        codigo += "+,p,2,p\n";
+        codigo += "+,p,0," + temp9 + "\n";
+        codigo += "+,p,1," + temp10 + "\n";
+        codigo += "=," + temp9 + ",-1,stack\n";
+        codigo += "=," + temp10 + "," + temp3 + ",stack\n";
+        codigo += "call,,,proc_intToString\n";
+        codigo += "+,p,0," + temp11 + "\n";
+        codigo += "=,stack," + temp11 + "," + temp12 + "\n";
+        codigo += "-,p,2,p\n";
+
+        codigo += "end,,,realToStringPrimitiva\n";
+        return codigo;
+    }
+
+    public String generarStringToBoolean(Tabla tabla){
+        String temp = tabla.getTemporal();
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+
+        String codigo = "";
+        codigo += "begin,,,booleanToStringPrimitiva\n";
+        codigo += "+,p,0,"+temp+"\n";
+        codigo += "=,"+temp+",h,stack\n";
+        codigo += "+,p,1,"+temp1+"\n";
+        codigo += "=,stack,"+temp1+","+temp2+"\n";
+
+        codigo += "je,0," + temp2 + "," + label1 + "\n";
+        codigo += "=,h,116,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,114,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,117,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,101,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "jmp,,," + label2 + "\n";
+
+        codigo += label1 + ":\n";
+        codigo += "=,h,102,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,97,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,108,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,115,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "=,h,101,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += label2 + ":\n";
+
+        codigo += "=,h,0,heap\n";
+        codigo += "+,h,1,h\n";
+        codigo += "end,,,booleanToStringPrimitiva\n";
+        return codigo;
+    }
 }
 //86 97 108 111 114 32 102 117 101 114 97 32 100 101 32 108 111 115 32 108 105 109 105 116 101 115 32 100 101 108 32 114 97 110 103 111 46

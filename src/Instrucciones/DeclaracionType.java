@@ -37,6 +37,7 @@ public class DeclaracionType implements Instruccion {
         for (int i = 0; i < identificadores.size(); i++) {
             String identificador = identificadores.get(i);
             Object result = tabla.insertarType(new UserType(identificador, tipo));
+
             if (result != null) {
                 Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                         (String) result,
@@ -84,10 +85,12 @@ public class DeclaracionType implements Instruccion {
                     return exc;
                 }
             } else if (tipo.getType() == Tipo.tipo.RECORD || tipo.getType() == Tipo.tipo.OBJETO) {
-                tipo.setTipoObjeto(identificador);
-                for(int k = 0; k < tipo.getAtributos().size(); k++){
-                    Registro r = tipo.getAtributos().get(k);
-                    r.setTipo(r.getTipo().verificarUserType(tabla));
+                if (tipo.getAtributos() != null) {
+                    tipo.setTipoObjeto(identificador);
+                    for (int k = 0; k < tipo.getAtributos().size(); k++) {
+                        Registro r = tipo.getAtributos().get(k);
+                        r.setTipo(r.getTipo().verificarUserType(tabla));
+                    }
                 }
             }
         }
