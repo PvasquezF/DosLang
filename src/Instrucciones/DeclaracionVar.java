@@ -68,14 +68,14 @@ public class DeclaracionVar implements Instruccion {
                     Tipo tipoUpper = (Tipo) result1;
                     if (tipoLower.equals(tipoUpper)) {
                         simbolo.getTipo().setTipoRange(tipoLower.getType());
-                        Object result3 = tabla.InsertarVariable(simbolo);
+                        /*Object result3 = tabla.InsertarVariable(simbolo);
                         if (result3 != null) {
                             Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                                     (String) result3,
                                     fila, columna);
                             arbol.getErrores().add(exc);
                             return exc;
-                        }
+                        }*/
                     } else {
                         Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
                                 "Los tipos del limite de rango no coinciden.",

@@ -35,7 +35,7 @@ public class If implements Instruccion {
             if (ast instanceof Instruccion) {
                 result = ((Instruccion) ast).ejecutar(tabla, arbol);
             } else {
-                result = ((Expresion) ast).getValor(tabla, arbol);
+                result = ((Expresion) ast).getTipo(tabla, arbol);
             }
             if (result instanceof Excepcion) {
                 return result;
@@ -47,7 +47,7 @@ public class If implements Instruccion {
             if (ast instanceof Instruccion) {
                 result = ((Instruccion) ast).ejecutar(tabla, arbol);
             } else {
-                result = ((Expresion) ast).getValor(tabla, arbol);
+                result = ((Expresion) ast).getTipo(tabla, arbol);
             }
             if (result instanceof Excepcion) {
                 return result;

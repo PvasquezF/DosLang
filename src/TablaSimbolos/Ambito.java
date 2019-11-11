@@ -48,7 +48,7 @@ public class Ambito {
         return null;
     }
 
-    public String insertarProcedimiento(Simbolo simbolo) {
+    /*public String insertarProcedimiento(Simbolo simbolo) {
         Ambito aux = this;
         //while (aux != null) {
             for (int i = 0; i < aux.getProcedimientos().size(); i++) {
@@ -61,7 +61,7 @@ public class Ambito {
         //}
         this.procedimientos.add(simbolo);
         return null;
-    }
+    }*/
 
     public Object getVariable(String identificador) {
         Ambito aux = this;
