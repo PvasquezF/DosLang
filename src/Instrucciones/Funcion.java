@@ -66,11 +66,30 @@ public class Funcion extends Simbolo implements Instruccion {
         tabla.setAmbito(this.getNombreCompleto());
         simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false, tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
+        for (int i = 0; i < instrucciones.size(); i++) {
+            AST ins = instrucciones.get(i);
+            if (ins instanceof Funcion) {
+                Funcion f = (Funcion) ins;
+                tabla.InsertarFuncion(f);
+                for (int j = 0; j < f.getParametros().size(); j++) {
+                    Parametro parametro = f.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
+                }
+                f.setNombreCompleto(f.generarNombreCompleto());
+            } else if (ins instanceof Procedimiento) {
+                Procedimiento p = (Procedimiento) ins;
+                tabla.InsertarFuncion(p);
+                for (int j = 0; j < p.getParametros().size(); j++) {
+                    Parametro parametro = p.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
+                }
+                p.setNombreCompleto(p.generarNombreCompleto());
+            }
+        }
         for (int i = 0; i < this.getParametros().size(); i++) {
             Parametro parametro = this.getParametros().get(i);
             parametro.ejecutar(tabla, arbol);
-            tamaño += parametro.getIdentificador().size();
-            tamaño += 1;
+            tamaño += (parametro.getIdentificador().size() * 2);
         }
 
         for (int i = 0; i < this.variables.size(); i++) {

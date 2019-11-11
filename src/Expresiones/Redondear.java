@@ -36,11 +36,6 @@ public class Redondear implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        return null;
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "// Inicio llamada round fila: " + this.fila + ", columna: " + this.columna + "\n";
         codigo += this.valor.get4D(tabla, arbol);

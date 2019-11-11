@@ -36,11 +36,6 @@ public class aMayusculas implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        return null;
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "// Inicio llamada toUpper fila: " + this.fila + ", columna: " + this.columna + "\n";
         codigo += this.cadena.get4D(tabla, arbol);

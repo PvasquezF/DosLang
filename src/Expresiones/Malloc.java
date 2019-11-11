@@ -35,11 +35,6 @@ public class Malloc implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        return null;
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "";
         String temp1 = tabla.getTemporal();

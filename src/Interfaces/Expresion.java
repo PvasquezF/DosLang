@@ -15,5 +15,4 @@ import TablaSimbolos.Tree;
  */
 public interface Expresion extends AST {
     Object getTipo(Tabla tabla, Tree arbol);
-    Object getValor(Tabla tabla, Tree arbol);
 }

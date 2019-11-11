@@ -50,11 +50,6 @@ public class Reemplazar implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        return null;
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "// Inicio llamada replace fila: " + this.fila + ", columna: " + this.columna + "\n";
         codigo += this.cadena.get4D(tabla, arbol);

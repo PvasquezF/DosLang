@@ -513,11 +513,6 @@ public class Operacion implements Expresion {
         return tipoResultante;
     }
 
-    @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     Object getTipoSuma(Tipo t1, Tipo t2) {
         //INTEGER
         if (t1.getType() == tipo.INTEGER && t2.getType() == tipo.CHAR
