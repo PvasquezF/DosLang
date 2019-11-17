@@ -42,11 +42,6 @@ public class Primitivo implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public String get4D(Tabla tabla, Tree arbol) {
         String codigo = "//Inicio primitivo\n";
         if (valor instanceof String) {

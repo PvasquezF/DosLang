@@ -123,11 +123,6 @@ public class AccesoVariable implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        return null;
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         // Bloque para variables with
         Identificador identificadorAux = (Identificador) accesos.get(0);

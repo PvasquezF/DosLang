@@ -95,6 +95,16 @@ public class Tipo {
             }
         } else if (this.getType() == tipo.ENUMERADO && t1.getType() == tipo.ENUMERADO) {
             return this.getNombreEnum().equalsIgnoreCase(t1.getNombreEnum());
+        } else if (this.getType() == tipo.REAL && t1.getType() == tipo.INTEGER) {
+            return true;
+        } else if (this.getType() == tipo.REAL && t1.getType() == tipo.CHAR) {
+            return true;
+        } else if (this.getType() == tipo.INTEGER && t1.getType() == tipo.CHAR) {
+            return true;
+        } else if (this.getType() == tipo.WORD && t1.getType() == tipo.STRING) {
+            return true;
+        } else if (this.getType() == tipo.STRING && t1.getType() == tipo.WORD) {
+            return true;
         } else {
             return this.getType() == t1.getType();
         }
@@ -148,7 +158,7 @@ public class Tipo {
         return this;
     }
 
-    public void ReestructurarTipo(){
+    public void ReestructurarTipo() {
 
     }
 

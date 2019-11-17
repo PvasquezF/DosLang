@@ -18,11 +18,6 @@ public class AccesoArreglo implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        return null;
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         return null;
     }

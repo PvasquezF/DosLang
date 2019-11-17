@@ -83,9 +83,9 @@ public class Tabla {
         //return null;
     }
 
-    public String InsertarProcedimiento(Simbolo simbolo) {
+    /*public String InsertarProcedimiento(Simbolo simbolo) {
         return this.enviroment.insertarProcedimiento(simbolo);
-    }
+    }*/
 
     public Object getVariable(String identificador) {
         return this.enviroment.getVariable(identificador);

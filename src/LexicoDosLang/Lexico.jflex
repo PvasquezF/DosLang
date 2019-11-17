@@ -96,6 +96,7 @@ ComentarioMulti =   "{" ~"}"
     "Equals"            { return symbol(sym.Equals, yytext().toLowerCase()); }
     "trunk"             { return symbol(sym.Truncar, yytext().toLowerCase()); }
     "round"             { return symbol(sym.Redondear, yytext().toLowerCase()); }
+    "default"           { return symbol(sym.defecto, yytext().toLowerCase()); }
     
     ":="                { return symbol(sym.igual, ":="); }
     "+"                 { return symbol(sym.mas, "+"); }

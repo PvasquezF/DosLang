@@ -36,11 +36,6 @@ public class Rango implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         return null;
     }

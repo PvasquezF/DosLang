@@ -38,7 +38,7 @@ terminal String to, until, var, punto, mientras, con, uses, dosPuntos;
 terminal String potencia, modulo, menorque, menorigual, mayorque, mayorigual;
 terminal String igualacion, diferente, nand, nor, falso, verdadero;
 terminal String mas, menos, por, division, UMENOS, leer;
-terminal String detener, continuar, salir, escribir, escribirln;
+terminal String detener, continuar, salir, escribir, escribirln, defecto;
 terminal String chartEn, longitud, reemplazar, toCharArreglo, aMinusculas, aMayusculas, Equals, Truncar, Redondear; 
 terminal char caracter;
 /* Non terminals */
@@ -160,6 +160,7 @@ LISTA_EXPRESION ::= LISTA_EXPRESION:e coma EXPRESION:e1 {:RESULT = e; RESULT.add
                   ;
 
 MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION:e parenD {: RESULT = new Sizeof(e, eleft, eright); :}
+                  | sizeof parenI identificador:e parenD {:RESULT = new Sizeof(e, eleft, eright);:}
                   | malloc parenI EXPRESION:e parenD {: RESULT = new Malloc(e, eleft, eright); :}
                   //| free parenI EXPRESION parenD
                   ;
@@ -219,12 +220,24 @@ METHOD_LIST ::= METHOD_LIST:e FUNCION:e1 {: RESULT = e; RESULT.add(e1); :}
               | PROCEDURE:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
               ;
 
-FUNCION ::= function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 BLOQUE_INSTRUCCIONES:e4 {: RESULT = new Funcion(e, e1, e2, e4, e3, eleft, eright); :}
-          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa BLOQUE_INSTRUCCIONES:e4 {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), eleft, eright); :}
+FUNCION ::= function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, e3, new ArrayList<AST>(), eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), new ArrayList<AST>(),eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 METHOD_LIST:e5 BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, e3, e5, eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa METHOD_LIST:e3 BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), e3, eleft, eright); :}
           ;
 
-PROCEDURE ::= procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 BLOQUE_INSTRUCCIONES:e3 {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, eleft, eright); :}
-            | procedure identificador:e PARAMETROS:e1 pComa BLOQUE_INSTRUCCIONES:e2 {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e2, new ArrayList<AST>(), eleft, eright); :}
+PROCEDURE ::= procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 BLOQUE_INSTRUCCIONES:e3 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, new ArrayList<AST>(), eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa BLOQUE_INSTRUCCIONES:e2 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e2, new ArrayList<AST>(), new ArrayList<AST>(), eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 METHOD_LIST:e4 BLOQUE_INSTRUCCIONES:e3 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, e4, eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa METHOD_LIST:e2 BLOQUE_INSTRUCCIONES:e3 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, new ArrayList<AST>(), e2, eleft, eright); :}
             ;
 
 PARAMETROS ::= parenI LISTA_PARAMETROS:e parenD {:RESULT = e;:}
@@ -272,12 +285,11 @@ INSTRUCCION ::= WITH:e {:RESULT = e;:}
               | free parenI VARIABLE:e parenD pComa {:RESULT = new Free(new AccesoVariable(e, eleft, eright), eleft, eright);:}
               | LLAMADA:e pComa {:RESULT = e;:}
               | FUNCION:e {:RESULT = e;:}
+              | PROCEDURE:e {:RESULT = e;:}
               ;
 
-WITH ::= con identificador:e hacer LISTA_INSTRUCCIONES:e1 end pComa {:
-                                                ArrayList<Expresion> listaExp = new ArrayList<>();
-                                                listaExp.add(new Identificador(e, eleft, eright));
-                                                RESULT = new With(new AccesoVariable(listaExp, eleft, eright), e1, eleft, eright);
+WITH ::= con VARIABLE:e hacer LISTA_INSTRUCCIONES:e1 end pComa {:
+                                                RESULT = new With(new AccesoVariable(e, eleft, eright), e1, eleft, eright);
                                                         :}
        ;
 
@@ -314,8 +326,8 @@ CASE ::= LISTA_EXPRESION:e dosPuntos INSTRUCCION:e1 {: ArrayList<AST> insSwitch 
        | LISTA_EXPRESION:e dosPuntos BLOQUE_INSTRUCCIONES:e1 {:RESULT = new Case(e, e1);:}
        ;
 
-DEFECTO ::= sino INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
-          | sino BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
+DEFECTO ::= defecto INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+          | defecto BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
           ;
 
 WHILE ::= mientras EXPRESION:e hacer BLOQUE_INSTRUCCIONES:e1 {: RESULT = new While(e, e1, eleft, eright); :}

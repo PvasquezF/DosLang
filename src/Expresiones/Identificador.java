@@ -52,21 +52,6 @@ public class Identificador implements Expresion {
     }
 
     @Override
-    public Object getValor(Tabla tabla, Tree arbol) {
-        Object sim = tabla.getVariable(identificador);
-        if (sim instanceof Simbolo) {
-            accesoGlobal = ((Simbolo) sim).getNivel().equalsIgnoreCase("global");
-            return sim;
-        } else {
-            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                    sim.toString(),
-                    fila, columna);
-            arbol.getErrores().add(exc);
-            return exc;
-        }
-    }
-
-    @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         Object sim = tabla.getVariable(identificador);
         String codigo = "// Inicio identificador linea: " + fila + ", columna: " + columna + "\n";

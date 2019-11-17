@@ -48,6 +48,7 @@ public class DosLang extends Thread {
         //Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang.txt")));
         Lexer lexer = new Lexer(new BufferedReader(new FileReader("C:\\Users\\Pavel\\Desktop\\entradaDosLang2.txt")));
         Syntax s = new Syntax(lexer);
+        System.out.println();
         s.parse();
         Tree t = s.getArbol();
         Tabla tabla = new Tabla();
@@ -59,26 +60,9 @@ public class DosLang extends Thread {
                 ins.ejecutar(tabla, t);
             }
         }
-        for (int i = 0; i < t.getInstrucciones().size(); i++) {
-            Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
-            if (ins instanceof Funcion) {
-                Funcion f = (Funcion) ins;
-                tabla.InsertarFuncion(f);
-                for (int j = 0; j < f.getParametros().size(); j++) {
-                    Parametro parametro = f.getParametros().get(j);
-                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
-                }
-                f.setNombreCompleto(f.generarNombreCompleto());
-            } else if (ins instanceof Procedimiento) {
-                Procedimiento p = (Procedimiento) ins;
-                tabla.InsertarFuncion(p);
-                for (int j = 0; j < p.getParametros().size(); j++) {
-                    Parametro parametro = p.getParametros().get(j);
-                    parametro.setTipo(parametro.getTipo().verificarUserType(tabla));
-                }
-                p.setNombreCompleto(p.generarNombreCompleto());
-            }
-        }
+
+        AgregarFunciones(tabla, t.getInstrucciones());
+
 
         /*for (int i = 0; i < t.getInstrucciones().size(); i++) {
             Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
@@ -161,23 +145,23 @@ public class DosLang extends Thread {
             }*/
             GenerarNativas4D gn4D = new GenerarNativas4D();
             Cuadruplos += gn4D.generarConcatenacion(tabla);
-            Cuadruplos += gn4D.generarChartAt(tabla);
-            Cuadruplos += gn4D.generarLenght(tabla);
-            Cuadruplos += gn4D.generarConcatenacionStringChar(tabla);
-            Cuadruplos += gn4D.generarConcatenacionCharString(tabla);
-            Cuadruplos += gn4D.generaReplace(tabla);
-            Cuadruplos += gn4D.generarIndexOut(tabla);
-            Cuadruplos += gn4D.generarLowerCase(tabla);
-            Cuadruplos += gn4D.generarUpperCase(tabla);
-            Cuadruplos += gn4D.generarEquals(tabla);
+            //Cuadruplos += gn4D.generarChartAt(tabla);
+            //Cuadruplos += gn4D.generarLenght(tabla);
+            //Cuadruplos += gn4D.generarConcatenacionStringChar(tabla);
+            //Cuadruplos += gn4D.generarConcatenacionCharString(tabla);
+            //Cuadruplos += gn4D.generaReplace(tabla);
+            //Cuadruplos += gn4D.generarIndexOut(tabla);
+            //Cuadruplos += gn4D.generarLowerCase(tabla);
+            //Cuadruplos += gn4D.generarUpperCase(tabla);
+            //Cuadruplos += gn4D.generarEquals(tabla);
             //Cuadruplos += gn4D.generarPrint(tabla);
-            Cuadruplos += gn4D.generarTrunk(tabla);
-            Cuadruplos += gn4D.generarRound(tabla);
-            Cuadruplos += gn4D.generarToCharArray(tabla);
-            Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
+            //Cuadruplos += gn4D.generarTrunk(tabla);
+            //Cuadruplos += gn4D.generarRound(tabla);
+            //Cuadruplos += gn4D.generarToCharArray(tabla);
+            //Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
             Cuadruplos += gn4D.generarIntToString(tabla);
-            Cuadruplos += gn4D.generarRealToString(tabla);
-            Cuadruplos += gn4D.generarStringToBoolean(tabla);
+            //Cuadruplos += gn4D.generarRealToString(tabla);
+            //Cuadruplos += gn4D.generarStringToBoolean(tabla);
             System.out.println(Cuadruplos);
         } else {
             errores.forEach(m -> {
@@ -191,12 +175,28 @@ public class DosLang extends Thread {
 
     }
 
-    public String generarFunciones(AST proc) {
-        if (proc instanceof Funcion) {
-
-        } else if (proc instanceof Procedimiento) {
-
+    public static void AgregarFunciones(Tabla table, ArrayList<AST> functions) {
+        for (int i = 0; i < functions.size(); i++) {
+            Instruccion ins = (Instruccion) functions.get(i);
+            if (ins instanceof Funcion) {
+                Funcion f = (Funcion) ins;
+                table.InsertarFuncion(f);
+                for (int j = 0; j < f.getParametros().size(); j++) {
+                    Parametro parametro = f.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(table));
+                }
+                f.setNombreCompleto(f.generarNombreCompleto());
+                //AgregarFunciones(table, f.getFunciones());
+            } else if (ins instanceof Procedimiento) {
+                Procedimiento p = (Procedimiento) ins;
+                table.InsertarFuncion(p);
+                for (int j = 0; j < p.getParametros().size(); j++) {
+                    Parametro parametro = p.getParametros().get(j);
+                    parametro.setTipo(parametro.getTipo().verificarUserType(table));
+                }
+                p.setNombreCompleto(p.generarNombreCompleto());
+                //AgregarFunciones(table, p.getFunciones());
+            }
         }
-        return null;
     }
 }
