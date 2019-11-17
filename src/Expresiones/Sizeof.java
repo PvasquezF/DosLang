@@ -2,9 +2,9 @@ package Expresiones;
 
 import Excepciones.Excepcion;
 import Interfaces.Expresion;
-import TablaSimbolos.Tabla;
-import TablaSimbolos.Tipo;
-import TablaSimbolos.Tree;
+import TablaSimbolos.*;
+
+import java.util.ArrayList;
 
 public class Sizeof implements Expresion {
 
@@ -12,6 +12,7 @@ public class Sizeof implements Expresion {
     private int fila;
     private int columna;
     private Tipo tipo;
+    private String fromType;
 
     public Sizeof(Expresion registro, int fila, int columna) {
         this.registro = registro;
@@ -19,13 +20,42 @@ public class Sizeof implements Expresion {
         this.columna = columna;
     }
 
+    public Sizeof(String fromType, int fila, int columna) {
+        this.fromType = fromType;
+        this.fila = fila;
+        this.columna = columna;
+    }
+
     @Override
     public Object getTipo(Tabla tabla, Tree arbol) {
-        Object result = registro.getTipo(tabla, arbol);
-        if (result instanceof Excepcion) {
-            return result;
+        if (registro != null) {
+            Object result = registro.getTipo(tabla, arbol);
+            if (result instanceof Excepcion) {
+                return result;
+            }
+            tipo = (Tipo) result;
+        } else {
+            ArrayList<UserType> uts = tabla.getEnviroment().getUserTypes();
+            boolean encontro = false;
+            for (UserType u : uts) {
+                if (u.getNombre().equalsIgnoreCase(fromType)) {
+                    tipo = u.getTipo();
+                    encontro = true;
+                    break;
+                }
+            }
+            if (!encontro) {
+                Object result = tabla.getVariable(fromType);
+                if (result instanceof String) {
+                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                            "No se ha encontrado el type o la variable " + fromType + ".",
+                            fila, columna);
+                    arbol.getErrores().add(exc);
+                    return exc;
+                }
+                tipo = ((Simbolo) result).getTipo();
+            }
         }
-        tipo = (Tipo) result;
         if (tipo.getType() != Tipo.tipo.RECORD) {
             Excepcion e = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "La sentencia sizeof solo aplica para registros",
                     this.fila, this.columna);

@@ -180,10 +180,7 @@ public class Operacion implements Expresion {
                 tabla.QuitarTemporal(op2Actual);
                 break;
             case DIVISION:
-                codigo += "/," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
+                codigo += get4DDivision(tabla, op1Actual, op2Actual, tipo1, tipo2);
                 break;
             case MODULO:
                 codigo += "%," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
@@ -681,7 +678,9 @@ public class Operacion implements Expresion {
                 || t1.getType() == tipo.STRING && t2.getType() == tipo.WORD
                 || t1.getType() == tipo.WORD && t2.getType() == tipo.STRING
                 || t1.getType() == tipo.WORD && t2.getType() == tipo.WORD
-                || t1.getType() == tipo.BOOLEAN && t2.getType() == tipo.BOOLEAN) {
+                || t1.getType() == tipo.BOOLEAN && t2.getType() == tipo.BOOLEAN
+                || t1.getType() == tipo.NIL && t2.getType() == tipo.RECORD
+                || t1.getType() == tipo.RECORD && t2.getType() == tipo.NIL) {
             return new Tipo(tipo.BOOLEAN);
         } else {
             return new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Error, los tipos " + t1.getType() + " y " + t2.getType() + ""
@@ -1180,6 +1179,36 @@ public class Operacion implements Expresion {
             codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
         } else {
             codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(op1Actual);
+            tabla.QuitarTemporal(op2Actual);
+        }
+        return codigo;
+    }
+
+    String get4DDivision(Tabla tabla, String op1Actual, String op2Actual, Tipo tipo1, Tipo tipo2) {
+        String codigo = "";
+        if ((tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.INTEGER)
+        || (tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.CHAR)
+        || (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.INTEGER)
+        || (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.CHAR)) {
+            String temp1 = tabla.getTemporal();
+            String temp2 = tabla.getTemporal();
+            codigo += "/," + op1Actual + "," + op2Actual + "," + temp1 + "\n";
+            tabla.AgregarTemporal(temp1);
+            tabla.QuitarTemporal(op1Actual);
+            tabla.QuitarTemporal(op2Actual);
+
+            codigo += "%," + temp1 + ",1," + temp2 + "\n";
+            tabla.AgregarTemporal(temp2);
+            tabla.QuitarTemporal(temp1);
+
+            codigo += "-," + temp1 + ","+temp2+"," + tabla.getTemporal() + "\n";
+            tabla.AgregarTemporal(tabla.getTemporalActual());
+            tabla.QuitarTemporal(temp1);
+            tabla.QuitarTemporal(temp2);
+        } else {
+            codigo += "/," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
             tabla.AgregarTemporal(tabla.getTemporalActual());
             tabla.QuitarTemporal(op1Actual);
             tabla.QuitarTemporal(op2Actual);

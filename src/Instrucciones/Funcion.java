@@ -13,15 +13,17 @@ public class Funcion extends Simbolo implements Instruccion {
     // String rol, String nivel, ArrayList<AST> instrucciones, boolean constante, int apuntador, int tamaño
     private ArrayList<AST> instrucciones;
     private ArrayList<AST> variables;
+    private ArrayList<AST> funciones;
     private int fila;
     private int columna;
     private int TemporalInicio;
     private int TemporalFin;
 
-    public Funcion(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, int fila, int columna) {
+    public Funcion(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, ArrayList<AST> funciones, int fila, int columna) {
         super(nombre, nombre, parametros, tipo, 0, null);
         this.instrucciones = instrucciones;
         this.variables = variables;
+        this.funciones = funciones;
         this.fila = fila;
         this.columna = columna;
         this.setNombreCompleto(generarNombreCompleto());
@@ -66,8 +68,8 @@ public class Funcion extends Simbolo implements Instruccion {
         tabla.setAmbito(this.getNombreCompleto());
         simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false, tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
-        for (int i = 0; i < instrucciones.size(); i++) {
-            AST ins = instrucciones.get(i);
+        for (int i = 0; i < funciones.size(); i++) {
+            AST ins = funciones.get(i);
             if (ins instanceof Funcion) {
                 Funcion f = (Funcion) ins;
                 tabla.InsertarFuncion(f);
@@ -85,6 +87,7 @@ public class Funcion extends Simbolo implements Instruccion {
                 }
                 p.setNombreCompleto(p.generarNombreCompleto());
             }
+            ((Instruccion) ins).ejecutar(tabla, arbol);
         }
         for (int i = 0; i < this.getParametros().size(); i++) {
             Parametro parametro = this.getParametros().get(i);
@@ -178,15 +181,21 @@ public class Funcion extends Simbolo implements Instruccion {
         tabla.getEtiquetasExit().clear();
         codigo += "end,,," + this.getNombreCompleto() + "\n";
         tabla.getTamañoActualFuncion().pop();
-        for (int i = 0; i < this.instrucciones.size(); i++) {
-            AST instruccion = instrucciones.get(i);
-            if (instruccion instanceof Funcion || instruccion instanceof Procedimiento) {
-                codigo += instruccion.get4D(tabla, arbol);
-            } else {
-                continue;
-            }
+        tabla.getTamañoActualFuncion().push(this.getTamaño());
+        for (int i = 0; i < this.funciones.size(); i++) {
+            AST instruccion = funciones.get(i);
+            codigo += instruccion.get4D(tabla, arbol);
         }
+        tabla.getTamañoActualFuncion().pop();
         tabla.setEnviroment(this.getEntorno().getAnterior());
         return codigo;
+    }
+
+    public ArrayList<AST> getFunciones() {
+        return funciones;
+    }
+
+    public void setFunciones(ArrayList<AST> funciones) {
+        this.funciones = funciones;
     }
 }

@@ -11,13 +11,15 @@ import java.util.ArrayList;
 public class Procedimiento extends Simbolo implements Instruccion {
     private ArrayList<AST> instrucciones;
     private ArrayList<AST> variables;
+    private ArrayList<AST> funciones;
     private int fila;
     private int columna;
 
-    public Procedimiento(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, int fila, int columna) {
+    public Procedimiento(String nombre, ArrayList<Parametro> parametros, Tipo tipo, ArrayList<AST> instrucciones, ArrayList<AST> variables, ArrayList<AST> funciones, int fila, int columna) {
         super(nombre, nombre, parametros, tipo, 0, null);
         this.instrucciones = instrucciones;
         this.variables = variables;
+        this.funciones = funciones;
         this.fila = fila;
         this.columna = columna;
         this.setNombreCompleto(generarNombreCompleto());
@@ -60,8 +62,8 @@ public class Procedimiento extends Simbolo implements Instruccion {
 
         simbolo = new Simbolo(nombre, tipoAux, tabla.getAmbito(), "retorno", "local", Tipo.valorPredeterminado(tipoAux), false,tabla.getEnviroment().getPosicionStack(), false);
         tabla.InsertarVariable(simbolo);
-        for (int i = 0; i < instrucciones.size(); i++) {
-            AST ins = instrucciones.get(i);
+        for (int i = 0; i < funciones.size(); i++) {
+            AST ins = funciones.get(i);
             if (ins instanceof Funcion) {
                 Funcion f = (Funcion) ins;
                 tabla.InsertarFuncion(f);
@@ -79,6 +81,7 @@ public class Procedimiento extends Simbolo implements Instruccion {
                 }
                 p.setNombreCompleto(p.generarNombreCompleto());
             }
+            ((Instruccion) ins).ejecutar(tabla, arbol);
         }
 
         for (int i = 0; i < this.getParametros().size(); i++) {
@@ -156,15 +159,33 @@ public class Procedimiento extends Simbolo implements Instruccion {
         }
         for (int i = 0; i < this.instrucciones.size(); i++) {
             AST instruccion = instrucciones.get(i);
-            codigo += instruccion.get4D(tabla, arbol);
+            if (instruccion instanceof Funcion || instruccion instanceof Procedimiento) {
+                continue;
+            } else {
+                codigo += instruccion.get4D(tabla, arbol);
+            }
         }
         for (Object o : tabla.getEtiquetasExit()) {
             codigo += (String) o + ": // Exit\n";
         }
         tabla.getEtiquetasExit().clear();
         codigo += "end,,," + this.getNombreCompleto() + "\n";
-        tabla.setEnviroment(this.getEntorno().getAnterior());
+        //tabla.setEnviroment(this.getEntorno().getAnterior());
         tabla.getTamañoActualFuncion().pop();
+        tabla.getTamañoActualFuncion().push(this.getTamaño());
+        for (int i = 0; i < this.funciones.size(); i++) {
+            AST instruccion = funciones.get(i);
+            codigo += instruccion.get4D(tabla, arbol);
+        }
+        tabla.getTamañoActualFuncion().pop();
+        tabla.setEnviroment(this.getEntorno().getAnterior());
         return codigo;
+    }
+    public ArrayList<AST> getFunciones() {
+        return funciones;
+    }
+
+    public void setFunciones(ArrayList<AST> funciones) {
+        this.funciones = funciones;
     }
 }
