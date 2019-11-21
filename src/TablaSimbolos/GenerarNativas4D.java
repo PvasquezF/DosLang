@@ -968,6 +968,35 @@ public class GenerarNativas4D {
         return codigo;
     }
 
+    public String generarPotencia(Tabla tabla){
+        String codigo = "";
+        String temp1 = tabla.getTemporal();
+        String temp2 = tabla.getTemporal();
+        String temp3 = tabla.getTemporal();
+        String temp4 = tabla.getTemporal();
+        String temp5 = tabla.getTemporal();
+        String temp6 = tabla.getTemporal();
+        String etiqueta1 = tabla.getEtiqueta();
+        String etiqueta2 = tabla.getEtiqueta();
+        codigo += "begin,,,potencia_primitiva\n";
+        codigo += "+,p,0,"+temp6+"\n";
+        codigo += "+,p,1,"+temp1+"\n";
+        codigo += "+,p,2,"+temp2+"\n";
+        codigo += "=,stack,"+temp1+","+temp3+"\n";
+        codigo += "=,stack,"+temp2+","+temp4+"\n";
+        codigo += "=,1,,"+temp5+"\n";
+
+        codigo += etiqueta1+":\n";
+        codigo += "*,"+temp3+","+temp5+","+temp5+"\n";
+        codigo += "-,"+temp4+",1,"+temp4+"\n";
+        codigo += "je,"+temp4+",0,"+etiqueta2+"\n";
+        codigo += "jmp,,,"+etiqueta1+"\n";
+        codigo += etiqueta2+":\n";
+        codigo += "=,"+temp6+","+temp5+",stack\n";
+        codigo += "end,,,potencia_primitiva\n";
+        return codigo;
+    }
+
     public String generarIndexOut(Tabla tabla) {
         String codigo = "";
         codigo += "begin,,,indexOutException_primitiva\n";
@@ -1040,6 +1069,34 @@ public class GenerarNativas4D {
         codigo += "print(%c,46)\n";
         codigo += "print(%c,10)\n";
         codigo += "end,,,rango_sobrepasado\n";
+        return codigo;
+    }
+
+    public String generarNullPointerException(Tabla tabla) {
+        String codigo = "";
+        codigo += "begin,,,NullPointerPrimitiva\n";
+        codigo += "print(%c, 78)\n";
+        codigo += "print(%c, 117)\n";
+        codigo += "print(%c, 108)\n";
+        codigo += "print(%c, 108)\n";
+        codigo += "print(%c, 80)\n";
+        codigo += "print(%c, 111)\n";
+        codigo += "print(%c, 105)\n";
+        codigo += "print(%c, 110)\n";
+        codigo += "print(%c, 116)\n";
+        codigo += "print(%c, 101)\n";
+        codigo += "print(%c, 114)\n";
+        codigo += "print(%c, 69)\n";
+        codigo += "print(%c, 120)\n";
+        codigo += "print(%c, 99)\n";
+        codigo += "print(%c, 101)\n";
+        codigo += "print(%c, 112)\n";
+        codigo += "print(%c, 116)\n";
+        codigo += "print(%c, 105)\n";
+        codigo += "print(%c, 111)\n";
+        codigo += "print(%c, 110)\n";
+        codigo += "print(%c, 10)\n";
+        codigo += "end,,,NullPointerPrimitiva\n";
         return codigo;
     }
 

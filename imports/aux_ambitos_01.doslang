@@ -65,8 +65,7 @@ begin
     if (not asistio_parcial) then
         penalizacion := penalizacion + PUNTOS_PENALIZACION;
 
-    {
-        Writeln("Calculo de penalización igual a: ", penalizacion);}
+    Writeln("Calculo de penalización igual a: ", penalizacion);
 
     calcularNota := nota_obtenida - penalizacion;
 end;

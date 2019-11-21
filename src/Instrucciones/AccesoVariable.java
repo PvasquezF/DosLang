@@ -110,13 +110,11 @@ public class AccesoVariable implements Expresion {
                     return exc;
                 }
             } else {
-                if (acceso instanceof AccesoArreglo) {
-                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                            "AccessException, No se puede acceder a una variable de tipo " + tipoResultado.getType() + ".",
-                            fila, columna);
-                    arbol.getErrores().add(exc);
-                    return exc;
-                }
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        "AccessException, No se puede acceder a una variable de tipo " + tipoResultado.getType() + ".",
+                        fila, columna);
+                arbol.getErrores().add(exc);
+                return exc;
             }
         }
         return tipoResultado;
@@ -138,6 +136,7 @@ public class AccesoVariable implements Expresion {
         // Fin Bloque para variables with
 
         String codigo = "// Inicio AccesoVariable linea: " + fila + ", columna: " + columna + "\n";
+        String tagNullPointer = tabla.getEtiqueta();
         Tipo tipoResultado = null;
         String temp7 = tabla.getTemporal();
         Identificador identificador = (Identificador) accesos.get(0);
@@ -169,6 +168,7 @@ public class AccesoVariable implements Expresion {
         }
         //tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
+            codigo += "je," + temp7 + ",-1," + tagNullPointer + "\n";
             Expresion acceso = accesos.get(i);
             if (tipoResultado.getType() == Tipo.tipo.ARREGLO) {
                 if (acceso instanceof AccesoArreglo) {
@@ -291,6 +291,11 @@ public class AccesoVariable implements Expresion {
                 tabla.AgregarTemporal(temp7);
             }
         }
+        String tagSalida = tabla.getEtiqueta();
+        codigo += "jmp,,," + tagSalida + "\n";
+        codigo += tagNullPointer + ":\n";
+        codigo += "call,,,NullPointerPrimitiva\n";
+        codigo += tagSalida + ":\n";
         codigo += "=," + temp7 + ",," + tabla.getTemporal() + "\n";
         tabla.AgregarTemporal(tabla.getTemporalActual());
         tabla.QuitarTemporal(temp7);

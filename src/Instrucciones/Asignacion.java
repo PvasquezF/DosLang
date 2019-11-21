@@ -51,6 +51,13 @@ public class Asignacion implements Instruccion {
             }
             simbolo = (Simbolo) result;
         }
+        if(simbolo.isConstante()){
+            Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                    "La variables constantes no pueden cambiar su valor.",
+                    fila, columna);
+            arbol.getErrores().add(exc);
+            return exc;
+        }
         Object resultValor = valor.getTipo(tabla, arbol);
         if (resultValor instanceof Excepcion) {
             return resultValor;

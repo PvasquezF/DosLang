@@ -126,7 +126,9 @@ public class Operacion implements Expresion {
             tabla.AgregarTemporal(op1Actual);
             tipo1 = (Tipo) tipoOP1;
             tipo1 = tipo1.verificarUserType(tabla);
-
+            if(tipo1.getType() == tipo.RANGE){
+                tipo1.setType(tipo1.getTipoRange());
+            }
             op2 = operando2.get4D(tabla, arbol);
             tipoOP2 = operando2.getTipo(tabla, arbol);
             if (op2 instanceof Excepcion || tipoOP2 instanceof Excepcion) {
@@ -141,6 +143,9 @@ public class Operacion implements Expresion {
             tabla.AgregarTemporal(op2Actual);
             tipo2 = (Tipo) tipoOP2;
             tipo2 = tipo2.verificarUserType(tabla);
+            if(tipo2.getType() == tipo.RANGE){
+                tipo2.setType(tipo2.getTipoRange());
+            }
         } else {
             opU = operandoU.get4D(tabla, arbol);
             tipoOPU = operandoU.getTipo(tabla, arbol);
@@ -189,10 +194,30 @@ public class Operacion implements Expresion {
                 tabla.QuitarTemporal(op2Actual);
                 break;
             case POTENCIA:
-                codigo += "^," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
+                String temp1Pot = tabla.getTemporal();
+                String temp2Pot = tabla.getTemporal();
+                String temp3Pot = tabla.getTemporal();
+                tabla.AgregarTemporal(temp1Pot);
+                tabla.AgregarTemporal(temp2Pot);
+                tabla.AgregarTemporal(temp3Pot);
+                codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+                codigo += "+,p,1,"+temp1Pot+"\n";
+                tabla.AgregarTemporal(temp1Pot);
+                codigo += "+,p,2,"+temp2Pot+"\n";
+                tabla.AgregarTemporal(temp2Pot);
+                codigo += "=,"+temp1Pot+","+op1Actual+",stack\n";
+                tabla.QuitarTemporal(temp1Pot);
                 tabla.QuitarTemporal(op1Actual);
+                codigo += "=,"+temp2Pot+","+op2Actual+",stack\n";
+                tabla.QuitarTemporal(temp2Pot);
                 tabla.QuitarTemporal(op2Actual);
+                codigo += "call,,,potencia_primitiva\n";
+                codigo += "+,p,0,"+temp3Pot+"\n";
+                tabla.AgregarTemporal(temp3Pot);
+                codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+                codigo += "=,stack," + temp3Pot + "," + tabla.getTemporal() + "\n";
+                tabla.QuitarTemporal(temp3Pot);
+                tabla.AgregarTemporal(tabla.getTemporalActual());
                 break;
             case MENOR_QUE:
                 String temp1 = tabla.getTemporal();
@@ -421,6 +446,9 @@ public class Operacion implements Expresion {
             }
             tipoOP1 = (Tipo) tipo1;
             tipoOP1 = tipoOP1.verificarUserType(tabla);
+            if(tipoOP1.getType() == tipo.RANGE){
+                tipoOP1.setType(tipoOP1.getTipoRange());
+            }
             tipo2 = operando2.getTipo(tabla, arbol);
             if (tipo2 instanceof Excepcion) {
                 return tipo2;
@@ -431,6 +459,9 @@ public class Operacion implements Expresion {
             }
             tipoOP2 = (Tipo) tipo2;
             tipoOP2 = tipoOP2.verificarUserType(tabla);
+            if(tipoOP2.getType() == tipo.RANGE){
+                tipoOP2.setType(tipoOP2.getTipoRange());
+            }
         } else {
             tipoU = operandoU.getTipo(tabla, arbol);
             if (tipoU instanceof Excepcion) {

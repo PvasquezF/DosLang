@@ -109,9 +109,6 @@ public class DeclaracionVar implements Instruccion {
                         }
                     }
                 } else if (tipoAux.getType() == Tipo.tipo.RECORD) {
-                    if (tipo.getType() == Tipo.tipo.RECORD) {
-                        simbolo.getTipo().setTipoObjeto(identificador);
-                    }
                     ArrayList<Registro> registros = tipoAux.getAtributos();
                     int apariciones = 0;
                     for (Registro reg : registros) {
@@ -127,6 +124,34 @@ public class DeclaracionVar implements Instruccion {
                                     fila, columna);
                             arbol.getErrores().add(exc);
                             return exc;
+                        }
+                    }
+                    if (tipo.getType() == Tipo.tipo.RECORD) {
+                        simbolo.getTipo().setTipoObjeto(identificador);
+                        for (int k = 0; k < tipo.getAtributos().size(); k++) {
+                            Registro r = tipo.getAtributos().get(k);
+                            r.setTipo(r.getTipo().verificarUserType(tabla));
+                            if (r.getTipo().getType() == Tipo.tipo.RANGE) {
+                                Object res = r.getTipo().getLowerLimit().getTipo(tabla, arbol);
+                                if (res instanceof Excepcion) {
+                                    return res;
+                                }
+                                Object res1 = r.getTipo().getUpperLimit().getTipo(tabla, arbol);
+                                if (res1 instanceof Excepcion) {
+                                    return res1;
+                                }
+                                Tipo tipoLower = (Tipo) res;
+                                Tipo tipoUpper = (Tipo) res1;
+                                if (tipoLower.equals(tipoUpper)) {
+                                    r.getTipo().setTipoRange(tipoLower.getType());
+                                } else {
+                                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                            "Los tipos del limite de rango no coinciden.",
+                                            fila, columna);
+                                    arbol.getErrores().add(exc);
+                                    return exc;
+                                }
+                            }
                         }
                     }
                 }
@@ -246,9 +271,6 @@ public class DeclaracionVar implements Instruccion {
                         return exc;
                     }
                 } else if (tipoAux.getType() == Tipo.tipo.RECORD) {
-                    if (tipo.getType() == Tipo.tipo.RECORD) {
-                        simbolo.getTipo().setTipoObjeto(identificador);
-                    }
                     ArrayList<Registro> registros = tipoAux.getAtributos();
                     int apariciones = 0;
                     for (Registro reg : registros) {
@@ -264,6 +286,34 @@ public class DeclaracionVar implements Instruccion {
                                     fila, columna);
                             arbol.getErrores().add(exc);
                             return exc;
+                        }
+                    }
+                    if (tipo.getType() == Tipo.tipo.RECORD) {
+                        simbolo.getTipo().setTipoObjeto(identificador);
+                        for (int k = 0; k < tipo.getAtributos().size(); k++) {
+                            Registro r = tipo.getAtributos().get(k);
+                            r.setTipo(r.getTipo().verificarUserType(tabla));
+                            if (r.getTipo().getType() == Tipo.tipo.RANGE) {
+                                Object res = r.getTipo().getLowerLimit().getTipo(tabla, arbol);
+                                if (res instanceof Excepcion) {
+                                    return res;
+                                }
+                                Object res1 = r.getTipo().getUpperLimit().getTipo(tabla, arbol);
+                                if (res1 instanceof Excepcion) {
+                                    return res1;
+                                }
+                                Tipo tipoLower = (Tipo) res;
+                                Tipo tipoUpper = (Tipo) res1;
+                                if (tipoLower.equals(tipoUpper)) {
+                                    r.getTipo().setTipoRange(tipoLower.getType());
+                                } else {
+                                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                                            "Los tipos del limite de rango no coinciden.",
+                                            fila, columna);
+                                    arbol.getErrores().add(exc);
+                                    return exc;
+                                }
+                            }
                         }
                     }
                 } else {
@@ -321,6 +371,11 @@ public class DeclaracionVar implements Instruccion {
 
                     codigo += tipoAux.getUpperLimit().get4D(tabla, arbol);
                     temp4 = tabla.getTemporalActual();
+
+                    if (this.valor == null) {
+                        codigo += "=," + temp3 + ",," + temp2 + "\n";
+                    }
+
                     codigo += "jl," + temp2 + "," + temp3 + "," + label1 + "\n"; // Si es menor al limite inferior salir a error
                     codigo += "jg," + temp2 + "," + temp4 + "," + label2 + "\n"; // Si es mayor al limite superior salir a error
                     if (isStack()) {

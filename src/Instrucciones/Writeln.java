@@ -102,6 +102,11 @@ public class Writeln implements Instruccion {
                 String label2 = tabla.getEtiqueta();
                 //codigo += "=,heap," + temp + "," + temp3 + "\n";
                 //codigo += "=,heap," + temp3 + "," + temp3 + "\n";
+                codigo += "jne," + temp + ",-1," + label2 + "\n";
+                codigo += "print(%c,110)\n";
+                codigo += "print(%c,105)\n";
+                codigo += "print(%c,108)\n";
+                codigo += "jmp,,," + label1 + "\n";
                 codigo += label2 + ":\n";
                 codigo += "=,heap," + temp + "," + temp3 + "\n";
                 tabla.QuitarTemporal(temp);

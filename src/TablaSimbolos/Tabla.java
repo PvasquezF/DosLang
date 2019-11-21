@@ -44,6 +44,7 @@ public class Tabla {
     private int TemporalFin;
     private ArrayList<String> TempUsados;
     private ArrayList<String> TempNoUsados;
+
     public Tabla() {
         this.enviroment = new Ambito(null);
         tabla = new ArrayList<>();
@@ -126,8 +127,9 @@ public class Tabla {
         //return null;
     }
 
-    public void generarTablaHTML() {
+    public String generarTablaHTML() {
         this.enviroment.concatenarTablas(this.tabla);
+        String HTMLTABLE = "";
         String HTML = "<html>\n"
                 + "\n"
                 + "<head>\n"
@@ -142,19 +144,23 @@ public class Tabla {
                 + "</head>\n"
                 + "\n"
                 + "<body>";
-        HTML += "<table class=\"table table-striped table-dark\" style=\"height: 100%;\"> ";
-        String encabezado = "<tr>";
+        HTMLTABLE += "<table class=\"table table-striped table-light\" style=\"height: 100%;\"> ";
+        String encabezado = "<tr style=\"height: 40px;\">";
         String filas = "";
         encabezado += "<th scope=\"col\">No</th>";
         encabezado += "<th scope=\"col\">Identificador</th>";
         encabezado += "<th scope=\"col\">Tipo Primitivo</th>";
         encabezado += "<th scope=\"col\">Tipo Generado</th>";
+        encabezado += "<th scope=\"col\">Dimensiones</th>";
         encabezado += "<th scope=\"col\">Ambito</th>";
         encabezado += "<th scope=\"col\">Constante</th>";
         encabezado += "<th scope=\"col\">Rol</th>";
         encabezado += "<th scope=\"col\">Parametros</th>";
+        encabezado += "<th scope=\"col\">Referencia</th>";
+        encabezado += "<th scope=\"col\">Valor</th>";
         encabezado += "<th scope=\"col\">Apuntador</th>";
         encabezado += "<th scope=\"col\">Tamaño</th>";
+        encabezado += "<th scope=\"col\">Atributos</th>";
 
         for (int i = 0; i < tabla.size(); i++) {
             Simbolo sim = tabla.get(i);
@@ -177,17 +183,51 @@ public class Tabla {
             } else {
                 filas += "<td scope=\"row\"> - </td>";
             }
+            if (sim.getTipo().getType() == Tipo.tipo.ARREGLO) {
+                filas += "<td scope=\"row\">" + sim.getTipo().getDimensiones().size() + "</td>";
+            } else {
+                filas += "<td scope=\"row\"> - </td>";
+            }
             filas += "<td scope=\"row\">" + sim.getAmbito() + "</td>";
-            filas += "<td scope=\"row\">" + sim.isConstante() + "</td>";
+            filas += "<td scope=\"row\">" + (sim.isConstante() ? "Si" : "No") + "</td>";
             filas += "<td scope=\"row\">" + sim.getRol() + "</td>";
-            filas += "<td scope=\"row\"> - </td>";
+            if (sim.getParametros() != null) {
+                filas += "<td scope=\"row\"> " + sim.getParametros().size() + " </td>";
+                filas += "<td scope=\"row\">" + (sim.isReferencia() ? "Si" : "No") + "</td>";
+                filas += "<td scope=\"row\">" + (!sim.isReferencia() ? "Si" : "No") + "</td>";
+            } else {
+                filas += "<td scope=\"row\"> - </td>";
+                filas += "<td scope=\"row\"> No </td>";
+                filas += "<td scope=\"row\"> Si </td>";
+            }
+
             filas += "<td scope=\"row\">" + sim.getApuntador() + "</td>";
             filas += "<td scope=\"row\">" + sim.getTamaño() + "</td>";
+            if (sim.getTipo().getType() == Tipo.tipo.RECORD) {
+                filas += "<td scope=\"row\">";
+                for (int z = 0; z < sim.getTipo().getAtributos().size(); z++) {
+                    Registro m = sim.getTipo().getAtributos().get(z);
+                    if (m.getTipo().getType() == Tipo.tipo.OBJETO ||
+                            m.getTipo().getType() == Tipo.tipo.RECORD) {
+                        filas += m.getTipo().getType() + "_" +
+                                m.getTipo().getTipoObjeto() + "_" +
+                                m.getIdentificador() + "<br/>";
+                    } else {
+                        filas += m.getTipo().getType() + "_" +
+                                m.getIdentificador() + "<br/>";
+                    }
+
+                }
+                filas += "</td>";
+            } else {
+                filas += "<td scope=\"row\"> - </td>";
+            }
             filas += "</tr>";
         }
         encabezado += "</tr>";
-        HTML += encabezado + filas;
-        HTML += "</table>";
+        HTMLTABLE += encabezado + filas;
+        HTMLTABLE += "</table>";
+        HTML += HTMLTABLE;
         HTML += "</body>\n"
                 + "\n"
                 + "</html>";
@@ -201,20 +241,21 @@ public class Tabla {
             try {
                 writer.close();
             } catch (Exception ex) {/*ignore*/
-
+                System.out.println(ex.getMessage());
             }
         }
+        return HTMLTABLE;
     }
 
-    public void AgregarTemporal(String temp){
-        if(this.getTempNoUsados().indexOf(temp) == -1){
+    public void AgregarTemporal(String temp) {
+        if (this.getTempNoUsados().indexOf(temp) == -1) {
             this.getTempNoUsados().add(temp);
         }
     }
 
 
-    public void QuitarTemporal(String temp){
-        if(this.getTempNoUsados().indexOf(temp) > -1){
+    public void QuitarTemporal(String temp) {
+        if (this.getTempNoUsados().indexOf(temp) > -1) {
             this.getTempNoUsados().remove(temp);
         }
     }

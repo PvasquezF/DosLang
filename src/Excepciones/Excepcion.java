@@ -5,6 +5,9 @@
  */
 package Excepciones;
 
+import TablaSimbolos.Simbolo;
+import TablaSimbolos.Tipo;
+
 /**
  *
  * @author Pavel

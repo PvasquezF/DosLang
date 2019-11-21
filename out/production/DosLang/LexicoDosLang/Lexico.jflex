@@ -4,6 +4,7 @@ import SintacticoDosLang.sym;
 import Excepciones.Excepcion;
 import Excepciones.Excepcion.TIPOERROR;
 import doslang.DosLang;
+import Conexion.Compilacion;
 %%
 
 %class Lexer
@@ -129,7 +130,7 @@ ComentarioMulti =   "{" ~"}"
     {WhiteSpace}        {}
     /* Cualquier Otro */
     .                   { yybegin(YYINITIAL); 
-                          DosLang.errores.add(new Excepcion(TIPOERROR.LEXICO, 
+                          Compilacion.errores.add(new Excepcion(TIPOERROR.LEXICO, 
                                                         "El caracter '"+yytext()+"' no pertenece al lenguaje", 
                                                         yyline, 
                                                         yycolumn));  }
@@ -151,7 +152,7 @@ ComentarioMulti =   "{" ~"}"
     \\t                          { NuevoString.append('\t'); }
     \\v                          { NuevoString.append('v'); }
     {FinLinea}                   { yybegin(YYINITIAL);
-                                   DosLang.errores.add(new Excepcion(TIPOERROR.LEXICO, 
+                                   Compilacion.errores.add(new Excepcion(TIPOERROR.LEXICO, 
                                                                  "String sin finalizar", 
                                                                  yyline, 
                                                                  yycolumn)); }
@@ -168,7 +169,7 @@ ComentarioMulti =   "{" ~"}"
     \\\"                         { NuevoChar = '\"'; }
     \\                           { NuevoChar = '\\'; }
     {FinLinea}                   { yybegin(YYINITIAL);
-                                   DosLang.errores.add(new Excepcion(TIPOERROR.LEXICO, 
+                                   Compilacion.errores.add(new Excepcion(TIPOERROR.LEXICO, 
                                                                  "Char sin finalizar", 
                                                                  yyline, 
                                                                  yycolumn)); }

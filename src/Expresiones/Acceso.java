@@ -109,13 +109,11 @@ public class Acceso implements Expresion {
                     return exc;
                 }
             } else {
-                if (acceso instanceof AccesoArreglo) {
-                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                            "AccessException, No se puede acceder a una variable de tipo " + tipoResultado.getType() + ".",
-                            fila, columna);
-                    arbol.getErrores().add(exc);
-                    return exc;
-                }
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        "AccessException, No se puede acceder a una variable de tipo " + tipoResultado.getType() + ".",
+                        fila, columna);
+                arbol.getErrores().add(exc);
+                return exc;
             }
         }
 
@@ -142,6 +140,7 @@ public class Acceso implements Expresion {
 
         String codigo = "// Inicio acceso linea: " + fila + ", columna: " + columna + "\n";
         Tipo tipoResultado = null;
+        String tagNullPointer = tabla.getEtiqueta();
         String temp7 = tabla.getTemporal();
         //String temp9 = tabla.getTemporal();
         Identificador identificador = (Identificador) accesos.get(0);
@@ -160,6 +159,7 @@ public class Acceso implements Expresion {
         Simbolo sim = (Simbolo) result;
         tipoResultado = sim.getTipo().verificarUserType(tabla);
         for (int i = 1; i < accesos.size(); i++) {
+            codigo += "je," + temp7 + ",-1," + tagNullPointer + "\n";
             Expresion acceso = accesos.get(i);
             if (tipoResultado.getType() == Tipo.tipo.ARREGLO) {
                 if (acceso instanceof AccesoArreglo) {
@@ -263,15 +263,18 @@ public class Acceso implements Expresion {
                     }
                 }
             } else {
-                if (acceso instanceof AccesoArreglo) {
-                    Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
-                            "AccessException, No se puede acceder a una variable de tipo " + tipoResultado.getType() + ".",
-                            fila, columna);
-                    arbol.getErrores().add(exc);
-                    return exc;
-                }
+                Excepcion exc = new Excepcion(Excepcion.TIPOERROR.SEMANTICO,
+                        "AccessException, No se puede acceder a una variable de tipo " + tipoResultado.getType() + ".",
+                        fila, columna);
+                arbol.getErrores().add(exc);
+                return exc;
             }
         }
+        String tagSalida = tabla.getEtiqueta();
+        codigo += "jmp,,," + tagSalida + "\n";
+        codigo += tagNullPointer + ":\n";
+        codigo += "call,,,NullPointerPrimitiva\n";
+        codigo += tagSalida + ":\n";
         codigo += "=," + temp7 + ",," + tabla.getTemporal() + "\n";
         tabla.AgregarTemporal(tabla.getTemporalActual());
         tabla.QuitarTemporal(temp7);
