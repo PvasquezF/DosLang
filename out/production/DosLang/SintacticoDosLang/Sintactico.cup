@@ -1,0 +1,415 @@
+package SintacticoDosLang;
+import java.util.ArrayList;
+import java_cup.runtime.*;
+import doslang.DosLang;
+import Conexion.Compilacion;
+import Instrucciones.*;
+import Expresiones.*;
+import Interfaces.*;
+import TablaSimbolos.*;
+import Excepciones.Excepcion;
+import Excepciones.Excepcion.TIPOERROR;
+import Expresiones.Operacion.Operador;
+import java.util.Collections;
+parser code 
+{:
+    Tree tree;
+    public Tree getArbol() {
+            return tree;
+    }
+    public void syntax_error(Symbol s){ 
+            System.err.println("Error Sintáctico en la Línea " + s.left +" Columna "+s.right+ ". No se esperaba este componente: " +s.value); 
+            Compilacion.errores.add(new Excepcion(TIPOERROR.SINTACTICO, "No se esperaba el token: "+s.value, s.left, s.right));
+    } 
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+            System.err.println("Error síntactico en la Línea " + s.left+ "__Columna "+s.right+ ". No se esperaba este componente: " +s.value); 
+            Compilacion.errores.add(new Excepcion(TIPOERROR.SINTACTICO, "No se esperaba el token: "+s.value, s.left, s.right));
+    }  
+:}
+
+/* Terminals (tokens returned by the scanner). */
+terminal String numero, decimal, igual, pComa, cadena, identificador;
+terminal String integer, real, character, bool, word, string, record, nil;
+terminal String type, coma, parenI, parenD, tresP, array, corI, corD, dosP;
+terminal String of, sizeof, malloc, free, and, begin, caso, constante, hacer;
+terminal String downto, sino, end, para, function, si;
+terminal String not, or, procedure, program, repeat, then;
+terminal String to, until, var, punto, mientras, con, uses, dosPuntos;
+terminal String potencia, modulo, menorque, menorigual, mayorque, mayorigual;
+terminal String igualacion, diferente, nand, nor, falso, verdadero;
+terminal String mas, menos, por, division, UMENOS, leer;
+terminal String detener, continuar, salir, escribir, escribirln, defecto;
+terminal String chartEn, longitud, reemplazar, toCharArreglo, aMinusculas, aMayusculas, Equals, Truncar, Redondear; 
+terminal char caracter;
+/* Non terminals */
+non terminal INICIO;
+
+non terminal ArrayList<AST> METHOD_LIST, PROGRAM, USES, SECCION_TIPO, LISTA_DECLARACION_TIPOS, LISTA_INSTRUCCIONES;
+non terminal ArrayList<AST> SECCION_FUNCION, VARINIT, DECLARACION_VAR, SECCION_VAR, SECCION_CONST, DECLARACION_CONST;
+non terminal ArrayList<AST> BLOQUE_INSTRUCCIONES, INSIF, INSTRUCCIONESIF, DEFECTO;
+non terminal ArrayList<String> LISTA_IDENTIFICADORES;
+non terminal ArrayList<Dimension> LISTA_RANGO_ARRAY, ARRAY_MULTI;
+non terminal ArrayList<Registro> LISTA_RECORDS, REGISTRO;
+non terminal ArrayList<Expresion> VARIABLE, LISTA_EXPRESION, ACCESO;
+non terminal AST DECLARACION_TIPOS, VAR, TIPO_DECLARACION, CONST, INSTRUCCION, ASIGNACION, WITH;
+non terminal AST FUNCION, MAIN, WRITE, PROCEDURE, SI, SWITCH, WHILE, READ, REPEAT, FOR, TRANSFERENCIA;
+non terminal Expresion PRIMITIVO, ARITMETICA, RELACIONAL, LOGICA,EXPRESION, LLAMADA;
+non terminal Expresion LOWER_LIMIT, UPPER_LIMIT, MEMORIA_VIRTUAL;
+non terminal Tipo ARRAY_DECLARATION, TIPO, TIPO_PRIMITIVO, ARRAY_DECLARATION_MULTI;
+non terminal Dimension RANGO_ARRAY;
+non terminal Registro RECORDS;
+non terminal Case CASE;
+non terminal ArrayList<Parametro> PARAMETROS, LISTA_PARAMETROS;
+non terminal ArrayList<Case> CASELIST;
+
+//precedence left then;
+//precedence left tresP;
+precedence left sino;
+precedence right igual;
+precedence left or;
+precedence left nand, nor;
+precedence left and;
+precedence left igualacion, diferente;
+precedence left mayorigual, menorigual, menorque, mayorque;
+precedence left mas, menos;
+precedence left por, division, potencia, modulo;
+precedence left potencia;
+precedence left not;
+precedence left UMENOS;
+precedence left parenI, parenD, punto, corI, corD;
+
+start with INICIO;
+
+INICIO ::= PROGRAM:e {: System.out.println("Termino Correctamente"); parser.tree = new Tree(e);:}
+         ;
+
+PROGRAM ::= program identificador:e pComa USES:e1 {: RESULT = new ArrayList<AST>(); RESULT.add(new Program(e)); RESULT.addAll(e1);:}
+          ;
+
+USES ::= uses LISTA_IDENTIFICADORES:e pComa SECCION_TIPO:e1 {:RESULT = e1; RESULT.add(0, new Uses(e, eleft, eright));:}
+       | SECCION_TIPO:e {:RESULT = e;:}
+       ;
+
+SECCION_TIPO ::= type LISTA_DECLARACION_TIPOS:e SECCION_CONST:e1 {:RESULT = e; RESULT.addAll(e1);:}
+               | SECCION_CONST:e {:RESULT = e;:}
+               ;
+
+LISTA_DECLARACION_TIPOS ::= LISTA_DECLARACION_TIPOS:e DECLARACION_TIPOS:e1 {:RESULT = e; RESULT.add(e1);:}
+                          | DECLARACION_TIPOS:e {:RESULT = new ArrayList<>(); RESULT.add(e);:}
+                          ;
+
+DECLARACION_TIPOS ::= TIPO_DECLARACION:e pComa {:RESULT = e;:}
+                    ;
+
+TIPO_DECLARACION ::= LISTA_IDENTIFICADORES:e igualacion TIPO:e1 {:RESULT = new DeclaracionType(e1, e, eleft, eright);:}
+                   ;
+
+LOWER_LIMIT ::= caracter:e      {: RESULT = new Primitivo(e); :}
+              | numero:e        {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | decimal:e       {: RESULT = new Primitivo(new Double(e+"")); :}
+              | menos numero:e  {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | menos decimal:e {: RESULT = new Primitivo(new Double(e+"")); :}
+              ; 
+
+UPPER_LIMIT ::= caracter:e      {: RESULT = new Primitivo(e); :}
+              | numero:e        {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | decimal:e       {: RESULT = new Primitivo(new Double(e+"")); :}
+              | menos numero:e  {: RESULT = new Primitivo(new Integer(e+"")); :}
+              | menos decimal:e {: RESULT = new Primitivo(new Double(e+"")); :}
+            ; 
+
+ARRAY_DECLARATION ::= array corI RANGO_ARRAY:e corD of ARRAY_DECLARATION:e1 {:
+                                RESULT = e1;
+                                RESULT.getDimensiones().add(e);
+                        :}
+                    | array corI RANGO_ARRAY:e corD of TIPO_PRIMITIVO:e1 {: 
+                                ArrayList<Dimension> dims = new ArrayList<>(); dims.add(e);  
+                                RESULT = new Tipo(Tipo.tipo.ARREGLO, e1.getType(), null, dims);
+                        :}
+                    | array corI RANGO_ARRAY:e corD of identificador:e1 {: 
+                                ArrayList<Dimension> dims = new ArrayList<>(); dims.add(e);  
+                                RESULT = new Tipo(Tipo.tipo.ARREGLO, Tipo.tipo.OBJETO, e1, dims);
+                        :}
+                    ;
+
+RANGO_ARRAY ::= EXPRESION:e dosP EXPRESION:e1 {: RESULT = new Dimension(e, e1, eleft, eright); :}
+              ;
+
+ARRAY_DECLARATION_MULTI ::= array corI ARRAY_MULTI:e corD of TIPO_PRIMITIVO:e1 {:RESULT = new Tipo(Tipo.tipo.ARREGLO, e1.getType(), null, e);:}
+                          | array corI ARRAY_MULTI:e corD of identificador:e1 {:RESULT = new Tipo(Tipo.tipo.ARREGLO, Tipo.tipo.OBJETO, e1, e);:}
+                          ;
+
+ARRAY_MULTI ::= RANGO_ARRAY:e coma LISTA_RANGO_ARRAY:e1 {: RESULT = e1; RESULT.add(0, e);  :}
+              ;
+
+LISTA_RANGO_ARRAY ::= LISTA_RANGO_ARRAY:e coma RANGO_ARRAY:e1 {:RESULT = e; RESULT.add(e1);:}
+                    | RANGO_ARRAY:e {:RESULT = new ArrayList<Dimension>(); RESULT.add(e);:}
+                    ;
+
+LISTA_IDENTIFICADORES ::= LISTA_IDENTIFICADORES:e coma identificador:e1 {:RESULT = e; RESULT.add(e1);:}
+                        | identificador:e {:RESULT = new ArrayList<String>(); RESULT.add(e);:}
+                        ;
+
+VARIABLE ::= identificador:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, eleft, eright)); :}
+           | VARIABLE:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
+           | VARIABLE:e parenI LISTA_EXPRESION:e1 parenD
+           | VARIABLE:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, eleft, eright)); :}
+           ;
+
+LISTA_EXPRESION ::= LISTA_EXPRESION:e coma EXPRESION:e1 {:RESULT = e; RESULT.add(e1);:}
+                  | EXPRESION:e {: RESULT = new ArrayList<Expresion>(); RESULT.add(e); :}
+                  ;
+
+MEMORIA_VIRTUAL ::= sizeof parenI EXPRESION:e parenD {: RESULT = new Sizeof(e, eleft, eright); :}
+                  | sizeof parenI identificador:e parenD {:RESULT = new Sizeof(e, eleft, eright);:}
+                  | malloc parenI EXPRESION:e parenD {: RESULT = new Malloc(e, eleft, eright); :}
+                  //| free parenI EXPRESION parenD
+                  ;
+
+TIPO_PRIMITIVO ::= integer   {:RESULT = new Tipo(Tipo.tipo.INTEGER);:} 
+                 | real      {:RESULT = new Tipo(Tipo.tipo.REAL);:}
+                 | character {:RESULT = new Tipo(Tipo.tipo.CHAR);:}
+                 | bool      {:RESULT = new Tipo(Tipo.tipo.BOOLEAN);:}
+                 | word      {:RESULT = new Tipo(Tipo.tipo.WORD);:}
+                 | string    {:RESULT = new Tipo(Tipo.tipo.STRING);:}
+                 | record    {:RESULT = new Tipo(Tipo.tipo.RECORD);:}
+                 ;
+
+TIPO ::= LOWER_LIMIT:e1 tresP UPPER_LIMIT:e2 {:RESULT = new Tipo(Tipo.tipo.RANGE, null, e1, e2);:}
+       | identificador:e {:RESULT = new Tipo(Tipo.tipo.OBJETO, e);:}
+       | parenI LISTA_EXPRESION:e parenD {:RESULT = new Tipo(Tipo.tipo.ENUMERADO, null, e);:}
+       | TIPO_PRIMITIVO:e {:RESULT = e;:}
+       | ARRAY_DECLARATION:e {:RESULT = e; 
+        Collections.reverse(RESULT.getDimensiones());:}
+       | ARRAY_DECLARATION_MULTI:e {:RESULT = e;:}
+       | REGISTRO:e {:RESULT = new Tipo(e);:}
+       ;
+
+SECCION_CONST ::= constante DECLARACION_CONST:e SECCION_VAR:e1 {:RESULT = e; RESULT.addAll(e1);:}
+                | SECCION_VAR:e {:RESULT = e;:}
+                ;
+
+DECLARACION_CONST ::= DECLARACION_CONST:e CONST:e1 {:RESULT = e; RESULT.add(e1);:}
+                   | CONST:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+                   ;
+
+CONST ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igualacion EXPRESION:e2 pComa {: RESULT = new DeclaracionConstante(e1, e, e2, eleft, eright); :}
+        ;
+
+SECCION_VAR ::= VARINIT:e SECCION_FUNCION:e1 {:RESULT = e; RESULT.addAll(e1);:}
+              | SECCION_FUNCION:e {:RESULT = e;:}
+              ;
+
+VARINIT ::= var DECLARACION_VAR:e {:RESULT = e;:}
+          ;
+
+DECLARACION_VAR ::= DECLARACION_VAR:e VAR:e1 {:RESULT = e; RESULT.add(e1);:}
+                  | VAR:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+                  ;
+
+VAR ::= LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 igualacion EXPRESION:e2 pComa {: RESULT = new DeclaracionVar(e1, e, e2, eleft, eright);:}
+      | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 pComa {: RESULT = new DeclaracionVar(e1, e, eleft, eright); :}
+      ;
+
+SECCION_FUNCION ::= METHOD_LIST:e MAIN:e1 {:RESULT = e; RESULT.add(e1);:}
+                  | MAIN:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+                  ;
+
+METHOD_LIST ::= METHOD_LIST:e FUNCION:e1 {: RESULT = e; RESULT.add(e1); :}
+              | METHOD_LIST:e PROCEDURE:e1 {: RESULT = e; RESULT.add(e1); :}
+              | FUNCION:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
+              | PROCEDURE:e {: RESULT = new ArrayList<AST>(); RESULT.add(e); :}
+              ;
+
+FUNCION ::= function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, e3, new ArrayList<AST>(), eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), new ArrayList<AST>(),eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa VARINIT:e3 METHOD_LIST:e5 BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, e3, e5, eleft, eright); :}
+          | function identificador:e PARAMETROS:e1 dosPuntos TIPO:e2 pComa METHOD_LIST:e3 BLOQUE_INSTRUCCIONES:e4 
+          {: RESULT = new Funcion(e, e1, e2, e4, new ArrayList<AST>(), e3, eleft, eright); :}
+          ;
+
+PROCEDURE ::= procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 BLOQUE_INSTRUCCIONES:e3 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, new ArrayList<AST>(), eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa BLOQUE_INSTRUCCIONES:e2 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e2, new ArrayList<AST>(), new ArrayList<AST>(), eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa VARINIT:e2 METHOD_LIST:e4 BLOQUE_INSTRUCCIONES:e3 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, e2, e4, eleft, eright); :}
+            | procedure identificador:e PARAMETROS:e1 pComa METHOD_LIST:e2 BLOQUE_INSTRUCCIONES:e3 
+            {: RESULT = new Procedimiento(e, e1, new Tipo(Tipo.tipo.VOID), e3, new ArrayList<AST>(), e2, eleft, eright); :}
+            ;
+
+PARAMETROS ::= parenI LISTA_PARAMETROS:e parenD {:RESULT = e;:}
+             | parenI parenD {:RESULT = new ArrayList<Parametro>();:}
+             ;
+
+LISTA_PARAMETROS ::= LISTA_PARAMETROS:e pComa LISTA_IDENTIFICADORES:e1 dosPuntos TIPO:e2 {: RESULT = e; RESULT.add(new Parametro(e2, e1, false, eleft, eright)); :}
+                   | LISTA_PARAMETROS:e pComa var LISTA_IDENTIFICADORES:e1 dosPuntos TIPO:e2 {: RESULT = e; RESULT.add(new Parametro(e2, e1, true, eleft, eright)); :}
+                   | LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 {: RESULT = new ArrayList<Parametro>(); RESULT.add(new Parametro(e1, e, false, eleft, eright)); :}
+                   | var LISTA_IDENTIFICADORES:e dosPuntos TIPO:e1 {: RESULT = new ArrayList<Parametro>(); RESULT.add(new Parametro(e1, e, true, eleft, eright)); :}
+                   ;
+
+REGISTRO ::= record LISTA_RECORDS:e end {:RESULT = e;:}
+           ;
+
+LISTA_RECORDS ::= LISTA_RECORDS:e RECORDS:e1 {:RESULT = e; RESULT.add(e1);:}
+                | RECORDS:e {:RESULT = new ArrayList<Registro>(); RESULT.add(e);:}
+                ;
+
+RECORDS ::= identificador:e dosPuntos TIPO:e1 pComa {: RESULT = new Registro(e1, e); :}
+          ;
+
+MAIN ::= begin LISTA_INSTRUCCIONES:e end punto {:RESULT = new Main(e, eleft, eright);:}
+       | begin end:e punto {:RESULT = new Main(new ArrayList<AST>(), eleft, eright);:}
+       ;
+
+BLOQUE_INSTRUCCIONES ::= begin LISTA_INSTRUCCIONES:e end pComa {:RESULT = e;:}
+                       | begin end pComa {:RESULT = new ArrayList<AST>();:}
+                       ;
+
+LISTA_INSTRUCCIONES ::= LISTA_INSTRUCCIONES:e INSTRUCCION:e1 {:RESULT = e; RESULT.add(e1);:}
+                      | INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+                      ;
+
+INSTRUCCION ::= WITH:e {:RESULT = e;:}
+              | ASIGNACION:e pComa {:RESULT = e;:}
+              | TRANSFERENCIA:e {:RESULT = e;:}
+              | SI:e {:RESULT = e;:}
+              | WHILE:e {:RESULT = e;:}
+              | REPEAT:e {:RESULT = e;:}
+              | FOR:e {:RESULT = e;:}
+              | WRITE:e {:RESULT = e;:}
+              | READ:e {:RESULT = e;:}
+              | SWITCH:e {:RESULT = e;:}
+              | free parenI VARIABLE:e parenD pComa {:RESULT = new Free(new AccesoVariable(e, eleft, eright), eleft, eright);:}
+              | LLAMADA:e pComa {:RESULT = e;:}
+              | FUNCION:e {:RESULT = e;:}
+              | PROCEDURE:e {:RESULT = e;:}
+              ;
+
+WITH ::= con VARIABLE:e hacer LISTA_INSTRUCCIONES:e1 end pComa {:
+                                                RESULT = new With(new AccesoVariable(e, eleft, eright), e1, eleft, eright);
+                                                        :}
+       ;
+
+ASIGNACION ::= VARIABLE:e igual EXPRESION:e1 {: RESULT = new Asignacion(new AccesoVariable(e, eleft, eright), e1, eleft, eright); :}
+             ;
+
+TRANSFERENCIA ::= detener:e pComa {:RESULT = new Break(eleft, eright);:}
+                | continuar:e pComa {:RESULT = new Continue(eleft, eright);:}
+                | salir:e pComa {:RESULT = new Salir(eleft, eright);:}
+                ;
+
+SI ::= si EXPRESION:e then INSIF:e1 sino INSIF:e2 {: RESULT = new If(e, e1, e2, eleft, eright); :}
+     | si EXPRESION:e then INSIF:e1 {: RESULT = new If(e, e1, new ArrayList<AST>(), eleft, eright); :}
+     ;
+
+INSIF ::= INSTRUCCIONESIF:e  {:RESULT = e; :}
+        | INSTRUCCIONESIF:e pComa  {:RESULT = e; :} 
+        | INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e); :}
+        ;
+
+INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES:e end {:RESULT = e; :} 
+                  | begin end {:RESULT = new ArrayList<AST>();:}
+                  ;
+
+SWITCH ::= caso EXPRESION:e of CASELIST:e1 end pComa {:RESULT = new SwitchCase(e, e1, new ArrayList<AST>(), eleft, eright);:}
+       |   caso EXPRESION:e of CASELIST:e1 DEFECTO:e2 dosPuntos end pComa {:RESULT = new SwitchCase(e, e1, e2, eleft, eright);:}
+       ;
+
+CASELIST ::= CASELIST:e CASE:e1 {:RESULT = e; RESULT.add(e1);:}
+           | CASE:e {:RESULT = new ArrayList<Case>(); RESULT.add(e);:}
+           ;
+
+CASE ::= LISTA_EXPRESION:e dosPuntos INSTRUCCION:e1 {: ArrayList<AST> insSwitch = new ArrayList<>(); insSwitch.add(e1); RESULT = new Case(e, insSwitch);:}
+       | LISTA_EXPRESION:e dosPuntos BLOQUE_INSTRUCCIONES:e1 {:RESULT = new Case(e, e1);:}
+       ;
+
+DEFECTO ::= defecto INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+          | defecto BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
+          ;
+
+WHILE ::= mientras EXPRESION:e hacer BLOQUE_INSTRUCCIONES:e1 {: RESULT = new While(e, e1, eleft, eright); :}
+        | mientras EXPRESION:e hacer INSTRUCCION:e1 {: ArrayList<AST> insWhile = new ArrayList<>(); insWhile.add(e1); RESULT = new While(e, insWhile, eleft, eright);:}
+        ;
+
+REPEAT ::= repeat LISTA_INSTRUCCIONES:e until EXPRESION:e1 pComa {:RESULT = new Repeat(e1, e, eleft, eright);:}
+         ;
+
+FOR ::= para ASIGNACION:e to EXPRESION:e1 hacer BLOQUE_INSTRUCCIONES:e2 {: RESULT = new For(e, e1, e2, true, eleft, eright);:}
+      | para ASIGNACION:e downto EXPRESION:e1 hacer BLOQUE_INSTRUCCIONES:e2 {: RESULT = new For(e, e1, e2, false, eleft, eright);:}
+      | para ASIGNACION:e to EXPRESION:e1 hacer INSTRUCCION:e2 {: ArrayList<AST> insFor = new ArrayList<>(); insFor.add(e2); RESULT = new For(e, e1, insFor, true, eleft, eright);:}
+      | para ASIGNACION:e downto EXPRESION:e1 hacer INSTRUCCION:e2 {: ArrayList<AST> insFor = new ArrayList<>(); insFor.add(e2); RESULT = new For(e, e1, insFor, false, eleft, eright);:}
+      ;
+
+WRITE ::= escribir parenI LISTA_EXPRESION:e parenD pComa {: RESULT = new Write(e, eleft, eright); :}
+        | escribirln parenI LISTA_EXPRESION:e parenD pComa {: RESULT = new Writeln(e, eleft, eright); :}
+        ; 
+
+READ ::= leer parenI VARIABLE:e parenD pComa {:RESULT = new Read(new AccesoVariable(e, eleft, eright), eleft, eright);:}
+       ;
+
+EXPRESION ::=  ARITMETICA:e                 {: RESULT = e; :}    
+           |   LOGICA:e                     {: RESULT = e; :}
+           |   RELACIONAL:e                 {: RESULT = e; :}
+           |   PRIMITIVO:e                  {: RESULT = e; :}
+           |   parenI EXPRESION:e parenD    {: RESULT = e; :}
+           |   ACCESO:e                     {: RESULT = new Acceso(e, eleft, eright); :}
+           |   MEMORIA_VIRTUAL:e            {: RESULT = e; :}
+           |   LLAMADA:e                    {: RESULT = e; :}
+           ;
+
+ACCESO   ::= identificador:e {:RESULT = new ArrayList<Expresion>(); RESULT.add(new Identificador(e, true, eleft,eright));:}
+           | ACCESO:e corI LISTA_EXPRESION:e1 corD {:RESULT = e; RESULT.add(new AccesoArreglo(e1));:}
+           //| ACCESO parenI LISTA_EXPRESION parenD
+           | ACCESO:e punto identificador:e1 {: RESULT = e; RESULT.add(new Identificador(e1, true, eleft, eright)); :}
+           ;
+
+LLAMADA ::= chartEn parenI EXPRESION:e coma EXPRESION:e1 parenD {:RESULT = new CharAt(e, e1, eleft, eright);:}
+          | longitud parenI EXPRESION:e parenD {:RESULT = new Longitud(e, eleft, eright);:}
+          | reemplazar parenI EXPRESION:e coma EXPRESION:e1 parenD {:RESULT = new Reemplazar(e, e1, eleft, eright);:}
+          | toCharArreglo parenI EXPRESION:e parenD {:RESULT = new toCharArray(e, eleft, eright);:}
+          | aMinusculas parenI EXPRESION:e parenD {:RESULT = new aMinusculas(e, eleft, eright);:}
+          | aMayusculas parenI EXPRESION:e parenD {:RESULT = new aMayusculas(e, eleft, eright);:}
+          | Equals parenI EXPRESION:e coma EXPRESION:e1 parenD  {:RESULT = new Iguals(e, e1, eleft, eright);:}
+          | Truncar parenI EXPRESION:e parenD {:RESULT = new Trunk(e, eleft, eright);:}
+          | Redondear parenI EXPRESION:e parenD {:RESULT = new Redondear(e, eleft, eright);:}
+          | identificador:e parenI LISTA_EXPRESION:e1 parenD {:RESULT = new Llamada(e, e1, eleft, eright);:}
+          | identificador:e parenI parenD {:RESULT = new Llamada(e, new ArrayList<Expresion>(), eleft, eright);:}
+          ;
+
+ARITMETICA ::= menos  EXPRESION:e                 {: RESULT = new Operacion(e, Operador.MENOS_UNARIO, eleft, eright); :} %prec UMENOS 
+             | EXPRESION:e mas EXPRESION:e1       {: RESULT = new Operacion(e, e1, Operador.SUMA, eleft, eright); :}
+             | EXPRESION:e menos EXPRESION:e1     {: RESULT = new Operacion(e, e1, Operador.RESTA, eleft, eright); :}
+             | EXPRESION:e por EXPRESION:e1       {: RESULT = new Operacion(e, e1, Operador.MULTIPLICACION, eleft, eright); :}
+             | EXPRESION:e division EXPRESION:e1  {: RESULT = new Operacion(e, e1, Operador.DIVISION, eleft, eright); :}
+             | EXPRESION:e potencia EXPRESION:e1  {: RESULT = new Operacion(e, e1, Operador.POTENCIA, eleft, eright); :}
+             | EXPRESION:e modulo EXPRESION:e1    {: RESULT = new Operacion(e, e1, Operador.MODULO, eleft, eright); :}
+             ;
+
+RELACIONAL ::= EXPRESION:e mayorque EXPRESION:e1   {: RESULT = new Operacion(e, e1, Operador.MAYOR_QUE, eleft, eright); :}
+             | EXPRESION:e mayorigual EXPRESION:e1 {: RESULT = new Operacion(e, e1, Operador.MAYOR_IGUAL, eleft, eright); :}
+             | EXPRESION:e menorigual EXPRESION:e1 {: RESULT = new Operacion(e, e1, Operador.MENOR_IGUAL, eleft, eright); :}
+             | EXPRESION:e menorque EXPRESION:e1   {: RESULT = new Operacion(e, e1, Operador.MENOR_QUE, eleft, eright); :}
+             | EXPRESION:e igualacion EXPRESION:e1 {: RESULT = new Operacion(e, e1, Operador.IGUAL_IGUAL, eleft, eright); :}
+             | EXPRESION:e diferente EXPRESION:e1  {: RESULT = new Operacion(e, e1, Operador.DIFERENTE_QUE, eleft, eright); :}
+             ;
+
+LOGICA ::= EXPRESION:e or EXPRESION:e1      {: RESULT = new Operacion(e, e1, Operador.OR, eleft, eright); :}
+        |  EXPRESION:e and EXPRESION:e1     {: RESULT = new Operacion(e, e1, Operador.AND, eleft, eright); :}
+        |  EXPRESION:e nand EXPRESION:e1    {: RESULT = new Operacion(e, e1, Operador.NAND, eleft, eright); :}
+        |  EXPRESION:e nor EXPRESION:e1     {: RESULT = new Operacion(e, e1, Operador.NOR, eleft, eright); :}
+        |  not EXPRESION:e                  {: RESULT = new Operacion(e, Operador.NOT, eleft, eright); :}
+        ;
+
+PRIMITIVO ::= cadena:e       {: RESULT = new Primitivo(e.toString()); :}
+           | caracter:e      {: RESULT = new Primitivo(e); :}
+           | verdadero:e     {: RESULT = new Primitivo(true); :}
+           | falso:e         {: RESULT = new Primitivo(false); :}
+           | numero:e        {: RESULT = new Primitivo(new Integer(e+"")); :}
+           | decimal:e       {: RESULT = new Primitivo(new Double(e+"")); :}
+           | nil:e           {: RESULT = new Primitivo(new Nil()); :}
+           ;

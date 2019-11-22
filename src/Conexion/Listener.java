@@ -1,6 +1,5 @@
 package Conexion;
 
-import static doslang.DosLang.inputStreamAsString;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -52,7 +51,7 @@ public class Listener extends Thread {
                 System.out.println(inputString);
                 //************RESPUESTA
                 Socket tcpClient = new Socket("localhost", 3001);
-                String msg = "hola desde java";
+                String msg = procesarEntrada(inputString);
                 DataOutputStream os = new DataOutputStream(tcpClient.getOutputStream());
                 PrintWriter pw = new PrintWriter(os);
                 pw.println(msg);
@@ -84,5 +83,28 @@ public class Listener extends Thread {
     synchronized void unpause() {
         this.halt = false;
         notifyAll();
+    }
+
+    public String inputStreamAsString(InputStream stream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+
+        while ((line = br.readLine()) != null) {
+            sb.append(line + "\n");
+        }
+        br.close();
+        return sb.toString();
+    }
+
+    public String procesarEntrada(String entrada) {
+        String codigo = "";
+        try {
+            codigo += new Compilacion().compilar(entrada);
+            codigo += "$$$-----FINALIZANDOCUADRUPLOS-----";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return codigo;
     }
 }
