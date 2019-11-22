@@ -108,322 +108,63 @@ public class Operacion implements Expresion {
     @Override
     public Object get4D(Tabla tabla, Tree arbol) {
         String codigo = "// Inicio operacion linea: " + fila + ", columna: " + columna + "\n", op1Actual = "", op2Actual = "", opUActual = "";
-        Object tipoOP1 = null, tipoOP2 = null, tipoOPU = null, tipoResultante = null;
+        Object tipoOP1 = null, tipoOP2 = null, tipoOPU = null;
         Object op1 = null, op2 = null, opU = null;
         Tipo tipo1 = null, tipo2 = null, tipoU = null;
-        if (operandoU == null) {
-            op1 = operando1.get4D(tabla, arbol);
-            tipoOP1 = operando1.getTipo(tabla, arbol);
-            if (op1 instanceof Excepcion || tipoOP1 instanceof Excepcion) {
-                return op1;
-            } else if (!(op1 instanceof String) || !(tipoOP1 instanceof Tipo)) {
-                tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, op1", fila, columna);
-                arbol.getErrores().add((Excepcion) tipoResultante);
-                return tipoResultante;
-            }
-            codigo += op1;
-            op1Actual = tabla.getTemporalActual();
-            tabla.AgregarTemporal(op1Actual);
-            tipo1 = (Tipo) tipoOP1;
-            tipo1 = tipo1.verificarUserType(tabla);
-            if(tipo1.getType() == tipo.RANGE){
-                tipo1.setType(tipo1.getTipoRange());
-            }
-            op2 = operando2.get4D(tabla, arbol);
-            tipoOP2 = operando2.getTipo(tabla, arbol);
-            if (op2 instanceof Excepcion || tipoOP2 instanceof Excepcion) {
-                return op2;
-            } else if (!(op2 instanceof String) || !(tipoOP2 instanceof Tipo)) {
-                tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, op2", fila, columna);
-                arbol.getErrores().add((Excepcion) tipoResultante);
-                return tipoResultante;
-            }
-            codigo += op2;
-            op2Actual = tabla.getTemporalActual();
-            tabla.AgregarTemporal(op2Actual);
-            tipo2 = (Tipo) tipoOP2;
-            tipo2 = tipo2.verificarUserType(tabla);
-            if(tipo2.getType() == tipo.RANGE){
-                tipo2.setType(tipo2.getTipoRange());
-            }
-        } else {
-            opU = operandoU.get4D(tabla, arbol);
-            tipoOPU = operandoU.getTipo(tabla, arbol);
-            if (opU instanceof Excepcion || tipoOPU instanceof Excepcion) {
-                return opU;
-            } else if (!(opU instanceof String) || !(tipoOPU instanceof Tipo)) {
-                tipoResultante = new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Ha habido un error al generar la operacion, opU", fila, columna);
-                arbol.getErrores().add((Excepcion) tipoResultante);
-                return tipoResultante;
-            }
-            codigo += opU;
-            opUActual = tabla.getTemporalActual();
-            tabla.AgregarTemporal(opUActual);
-            tipoU = (Tipo) tipoOPU;
-            tipoU = tipoU.verificarUserType(tabla);
-        }
-        String etiquetaVerdadera1 = "";
-        String etiquetaFalsa1 = "";
-        String etiquetaVerdadera2 = "";
-        String etiquetaFalsa2 = "";
         switch (operador) {
             case SUMA:
-                codigo += get4DSuma(tabla, op1Actual, op2Actual, tipo1, tipo2);
-
-                //codigo += "+," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+                codigo += get4DSuma(tabla, arbol, operando1, operando2);
                 break;
             case RESTA:
-                codigo += "-," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
+                codigo += get4DResta(tabla, arbol, operando1, operando2);
                 break;
             case MULTIPLICACION:
-                codigo += "*," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
+                codigo += get4DMultiplicacion(tabla, arbol, operando1, operando2);
                 break;
             case DIVISION:
-                codigo += get4DDivision(tabla, op1Actual, op2Actual, tipo1, tipo2);
+                codigo += get4DDivision(tabla, arbol, operando1, operando2);
                 break;
             case MODULO:
-                codigo += "%," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
+                codigo += get4DModulo(tabla, arbol, operando1, operando2);
                 break;
             case POTENCIA:
-                String temp1Pot = tabla.getTemporal();
-                String temp2Pot = tabla.getTemporal();
-                String temp3Pot = tabla.getTemporal();
-                tabla.AgregarTemporal(temp1Pot);
-                tabla.AgregarTemporal(temp2Pot);
-                tabla.AgregarTemporal(temp3Pot);
-                codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
-                codigo += "+,p,1,"+temp1Pot+"\n";
-                tabla.AgregarTemporal(temp1Pot);
-                codigo += "+,p,2,"+temp2Pot+"\n";
-                tabla.AgregarTemporal(temp2Pot);
-                codigo += "=,"+temp1Pot+","+op1Actual+",stack\n";
-                tabla.QuitarTemporal(temp1Pot);
-                tabla.QuitarTemporal(op1Actual);
-                codigo += "=,"+temp2Pot+","+op2Actual+",stack\n";
-                tabla.QuitarTemporal(temp2Pot);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "call,,,potencia_primitiva\n";
-                codigo += "+,p,0,"+temp3Pot+"\n";
-                tabla.AgregarTemporal(temp3Pot);
-                codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
-                codigo += "=,stack," + temp3Pot + "," + tabla.getTemporal() + "\n";
-                tabla.QuitarTemporal(temp3Pot);
-                tabla.AgregarTemporal(tabla.getTemporalActual());
+                codigo += get4DPotencia(tabla, arbol, operando1, operando2);
                 break;
             case MENOR_QUE:
-                String temp1 = tabla.getTemporal();
-                String label1 = tabla.getEtiqueta();
-                String label2 = tabla.getEtiqueta();
-                codigo += "jl," + op1Actual + "," + op2Actual + "," + label1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "=,0,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += "jmp,,," + label2 + "\n";
-                codigo += label1 + ":\n";
-                codigo += "=,1,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += label2 + ":\n";
-                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
+                codigo += get4DMenorQue(tabla, arbol, operando1, operando2);
                 break;
             case MENOR_IGUAL:
-                temp1 = tabla.getTemporal();
-                label1 = tabla.getEtiqueta();
-                label2 = tabla.getEtiqueta();
-                codigo += "jle," + op1Actual + "," + op2Actual + "," + label1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "=,0,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += "jmp,,," + label2 + "\n";
-                codigo += label1 + ":\n";
-                codigo += "=,1,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += label2 + ":\n";
-                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
+                codigo += get4DMenorIgual(tabla, arbol, operando1, operando2);
                 break;
             case MAYOR_QUE:
-                temp1 = tabla.getTemporal();
-                label1 = tabla.getEtiqueta();
-                label2 = tabla.getEtiqueta();
-                codigo += "jg," + op1Actual + "," + op2Actual + "," + label1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "=,0,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += "jmp,,," + label2 + "\n";
-                codigo += label1 + ":\n";
-                codigo += "=,1,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += label2 + ":\n";
-                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
+                codigo += get4DMayorQue(tabla, arbol, operando1, operando2);
                 break;
             case MAYOR_IGUAL:
-                temp1 = tabla.getTemporal();
-                label1 = tabla.getEtiqueta();
-                label2 = tabla.getEtiqueta();
-                codigo += "jge," + op1Actual + "," + op2Actual + "," + label1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "=,0,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += "jmp,,," + label2 + "\n";
-                codigo += label1 + ":\n";
-                codigo += "=,1,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += label2 + ":\n";
-                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
+                codigo += get4DMayorIgual(tabla, arbol, operando1, operando2);
                 break;
             case IGUAL_IGUAL:
-                temp1 = tabla.getTemporal();
-                label1 = tabla.getEtiqueta();
-                label2 = tabla.getEtiqueta();
-                codigo += "je," + op1Actual + "," + op2Actual + "," + label1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "=,0,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += "jmp,,," + label2 + "\n";
-                codigo += label1 + ":\n";
-                codigo += "=,1,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += label2 + ":\n";
-                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
+                codigo += get4DIgualIgual(tabla, arbol, operando1, operando2);
                 break;
             case DIFERENTE_QUE:
-                temp1 = tabla.getTemporal();
-                label1 = tabla.getEtiqueta();
-                label2 = tabla.getEtiqueta();
-                codigo += "jne," + op1Actual + "," + op2Actual + "," + label1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "=,0,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += "jmp,,," + label2 + "\n";
-                codigo += label1 + ":\n";
-                codigo += "=,1,," + temp1 + "\n";
-                tabla.AgregarTemporal(temp1);
-                codigo += label2 + ":\n";
-                codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                tabla.QuitarTemporal(temp1);
+                codigo += get4DDiferente(tabla, arbol, operando1, operando2);
                 break;
             case AND:
-                etiquetaVerdadera1 = tabla.getEtiqueta();
-                etiquetaFalsa1 = tabla.getEtiqueta();
-                etiquetaVerdadera2 = tabla.getEtiqueta();
-                etiquetaFalsa2 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
-                codigo += etiquetaVerdadera1 + ":\n";
-                codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "jmp,,," + etiquetaFalsa2 + "\n";
-                codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += etiquetaFalsa1 + ":\n";
-                codigo += etiquetaFalsa2 + ":\n";
+                codigo += get4DAND(tabla, arbol, operando1, operando2);
                 break;
             case OR:
-                etiquetaVerdadera1 = tabla.getEtiqueta();
-                etiquetaVerdadera2 = tabla.getEtiqueta();
-                etiquetaFalsa1 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-
-                codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
-
-                codigo += etiquetaVerdadera1 + ":\n";
-                codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-
-                codigo += etiquetaFalsa1 + ":\n";
+                codigo += get4DOR(tabla, arbol, operando1, operando2);
                 break;
             case NOR:
-                etiquetaVerdadera1 = tabla.getEtiqueta();
-                etiquetaFalsa1 = tabla.getEtiqueta();
-                etiquetaVerdadera2 = tabla.getEtiqueta();
-                etiquetaFalsa2 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
-                codigo += etiquetaVerdadera1 + ":\n";
-                codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "jmp,,," + etiquetaFalsa2 + "\n";
-                codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += etiquetaFalsa1 + ":\n";
-                codigo += etiquetaFalsa2 + ":\n";
+                codigo += get4DNOR(tabla, arbol, operando1, operando2);
                 break;
             case NAND:
-                etiquetaVerdadera1 = tabla.getEtiqueta();
-                etiquetaVerdadera2 = tabla.getEtiqueta();
-                etiquetaFalsa1 = tabla.getEtiqueta();
-                codigo += "=," + 0 + ",," + tabla.getTemporal() + "\n"; //Asignar falso
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
-                tabla.QuitarTemporal(op1Actual);
-
-                codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
-                tabla.QuitarTemporal(op2Actual);
-                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
-
-                codigo += etiquetaVerdadera1 + ":\n";
-                codigo += etiquetaVerdadera2 + ":\n";
-                codigo += "=," + 1 + ",," + tabla.getTemporalActual() + "\n"; //Asignar true 
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += etiquetaFalsa1 + ":\n";
+                codigo += get4DNAND(tabla, arbol, operando1, operando2);
                 break;
             case NOT:
-                etiquetaVerdadera1 = tabla.getEtiqueta();
-                etiquetaFalsa1 = tabla.getEtiqueta();
-                codigo += "je," + opUActual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
-                tabla.QuitarTemporal(opUActual);
-                codigo += "=," + 1 + ",," + tabla.getTemporal() + "\n"; //Asignar true
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += "jmp,,," + etiquetaFalsa1 + "\n";
-                codigo += etiquetaVerdadera1 + ":\n";
-                codigo += "=," + 0 + ",," + tabla.getTemporalActual() + "\n"; //Asignar false
-                tabla.AgregarTemporal(tabla.getTemporalActual());
-                codigo += etiquetaFalsa1 + ":\n";
+                codigo += get4DNOT(tabla, arbol, operandoU);
                 break;
-
             case MENOS_UNARIO:
-                codigo += "*," + opUActual + ",-1," + tabla.getTemporal() + "\n";
-                tabla.QuitarTemporal(opUActual);
-                tabla.AgregarTemporal(tabla.getTemporalActual());
+                codigo += get4DNEGAR(tabla, arbol, operandoU);
                 break;
         }
         codigo += "// Fin operacion\n";
@@ -446,7 +187,7 @@ public class Operacion implements Expresion {
             }
             tipoOP1 = (Tipo) tipo1;
             tipoOP1 = tipoOP1.verificarUserType(tabla);
-            if(tipoOP1.getType() == tipo.RANGE){
+            if (tipoOP1.getType() == tipo.RANGE) {
                 tipoOP1.setType(tipoOP1.getTipoRange());
             }
             tipo2 = operando2.getTipo(tabla, arbol);
@@ -459,7 +200,7 @@ public class Operacion implements Expresion {
             }
             tipoOP2 = (Tipo) tipo2;
             tipoOP2 = tipoOP2.verificarUserType(tabla);
-            if(tipoOP2.getType() == tipo.RANGE){
+            if (tipoOP2.getType() == tipo.RANGE) {
                 tipoOP2.setType(tipoOP2.getTipoRange());
             }
         } else {
@@ -711,11 +452,18 @@ public class Operacion implements Expresion {
                 || t1.getType() == tipo.WORD && t2.getType() == tipo.WORD
                 || t1.getType() == tipo.BOOLEAN && t2.getType() == tipo.BOOLEAN
                 || t1.getType() == tipo.NIL && t2.getType() == tipo.RECORD
-                || t1.getType() == tipo.RECORD && t2.getType() == tipo.NIL) {
+                || t1.getType() == tipo.RECORD && t2.getType() == tipo.NIL
+                || ((t1.getType() == tipo.ENUMERADO && t2.getType() == tipo.ENUMERADO) && (t1.equals(t2)))) {
             return new Tipo(tipo.BOOLEAN);
         } else {
-            return new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Error, los tipos " + t1.getType() + " y " + t2.getType() + ""
-                    + " no se pueden utilizar con el operador RELACIONAL " + operador + ".", fila, columna);
+            if (t1.getType() == tipo.ENUMERADO && t2.getType() == tipo.ENUMERADO) {
+                return new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Error, los tipos Enum_" + t1.getNombreEnum() + " y Enum_" + t2.getNombreEnum() + ""
+                        + " no se pueden comparar.", fila, columna);
+            } else {
+                return new Excepcion(Excepcion.TIPOERROR.SEMANTICO, "Error, los tipos " + t1.getType() + " y " + t2.getType() + ""
+                        + " no se pueden utilizar con el operador RELACIONAL " + operador + ".", fila, columna);
+            }
+
         }
     }
 
@@ -746,8 +494,20 @@ public class Operacion implements Expresion {
         }
     }
 
-    String get4DSuma(Tabla tabla, String op1Actual, String op2Actual, Tipo tipo1, Tipo tipo2) {
+    String get4DSuma(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
         String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+        Tipo tipo1 = (Tipo) op1.getTipo(tabla, arbol);
+        tipo1 = tipo1.verificarUserType(tabla);
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+        Tipo tipo2 = (Tipo) op1.getTipo(tabla, arbol);
+        tipo2 = tipo2.verificarUserType(tabla);
         if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && tipo2.getType() == tipo.INTEGER) {
             String temp10 = tabla.getTemporal();
             String temp11 = tabla.getTemporal();
@@ -1217,12 +977,504 @@ public class Operacion implements Expresion {
         return codigo;
     }
 
-    String get4DDivision(Tabla tabla, String op1Actual, String op2Actual, Tipo tipo1, Tipo tipo2) {
+    String get4DResta(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
         String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        codigo += "-," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        return codigo;
+    }
+
+    String get4DMultiplicacion(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        codigo += "*," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        return codigo;
+    }
+
+    String get4DModulo(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        codigo += "%," + op1Actual + "," + op2Actual + "," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        return codigo;
+    }
+
+    String get4DPotencia(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1Pot = tabla.getTemporal();
+        String temp2Pot = tabla.getTemporal();
+        String temp3Pot = tabla.getTemporal();
+        tabla.AgregarTemporal(temp1Pot);
+        tabla.AgregarTemporal(temp2Pot);
+        tabla.AgregarTemporal(temp3Pot);
+        codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+        codigo += "+,p,1," + temp1Pot + "\n";
+        tabla.AgregarTemporal(temp1Pot);
+        codigo += "+,p,2," + temp2Pot + "\n";
+        tabla.AgregarTemporal(temp2Pot);
+        codigo += "=," + temp1Pot + "," + op1Actual + ",stack\n";
+        tabla.QuitarTemporal(temp1Pot);
+        tabla.QuitarTemporal(op1Actual);
+        codigo += "=," + temp2Pot + "," + op2Actual + ",stack\n";
+        tabla.QuitarTemporal(temp2Pot);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "call,,,potencia_primitiva\n";
+        codigo += "+,p,0," + temp3Pot + "\n";
+        tabla.AgregarTemporal(temp3Pot);
+        codigo += "-,p," + tabla.getTamañoActualFuncion().peek() + ",p\n";
+        codigo += "=,stack," + temp3Pot + "," + tabla.getTemporal() + "\n";
+        tabla.QuitarTemporal(temp3Pot);
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        return codigo;
+    }
+
+    String get4DMenorQue(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        codigo += "jl," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "=,0,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,1,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += label2 + ":\n";
+        codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp1);
+        return codigo;
+    }
+
+    String get4DMayorQue(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        codigo += "jg," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "=,0,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,1,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += label2 + ":\n";
+        codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp1);
+        return codigo;
+    }
+
+    String get4DMenorIgual(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        codigo += "jle," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "=,0,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,1,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += label2 + ":\n";
+        codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp1);
+        return codigo;
+    }
+
+    String get4DMayorIgual(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        codigo += "jge," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "=,0,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,1,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += label2 + ":\n";
+        codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp1);
+        return codigo;
+    }
+
+    String get4DIgualIgual(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        codigo += "je," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "=,0,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,1,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += label2 + ":\n";
+        codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp1);
+        return codigo;
+    }
+
+    String get4DDiferente(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+
+        String temp1 = tabla.getTemporal();
+        String label1 = tabla.getEtiqueta();
+        String label2 = tabla.getEtiqueta();
+        codigo += "jne," + op1Actual + "," + op2Actual + "," + label1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "=,0,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += "jmp,,," + label2 + "\n";
+        codigo += label1 + ":\n";
+        codigo += "=,1,," + temp1 + "\n";
+        tabla.AgregarTemporal(temp1);
+        codigo += label2 + ":\n";
+        codigo += "=," + temp1 + ",," + tabla.getTemporal() + "\n";
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        tabla.QuitarTemporal(temp1);
+        return codigo;
+    }
+
+    String get4DAND(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        String etiquetaVerdadera1 = tabla.getEtiqueta();
+        String etiquetaFalsa1 = tabla.getEtiqueta();
+        String etiquetaVerdadera2 = tabla.getEtiqueta();
+        String etiquetaFalsa2 = tabla.getEtiqueta();
+        String temporalSalida = tabla.getTemporal();
+
+        codigo += "// CONDICION 1 AND\n";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+        codigo += "// FIN CONDICION 1 AND\n";
+
+        codigo += "=," + 0 + ",," + temporalSalida + "\n"; //Asignar falso
+        tabla.AgregarTemporal(temporalSalida);
+        codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+        codigo += etiquetaVerdadera1 + ":\n";
+
+        codigo += "// CONDICION 2 AND\n";
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+        codigo += "// FIN CONDICION 2 AND\n";
+
+        codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "jmp,,," + etiquetaFalsa2 + "\n";
+        codigo += etiquetaVerdadera2 + ":\n";
+        codigo += "=," + 1 + ",," + temporalSalida + "\n"; //Asignar true
+        tabla.AgregarTemporal(temporalSalida);
+        codigo += etiquetaFalsa1 + ":\n";
+        codigo += etiquetaFalsa2 + ":\n";
+        codigo += "=," + temporalSalida + ",," + tabla.getTemporal() + "\n";
+        return codigo;
+    }
+
+    String get4DOR(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+
+        String etiquetaVerdadera1 = tabla.getEtiqueta();
+        String etiquetaFalsa1 = tabla.getEtiqueta();
+        String etiquetaVerdadera2 = tabla.getEtiqueta();
+        String temporalSalida = tabla.getTemporal();
+
+        codigo += "// CONDICION 1 OR\n";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+        codigo += "// FIN CONDICION 1 OR\n";
+
+        codigo += "=," + 0 + ",," + temporalSalida + "\n"; //Asignar falso
+        tabla.AgregarTemporal(temporalSalida);
+        codigo += "je," + op1Actual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+
+        codigo += "// CONDICION 1 OR\n";
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+        codigo += "// FIN CONDICION 1 OR\n";
+
+        codigo += "je," + op2Actual + "," + 1 + "," + etiquetaVerdadera2 + "\n";
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+
+        codigo += etiquetaVerdadera1 + ":\n";
+        codigo += etiquetaVerdadera2 + ":\n";
+        codigo += "=," + 1 + ",," + temporalSalida + "\n"; //Asignar true
+        tabla.AgregarTemporal(temporalSalida);
+
+        codigo += etiquetaFalsa1 + ":\n";
+        codigo += "=," + temporalSalida + ",," + tabla.getTemporal() + "\n";
+        return codigo;
+    }
+
+    String get4DNOR(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        String etiquetaVerdadera1 = tabla.getEtiqueta();
+        String etiquetaFalsa1 = tabla.getEtiqueta();
+        String etiquetaVerdadera2 = tabla.getEtiqueta();
+        String etiquetaFalsa2 = tabla.getEtiqueta();
+        String temporalSalida = tabla.getTemporal();
+
+        codigo += "// CONDICION 1 NOR\n";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+        codigo += "// FIN CONDICION 1 NOR\n";
+
+        codigo += "=," + 0 + ",," + temporalSalida + "\n"; //Asignar falso
+        tabla.AgregarTemporal(temporalSalida);
+        codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+        codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+        codigo += etiquetaVerdadera1 + ":\n";
+
+        codigo += "// CONDICION 2 NOR\n";
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+        codigo += "// FIN CONDICION 2 NOR\n";
+
+        codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "jmp,,," + etiquetaFalsa2 + "\n";
+        codigo += etiquetaVerdadera2 + ":\n";
+        codigo += "=," + 1 + ",," + temporalSalida + "\n"; //Asignar true
+        tabla.AgregarTemporal(temporalSalida);
+        codigo += etiquetaFalsa1 + ":\n";
+        codigo += etiquetaFalsa2 + ":\n";
+        codigo += "=," + temporalSalida + ",," + tabla.getTemporal() + "\n";
+        return codigo;
+    }
+
+    String get4DNAND(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+
+        String etiquetaVerdadera1 = tabla.getEtiqueta();
+        String etiquetaFalsa1 = tabla.getEtiqueta();
+        String etiquetaVerdadera2 = tabla.getEtiqueta();
+        String temporalSalida = tabla.getTemporal();
+
+        codigo += "// CONDICION 1 NAND\n";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+        codigo += "// FIN CONDICION 1 NAND\n";
+
+        codigo += "=," + 0 + ",," + temporalSalida + "\n"; //Asignar falso
+        tabla.AgregarTemporal(temporalSalida);
+        codigo += "je," + op1Actual + "," + 0 + "," + etiquetaVerdadera1 + "\n";
+        tabla.QuitarTemporal(op1Actual);
+
+        codigo += "// CONDICION 1 NAND\n";
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+        codigo += "// FIN CONDICION 1 NAND\n";
+
+        codigo += "je," + op2Actual + "," + 0 + "," + etiquetaVerdadera2 + "\n";
+        tabla.QuitarTemporal(op2Actual);
+        codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+
+        codigo += etiquetaVerdadera1 + ":\n";
+        codigo += etiquetaVerdadera2 + ":\n";
+        codigo += "=," + 1 + ",," + temporalSalida + "\n"; //Asignar true
+        tabla.AgregarTemporal(temporalSalida);
+
+        codigo += etiquetaFalsa1 + ":\n";
+        codigo += "=," + temporalSalida + ",," + tabla.getTemporal() + "\n";
+        return codigo;
+    }
+
+    String get4DNOT(Tabla tabla, Tree arbol, Expresion opU) {
+        String codigo = "";
+        String opUActual = "";
+        codigo += opU.get4D(tabla, arbol);
+        opUActual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(opUActual);
+
+        String etiquetaVerdadera1 = tabla.getEtiqueta();
+        String etiquetaFalsa1 = tabla.getEtiqueta();
+        codigo += "je," + opUActual + "," + 1 + "," + etiquetaVerdadera1 + "\n";
+        tabla.QuitarTemporal(opUActual);
+        codigo += "=," + 1 + ",," + tabla.getTemporal() + "\n"; //Asignar true
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        codigo += "jmp,,," + etiquetaFalsa1 + "\n";
+        codigo += etiquetaVerdadera1 + ":\n";
+        codigo += "=," + 0 + ",," + tabla.getTemporalActual() + "\n"; //Asignar false
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        codigo += etiquetaFalsa1 + ":\n";
+        return codigo;
+    }
+
+    String get4DNEGAR(Tabla tabla, Tree arbol, Expresion opU) {
+        String codigo = "";
+        String opUActual = "";
+        codigo += opU.get4D(tabla, arbol);
+        opUActual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(opUActual);
+
+        codigo += "*," + opUActual + ",-1," + tabla.getTemporal() + "\n";
+        tabla.QuitarTemporal(opUActual);
+        tabla.AgregarTemporal(tabla.getTemporalActual());
+        return codigo;
+    }
+
+    String get4DDivision(Tabla tabla, Tree arbol, Expresion op1, Expresion op2) {
+        String codigo = "";
+        String op1Actual = "";
+        String op2Actual = "";
+        codigo += op1.get4D(tabla, arbol);
+        op1Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op1Actual);
+        Tipo tipo1 = (Tipo) op1.getTipo(tabla, arbol);
+        tipo1 = tipo1.verificarUserType(tabla);
+        codigo += op2.get4D(tabla, arbol);
+        op2Actual = tabla.getTemporalActual();
+        tabla.AgregarTemporal(op2Actual);
+        Tipo tipo2 = (Tipo) op1.getTipo(tabla, arbol);
+        tipo2 = tipo2.verificarUserType(tabla);
         if ((tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.INTEGER)
-        || (tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.CHAR)
-        || (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.INTEGER)
-        || (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.CHAR)) {
+                || (tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.CHAR)
+                || (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.INTEGER)
+                || (tipo1.getType() == tipo.CHAR && tipo2.getType() == tipo.CHAR)) {
             String temp1 = tabla.getTemporal();
             String temp2 = tabla.getTemporal();
             codigo += "/," + op1Actual + "," + op2Actual + "," + temp1 + "\n";
@@ -1234,7 +1486,7 @@ public class Operacion implements Expresion {
             tabla.AgregarTemporal(temp2);
             tabla.QuitarTemporal(temp1);
 
-            codigo += "-," + temp1 + ","+temp2+"," + tabla.getTemporal() + "\n";
+            codigo += "-," + temp1 + "," + temp2 + "," + tabla.getTemporal() + "\n";
             tabla.AgregarTemporal(tabla.getTemporalActual());
             tabla.QuitarTemporal(temp1);
             tabla.QuitarTemporal(temp2);

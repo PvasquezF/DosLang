@@ -137,6 +137,7 @@ RANGO_ARRAY ::= EXPRESION:e dosP EXPRESION:e1 {: RESULT = new Dimension(e, e1, e
               ;
 
 ARRAY_DECLARATION_MULTI ::= array corI ARRAY_MULTI:e corD of TIPO_PRIMITIVO:e1 {:RESULT = new Tipo(Tipo.tipo.ARREGLO, e1.getType(), null, e);:}
+                          | array corI ARRAY_MULTI:e corD of identificador:e1 {:RESULT = new Tipo(Tipo.tipo.ARREGLO, Tipo.tipo.OBJETO, e1, e);:}
                           ;
 
 ARRAY_MULTI ::= RANGO_ARRAY:e coma LISTA_RANGO_ARRAY:e1 {: RESULT = e1; RESULT.add(0, e);  :}
@@ -316,7 +317,7 @@ INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES:e end {:RESULT = e; :}
                   ;
 
 SWITCH ::= caso EXPRESION:e of CASELIST:e1 end pComa {:RESULT = new SwitchCase(e, e1, new ArrayList<AST>(), eleft, eright);:}
-       |   caso EXPRESION:e of CASELIST:e1 DEFECTO:e2 end pComa {:RESULT = new SwitchCase(e, e1, e2, eleft, eright);:}
+       |   caso EXPRESION:e of CASELIST:e1 DEFECTO:e2 dosPuntos end pComa {:RESULT = new SwitchCase(e, e1, e2, eleft, eright);:}
        ;
 
 CASELIST ::= CASELIST:e CASE:e1 {:RESULT = e; RESULT.add(e1);:}

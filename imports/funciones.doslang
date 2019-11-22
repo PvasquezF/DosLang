@@ -1,6 +1,6 @@
 program Funciones;
 var
-    n: integer;
+    n: integer; (* Declaracion de variables va antes de funciones *)
 function factorial(n: integer): integer;
 begin
     if (n = 0) then
@@ -47,7 +47,81 @@ begin
 end;
 
 
+function mcd(a,b:integer):integer;
+begin
+    if(b=0) then
+        mcd:=a;
+    else
+        mcd := mcd(b,modulo(a,b));
+end;
+
+
+function hofstaderFemenina(n:integer):integer ;
+begin
+    if n < 0 then
+        hofstaderFemenina := 0;
+    else if n = 0 then
+        hofstaderFemenina := 1;
+    else
+        hofstaderFemenina := n - hofstaderFemenina(n - 1);
+end;
+
+function hofstaderMasculino(n:integer):integer ;
+begin
+    if n < 0 then
+        hofstaderMasculino := 0;
+    else if n = 0 then
+        hofstaderMasculino := 0;
+    else
+        hofstaderMasculino := n - hofstaderMasculino(n - 1);
+end;
+
+function par(nump:integer) : boolean;
+begin
+    if (nump = 0) then
+    begin
+        par := True;
+        exit;
+    end;
+
+    par := impar(nump - 1);
+end;
+
+function impar(numi:integer) : boolean;
+begin
+    if (numi = 0) then
+    begin
+        impar := False;
+        exit;
+    end;
+
+    impar := par(numi - 1);
+end;
+
+procedure Hanoi(discos:integer; origen,aux,destino:string);
+begin
+    if(discos=1) then
+        writeln("Mover Disco de ",origen," a ",destino);
+    else
+        Begin
+        Hanoi(discos-1,origen,destino,aux);
+        writeln("Mover disco de ",origen," a ",destino);
+        Hanoi(discos-1,aux,origen,destino);
+        End;
+end;
+
 begin
     {Mandamos a llamar todas las funciones}
-	writeln(0);
+    writeln(ackermann(3,4));
+    Hanoi(4,"uno","dos","tres");
+    writeln(impar(5));
+    writeln(impar(6));
+    writeln(par(6));
+    writeln(par(6));
+    writeln(hofstaderMasculino(20));
+    writeln(hofstaderFemenina(20));
+    writeln(mcd(6,3));
+    writeln(potencia(5,5));
+    writeln(fibonacci(8));
+    writeln(factorial(7));
 end.

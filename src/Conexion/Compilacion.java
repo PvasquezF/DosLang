@@ -34,6 +34,12 @@ public class Compilacion {
             int espaciosReservaHeap = 0;
             for (int i = 0; i < t.getInstrucciones().size(); i++) {
                 Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
+                if (ins instanceof Program) {
+                    ins.ejecutar(tabla, t);
+                }
+            }
+            for (int i = 0; i < t.getInstrucciones().size(); i++) {
+                Instruccion ins = (Instruccion) t.getInstrucciones().get(i);
                 if (ins instanceof DeclaracionType) {
                     ins.ejecutar(tabla, t);
                 }
@@ -74,23 +80,32 @@ public class Compilacion {
                 Cuadruplos += gn4D.generarConcatenacion(tabla);
                 Cuadruplos += gn4D.generarPotencia(tabla);
                 Cuadruplos += gn4D.generarNullPointerException(tabla);
-                //Cuadruplos += gn4D.generarChartAt(tabla);
-                //Cuadruplos += gn4D.generarLenght(tabla);
-                //Cuadruplos += gn4D.generarConcatenacionStringChar(tabla);
-                //Cuadruplos += gn4D.generarConcatenacionCharString(tabla);
-                //Cuadruplos += gn4D.generaReplace(tabla);
-                Cuadruplos += gn4D.generarIndexOut(tabla);
-                //Cuadruplos += gn4D.generarLowerCase(tabla);
-                //Cuadruplos += gn4D.generarUpperCase(tabla);
-                //Cuadruplos += gn4D.generarEquals(tabla);
-                //Cuadruplos += gn4D.generarPrint(tabla);
-                //Cuadruplos += gn4D.generarTrunk(tabla);
-                //Cuadruplos += gn4D.generarRound(tabla);
-                //Cuadruplos += gn4D.generarToCharArray(tabla);
                 Cuadruplos += gn4D.generarRangoFueraLimites(tabla);
+                Cuadruplos += gn4D.generarIndexOut(tabla);
                 Cuadruplos += gn4D.generarIntToString(tabla);
-                //Cuadruplos += gn4D.generarRealToString(tabla);
-                //Cuadruplos += gn4D.generarStringToBoolean(tabla);
+
+                Cuadruplos += "\n\n\n\n// ----------------------------------INICIO Funciones Que se pueden quitar-------------------------\n\n\n\n";
+                Cuadruplos += gn4D.generarConcatenacionCharString(tabla);
+                Cuadruplos += gn4D.generarConcatenacionStringChar(tabla);
+                Cuadruplos += gn4D.generarStringToBoolean(tabla);
+                Cuadruplos += "\n\n\n\n// ----------------------------------FIN Funciones Que se pueden quitar-------------------------\n\n\n\n";
+                // Funciones primitivas
+                Cuadruplos += "\n\n\n\n// ----------------------------------INICIO NATIVAS-------------------------\n\n\n\n";
+                Cuadruplos += gn4D.generarChartAt(tabla);
+                Cuadruplos += gn4D.generarLenght(tabla);
+                Cuadruplos += gn4D.generaReplace(tabla);
+                Cuadruplos += gn4D.generarToCharArray(tabla);
+                Cuadruplos += gn4D.generarLowerCase(tabla);
+                Cuadruplos += gn4D.generarUpperCase(tabla);
+                Cuadruplos += gn4D.generarEquals(tabla);
+                Cuadruplos += "\n\n\n\n// ----------------------------------FIN NATIVAS-------------------------\n\n\n\n";
+
+                Cuadruplos += "\n\n\n\n// ----------------------------------INICIO NO VAN EN ASSEMBLER PORQUE NO JALAN-------------------------\n\n\n\n";
+                Cuadruplos += gn4D.generarRealToString(tabla);
+                Cuadruplos += gn4D.generarTrunk(tabla);
+                Cuadruplos += gn4D.generarRound(tabla);
+                Cuadruplos += "\n\n\n\n// ----------------------------------FIN NO VAN EN ASSEMBLER PORQUE NO JALAN-------------------------\n\n\n\n";
+                //Cuadruplos += gn4D.generarPrint(tabla);
                 //System.out.println(Cuadruplos);
                 Cuadruplos = Cuadruplos.replaceAll("\n", "\\\\n");
                 jsonEnvio += "\"Cuadruplos\": \"" + Cuadruplos + "\",\n";
