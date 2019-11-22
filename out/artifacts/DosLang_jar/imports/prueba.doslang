@@ -1,0 +1,11 @@
+program u2 ;
+type
+	perro 	= 	record
+    					nombre:string;
+                        carnet:integer;
+                 	end;
+const
+ T : integer = 5;
+begin
+write(0);
+end.

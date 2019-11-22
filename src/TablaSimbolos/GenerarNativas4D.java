@@ -114,17 +114,17 @@ public class GenerarNativas4D {
         codigo += "=,stack," + temp1 + "," + temp2 + "\n";
         codigo += "+,p,2," + temp3 + "\n";
         codigo += "=,stack," + temp3 + "," + temp4 + "\n";
-        codigo += "=,h,," + temp7;
+        codigo += "=,h,," + temp7+'\n';
 
-        codigo += "=,h," + temp4 + ",heap" + "\n";
+        codigo += "=,h," + temp2 + ",heap" + "\n";
         codigo += "+,h,1,h\n";
 
         codigo += label1 + ":" + "\n";
-        codigo += "=,heap," + temp2 + "," + temp5 + "\n";
+        codigo += "=,heap," + temp4 + "," + temp5 + "\n";
         codigo += "je," + temp5 + ",0," + label2 + "\n";
         codigo += "=,h," + temp5 + ",heap" + "\n";
         codigo += "+,h,1,h\n";
-        codigo += "+," + temp2 + ",1," + temp2 + "\n";
+        codigo += "+," + temp4 + ",1," + temp4 + "\n";
         codigo += "jmp,,," + label1 + "\n";
         codigo += label2 + ":" + "\n";
 

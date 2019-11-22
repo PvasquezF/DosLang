@@ -506,7 +506,7 @@ public class Operacion implements Expresion {
         codigo += op2.get4D(tabla, arbol);
         op2Actual = tabla.getTemporalActual();
         tabla.AgregarTemporal(op2Actual);
-        Tipo tipo2 = (Tipo) op1.getTipo(tabla, arbol);
+        Tipo tipo2 = (Tipo) op2.getTipo(tabla, arbol);
         tipo2 = tipo2.verificarUserType(tabla);
         if ((tipo1.getType() == Tipo.tipo.STRING || tipo1.getType() == tipo.WORD) && tipo2.getType() == tipo.INTEGER) {
             String temp10 = tabla.getTemporal();
@@ -961,7 +961,7 @@ public class Operacion implements Expresion {
             tabla.QuitarTemporal(temp3);
             tabla.QuitarTemporal(op2Actual);
             codigo += "+,p," + tabla.getTamañoActualFuncion().peek() + ",p" + "\n";
-            codigo += "call,,,concatenar_Stringchar" + "\n";
+            codigo += "call,,,concatenar_charString" + "\n";
             codigo += "+,p,0," + temp4 + "\n";
             tabla.AgregarTemporal(temp4);
             codigo += "=,stack," + temp4 + "," + tabla.getTemporal() + "\n";
@@ -1469,7 +1469,7 @@ public class Operacion implements Expresion {
         codigo += op2.get4D(tabla, arbol);
         op2Actual = tabla.getTemporalActual();
         tabla.AgregarTemporal(op2Actual);
-        Tipo tipo2 = (Tipo) op1.getTipo(tabla, arbol);
+        Tipo tipo2 = (Tipo) op2.getTipo(tabla, arbol);
         tipo2 = tipo2.verificarUserType(tabla);
         if ((tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.INTEGER)
                 || (tipo1.getType() == tipo.INTEGER && tipo2.getType() == tipo.CHAR)
