@@ -124,7 +124,7 @@ public class Compilacion {
 
             return jsonEnvio;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             String jsonEnvio = "{\n";
             jsonEnvio += "\"Cuadruplos\": \"\",\n";
             String htmlErrores = toHtmlErrors();

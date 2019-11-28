@@ -317,7 +317,7 @@ INSTRUCCIONESIF ::= begin LISTA_INSTRUCCIONES:e end {:RESULT = e; :}
                   ;
 
 SWITCH ::= caso EXPRESION:e of CASELIST:e1 end pComa {:RESULT = new SwitchCase(e, e1, new ArrayList<AST>(), eleft, eright);:}
-       |   caso EXPRESION:e of CASELIST:e1 DEFECTO:e2 dosPuntos end pComa {:RESULT = new SwitchCase(e, e1, e2, eleft, eright);:}
+       |   caso EXPRESION:e of CASELIST:e1 DEFECTO:e2 end pComa {:RESULT = new SwitchCase(e, e1, e2, eleft, eright);:}
        ;
 
 CASELIST ::= CASELIST:e CASE:e1 {:RESULT = e; RESULT.add(e1);:}
@@ -328,8 +328,8 @@ CASE ::= LISTA_EXPRESION:e dosPuntos INSTRUCCION:e1 {: ArrayList<AST> insSwitch 
        | LISTA_EXPRESION:e dosPuntos BLOQUE_INSTRUCCIONES:e1 {:RESULT = new Case(e, e1);:}
        ;
 
-DEFECTO ::= defecto INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
-          | defecto BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
+DEFECTO ::= defecto dosPuntos INSTRUCCION:e {:RESULT = new ArrayList<AST>(); RESULT.add(e);:}
+          | defecto dosPuntos BLOQUE_INSTRUCCIONES:e {:RESULT = e;:}
           ;
 
 WHILE ::= mientras EXPRESION:e hacer BLOQUE_INSTRUCCIONES:e1 {: RESULT = new While(e, e1, eleft, eright); :}

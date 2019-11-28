@@ -81,6 +81,7 @@ public class Llamada implements Expresion {
             } else {
                 parametrosRefValida.add(false);
                 parametroLocalGlobal.add(false);
+                parametroLlamadaisReferencia.add(false);
             }
         }
 
